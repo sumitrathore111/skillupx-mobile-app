@@ -1,0 +1,21 @@
+{
+  "name": "SkillUpX",
+  "short_name": "SkillUpX",
+  "description": "Free developer platform – Practice DSA questions, 1v1 coding battles in CodeArena, real-world project collaboration, interview prep & career roadmaps",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#00ADB5",
+  "orientation": "portrait-primary",
+  "categories": ["education", "developer-tools", "productivity"],
+  "lang": "en",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "https://res.cloudinary.com/doytvgisa/image/upload/v1758623200/logo_evymhe.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

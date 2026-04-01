@@ -1,0 +1,158 @@
+src/Context/UserDataContext.tsx(353,56): error TS6133: 'projectId' is declared but its value is never read.
+src/Context/UserDataContext.tsx(353,75): error TS6133: 'userId' is declared but its value is never read.
+src/Context/UserDataContext.tsx(353,91): error TS6133: 'userName' is declared but its value is never read.
+src/Pages/CodeArena/ChallengeEditor.tsx(26,5): error TS6133: 'getChallengeById' is declared but its value is never read.
+src/Pages/CodeArena/ChallengeEditor.tsx(62,48): error TS2339: Property 'getSupportedLanguages' does not exist on type 'SecureCodeExecutionService'.
+src/Pages/CodeArena/ChallengeEditor.tsx(160,68): error TS2554: Expected 1 arguments, but got 2.
+src/Pages/CodeArena/ChallengeEditor.tsx(161,26): error TS2345: Argument of type 'TestCase[]' is not assignable to parameter of type 'SetStateAction<{ input: string; output: string; }[]>'.
+  Type 'TestCase[]' is not assignable to type '{ input: string; output: string; }[]'.
+    Property 'output' is missing in type 'TestCase' but required in type '{ input: string; output: string; }'.
+src/Pages/CodeArena/ChallengeEditor.tsx(248,31): error TS2339: Property 'expectedOutput' does not exist on type '{ input: string; output: string; }'.
+src/Pages/CodeArena/ChallengeEditor.tsx(248,65): error TS2339: Property 'expected_output' does not exist on type '{ input: string; output: string; }'.
+src/Pages/CodeArena/ChallengeEditor.tsx(249,30): error TS2339: Property 'expectedOutput' does not exist on type '{ input: string; output: string; }'.
+src/Pages/CodeArena/ChallengeEditor.tsx(249,64): error TS2339: Property 'expected_output' does not exist on type '{ input: string; output: string; }'.
+src/Pages/CodeArena/ChallengeEditor.tsx(411,37): error TS7006: Parameter 'l' implicitly has an 'any' type.
+src/Pages/CodeArena/ChallengeEditor.tsx(411,103): error TS7006: Parameter 'lang' implicitly has an 'any' type.
+src/Pages/CodeArena/ChallengeEditor.tsx(527,86): error TS2554: Expected 1 arguments, but got 2.
+src/Pages/CodeArena/ChallengeEditor.tsx(528,44): error TS2345: Argument of type 'TestCase[]' is not assignable to parameter of type 'SetStateAction<{ input: string; output: string; }[]>'.
+  Type 'TestCase[]' is not assignable to type '{ input: string; output: string; }[]'.
+    Property 'output' is missing in type 'TestCase' but required in type '{ input: string; output: string; }'.
+src/Pages/CodeArena/CodeArena.tsx(195,45): error TS2554: Expected 1 arguments, but got 2.
+src/Pages/CodeArena/CodeArena.tsx(425,11): error TS2339: Property 'fetchActiveBattles' does not exist on type 'DataContextType'.
+src/Pages/CodeArena/LocalChallengeEditor.tsx(51,9): error TS6133: 'user' is declared but its value is never read.
+src/Pages/CodeArena/LocalChallengeEditor.tsx(52,9): error TS6133: 'getUserProgress' is declared but its value is never read.
+src/Pages/CodeArena/LocalChallengeEditor.tsx(93,27): error TS2352: Conversion of type '{ id: string; title: string; description: string; difficulty: "easy" | "medium" | "hard" | "expert"; category: any; points: number; coinReward: any; timeLimit: number; memoryLimit: number; ... 12 more ...; acceptanceRate: number; }' to type 'Challenge' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type '{ id: string; title: string; description: string; difficulty: "medium" | "easy" | "hard" | "expert"; category: any; points: number; coinReward: any; timeLimit: number; memoryLimit: number; problemStatement: string; ... 11 more ...; acceptanceRate: number; }' is missing the following properties from type 'Challenge': createdAt, updatedAt
+src/Pages/CodeArena/LocalChallengeEditor.tsx(501,46): error TS2322: Type 'string | undefined' is not assignable to type 'string | TrustedHTML'.
+  Type 'undefined' is not assignable to type 'string | TrustedHTML'.
+src/Pages/CodeArena/LocalChallengeEditor.tsx(508,20): error TS18048: 'challenge.examples' is possibly 'undefined'.
+src/Pages/CodeArena/LocalChallengeEditor.tsx(591,84): error TS2339: Property 'coinCost' does not exist on type 'string'.
+src/Pages/CodeArena/LocalChallengeEditor.tsx(593,74): error TS2339: Property 'text' does not exist on type 'string'.
+src/Pages/CodeArena/SeedChallenges.tsx(14,7): error TS6133: 'CHALLENGES_COLLECTION' is declared but its value is never read.
+src/Pages/CodeArena/WalletPanel.tsx(55,17): error TS6133: 'battlesRef' is declared but its value is never read.
+src/Pages/CodeArena/WalletPanel.tsx(55,30): error TS2304: Cannot find name 'collection'.
+src/Pages/CodeArena/WalletPanel.tsx(55,41): error TS2304: Cannot find name 'db'.
+src/Pages/CodeArena/WalletPanel.tsx(56,17): error TS6133: 'snapshot' is declared but its value is never read.
+src/Pages/CodeArena/WalletPanel.tsx(59,31): error TS2304: Cannot find name 'allBattles'.
+src/Pages/CodeArena/WalletPanel.tsx(129,19): error TS6133: 'battlesRef' is declared but its value is never read.
+src/Pages/CodeArena/WalletPanel.tsx(129,32): error TS2304: Cannot find name 'collection'.
+src/Pages/CodeArena/WalletPanel.tsx(129,43): error TS2304: Cannot find name 'db'.
+src/Pages/CodeArena/WalletPanel.tsx(130,19): error TS6133: 'snapshot' is declared but its value is never read.
+src/Pages/CodeArena/WalletPanel.tsx(133,33): error TS2304: Cannot find name 'allBattles'.
+src/Pages/ProjectContribution.tsx(2,1): error TS6133: 'apiRequest' is declared but its value is never read.
+src/Pages/ProjectContribution.tsx(26,40): error TS2304: Cannot find name 'getDocs'.
+src/Pages/ProjectContribution.tsx(26,48): error TS2304: Cannot find name 'collection'.
+src/Pages/ProjectContribution.tsx(26,59): error TS2304: Cannot find name 'db'.
+src/Pages/ProjectContribution.tsx(32,40): error TS2304: Cannot find name 'getDocs'.
+src/Pages/ProjectContribution.tsx(33,13): error TS2304: Cannot find name 'collection'.
+src/Pages/ProjectContribution.tsx(33,24): error TS2304: Cannot find name 'db'.
+src/Pages/ProjectContribution.tsx(35,35): error TS7006: Parameter 'issueDoc' implicitly has an 'any' type.
+src/Pages/ProjectContribution.tsx(53,42): error TS2304: Cannot find name 'getDocs'.
+src/Pages/ProjectContribution.tsx(54,13): error TS2304: Cannot find name 'collection'.
+src/Pages/ProjectContribution.tsx(54,24): error TS2304: Cannot find name 'db'.
+src/Pages/ProjectContribution.tsx(56,37): error TS7006: Parameter 'msgDoc' implicitly has an 'any' type.
+src/Pages/ProjectContribution.tsx(74,41): error TS2304: Cannot find name 'getDocs'.
+src/Pages/ProjectContribution.tsx(75,13): error TS2304: Cannot find name 'collection'.
+src/Pages/ProjectContribution.tsx(75,24): error TS2304: Cannot find name 'db'.
+src/Pages/ProjectContribution.tsx(77,36): error TS7006: Parameter 'memberDoc' implicitly has an 'any' type.
+src/Pages/ProjectContribution.tsx(96,37): error TS2304: Cannot find name 'getDocs'.
+src/Pages/ProjectContribution.tsx(96,45): error TS2304: Cannot find name 'collection'.
+src/Pages/ProjectContribution.tsx(96,56): error TS2304: Cannot find name 'db'.
+src/Pages/ProjectContribution.tsx(97,32): error TS7006: Parameter 'userDoc' implicitly has an 'any' type.
+src/Pages/Projects/BrowseProjects.tsx(119,84): error TS6133: 'fetchTasks' is declared but its value is never read.
+src/Pages/Projects/BrowseProjects.tsx(119,96): error TS6133: 'fetchCompletedTasksCount' is declared but its value is never read.
+src/Pages/Projects/OpenProject.tsx(5,1): error TS6133: 'apiRequest' is declared but its value is never read.
+src/Pages/Projects/OpenProject.tsx(42,35): error TS2304: Cannot find name 'getDocs'.
+src/Pages/Projects/OpenProject.tsx(42,43): error TS2304: Cannot find name 'collection'.
+src/Pages/Projects/OpenProject.tsx(42,54): error TS2304: Cannot find name 'db'.
+src/Pages/Projects/OpenProject.tsx(43,59): error TS7006: Parameter 'doc' implicitly has an 'any' type.
+src/Pages/Projects/OpenProject.tsx(49,15): error TS2304: Cannot find name 'deleteDoc'.
+src/Pages/Projects/OpenProject.tsx(49,25): error TS2304: Cannot find name 'doc'.
+src/Pages/Projects/OpenProject.tsx(49,29): error TS2304: Cannot find name 'db'.
+src/Pages/Projects/OpenProject.tsx(120,34): error TS2304: Cannot find name 'addDoc'.
+src/Pages/Projects/OpenProject.tsx(120,41): error TS2304: Cannot find name 'collection'.
+src/Pages/Projects/OpenProject.tsx(120,52): error TS2304: Cannot find name 'db'.
+src/Pages/Projects/OpenProject.tsx(124,22): error TS2304: Cannot find name 'serverTimestamp'.
+src/Pages/Projects/OpenProject.tsx(133,17): error TS2304: Cannot find name 'addDoc'.
+src/Pages/Projects/OpenProject.tsx(133,24): error TS2304: Cannot find name 'collection'.
+src/Pages/Projects/OpenProject.tsx(133,35): error TS2304: Cannot find name 'db'.
+src/Pages/Projects/OpenProject.tsx(138,24): error TS2304: Cannot find name 'serverTimestamp'.
+src/Pages/Projects/OpenProject.tsx(155,35): error TS2304: Cannot find name 'getDocs'.
+src/Pages/Projects/OpenProject.tsx(155,43): error TS2304: Cannot find name 'collection'.
+src/Pages/Projects/OpenProject.tsx(155,54): error TS2304: Cannot find name 'db'.
+src/Pages/Projects/OpenProject.tsx(156,52): error TS7006: Parameter 'doc' implicitly has an 'any' type.
+src/Pages/Projects/OpenProject.tsx(186,42): error TS2304: Cannot find name 'getDocs'.
+src/Pages/Projects/OpenProject.tsx(186,50): error TS2304: Cannot find name 'collection'.
+src/Pages/Projects/OpenProject.tsx(186,61): error TS2304: Cannot find name 'db'.
+src/Pages/Projects/OpenProject.tsx(191,42): error TS2304: Cannot find name 'getDocs'.
+src/Pages/Projects/OpenProject.tsx(191,50): error TS2304: Cannot find name 'collection'.
+src/Pages/Projects/OpenProject.tsx(191,61): error TS2304: Cannot find name 'db'.
+src/Pages/Projects/OpenProject.tsx(192,37): error TS7006: Parameter 'issueDoc' implicitly has an 'any' type.
+src/Pages/Projects/OpenProject.tsx(208,44): error TS2304: Cannot find name 'getDocs'.
+src/Pages/Projects/OpenProject.tsx(208,52): error TS2304: Cannot find name 'collection'.
+src/Pages/Projects/OpenProject.tsx(208,63): error TS2304: Cannot find name 'db'.
+src/Pages/Projects/OpenProject.tsx(209,39): error TS7006: Parameter 'msgDoc' implicitly has an 'any' type.
+src/Pages/Projects/OpenProject.tsx(225,43): error TS2304: Cannot find name 'getDocs'.
+src/Pages/Projects/OpenProject.tsx(225,51): error TS2304: Cannot find name 'collection'.
+src/Pages/Projects/OpenProject.tsx(225,62): error TS2304: Cannot find name 'db'.
+src/Pages/Projects/OpenProject.tsx(226,38): error TS7006: Parameter 'memberDoc' implicitly has an 'any' type.
+src/Pages/Projects/OpenProject.tsx(243,39): error TS2304: Cannot find name 'getDocs'.
+src/Pages/Projects/OpenProject.tsx(243,47): error TS2304: Cannot find name 'collection'.
+src/Pages/Projects/OpenProject.tsx(243,58): error TS2304: Cannot find name 'db'.
+src/Pages/Projects/OpenProject.tsx(244,34): error TS7006: Parameter 'userDoc' implicitly has an 'any' type.
+src/Pages/Projects/ProjectAccessDiagnostic.tsx(11,11): error TS2339: Property 'checkAccessDiagnostics' does not exist on type 'DataContextType'.
+src/Pages/Projects/ProjectAccessDiagnostic.tsx(11,35): error TS2339: Property 'forceAddMember' does not exist on type 'DataContextType'.
+src/Pages/Projects/ProjectDetails.tsx(6,1): error TS6133: 'apiRequest' is declared but its value is never read.
+src/Pages/Projects/ProjectDetails.tsx(13,42): error TS2552: Cannot find name 'DocumentData'. Did you mean 'Document'?
+src/Pages/Projects/ProjectDetails.tsx(14,40): error TS2552: Cannot find name 'DocumentData'. Did you mean 'Document'?
+src/Pages/Projects/ProjectDetails.tsx(24,24): error TS2304: Cannot find name 'doc'.
+src/Pages/Projects/ProjectDetails.tsx(24,28): error TS2304: Cannot find name 'db'.
+src/Pages/Projects/ProjectDetails.tsx(25,19): error TS2304: Cannot find name 'onSnapshot'.
+src/Pages/Projects/ProjectDetails.tsx(25,43): error TS7006: Parameter 'snap' implicitly has an 'any' type.
+src/Pages/Projects/ProjectDetails.tsx(38,21): error TS2304: Cannot find name 'query'.
+src/Pages/Projects/ProjectDetails.tsx(39,7): error TS2304: Cannot find name 'collection'.
+src/Pages/Projects/ProjectDetails.tsx(39,18): error TS2304: Cannot find name 'db'.
+src/Pages/Projects/ProjectDetails.tsx(40,7): error TS2304: Cannot find name 'orderBy'.
+src/Pages/Projects/ProjectDetails.tsx(42,19): error TS2304: Cannot find name 'onSnapshot'.
+src/Pages/Projects/ProjectDetails.tsx(42,40): error TS7006: Parameter 'snap' implicitly has an 'any' type.
+src/Pages/Projects/ProjectDetails.tsx(43,32): error TS7006: Parameter 'd' implicitly has an 'any' type.
+src/Pages/Projects/ProjectDetails.tsx(52,31): error TS2304: Cannot find name 'collection'.
+src/Pages/Projects/ProjectDetails.tsx(52,42): error TS2304: Cannot find name 'db'.
+src/Pages/Projects/ProjectDetails.tsx(53,17): error TS2304: Cannot find name 'query'.
+src/Pages/Projects/ProjectDetails.tsx(53,40): error TS2304: Cannot find name 'where'.
+src/Pages/Projects/ProjectDetails.tsx(54,26): error TS2304: Cannot find name 'getDocs'.
+src/Pages/Projects/ProjectDetails.tsx(75,13): error TS2304: Cannot find name 'addDoc'.
+src/Pages/Projects/ProjectDetails.tsx(75,20): error TS2304: Cannot find name 'collection'.
+src/Pages/Projects/ProjectDetails.tsx(75,31): error TS2304: Cannot find name 'db'.
+src/Pages/Projects/ProjectDetails.tsx(79,19): error TS2304: Cannot find name 'serverTimestamp'.
+src/Pages/Projects/ProjectDetails.tsx(100,13): error TS2304: Cannot find name 'addDoc'.
+src/Pages/Projects/ProjectDetails.tsx(100,20): error TS2304: Cannot find name 'collection'.
+src/Pages/Projects/ProjectDetails.tsx(100,31): error TS2304: Cannot find name 'db'.
+src/Pages/Projects/ProjectDetails.tsx(107,20): error TS2304: Cannot find name 'serverTimestamp'.
+src/Pages/Projects/ProjectDetails.tsx(125,24): error TS2304: Cannot find name 'doc'.
+src/Pages/Projects/ProjectDetails.tsx(125,28): error TS2304: Cannot find name 'db'.
+src/Pages/Projects/ProjectDetails.tsx(127,13): error TS2304: Cannot find name 'updateDoc'.
+src/Pages/Projects/ProjectDetails.tsx(130,48): error TS2304: Cannot find name 'serverTimestamp'.
+src/Pages/Projects/ProjectIssues.tsx(3,1): error TS6133: 'useAuth' is declared but its value is never read.
+src/Pages/Projects/ProjectIssues.tsx(4,1): error TS6133: 'apiRequest' is declared but its value is never read.
+src/Pages/Projects/ProjectIssues.tsx(14,19): error TS2304: Cannot find name 'onSnapshot'.
+src/Pages/Projects/ProjectIssues.tsx(14,30): error TS2304: Cannot find name 'collection'.
+src/Pages/Projects/ProjectIssues.tsx(14,41): error TS2304: Cannot find name 'db'.
+src/Pages/Projects/ProjectIssues.tsx(14,79): error TS7006: Parameter 'snap' implicitly has an 'any' type.
+src/Pages/Projects/ProjectIssues.tsx(15,32): error TS7006: Parameter 'd' implicitly has an 'any' type.
+src/Pages/Projects/ProjectIssues.tsx(21,18): error TS2304: Cannot find name 'auth'.
+src/Pages/Projects/ProjectIssues.tsx(23,11): error TS2304: Cannot find name 'addDoc'.
+src/Pages/Projects/ProjectIssues.tsx(23,18): error TS2304: Cannot find name 'collection'.
+src/Pages/Projects/ProjectIssues.tsx(23,29): error TS2304: Cannot find name 'db'.
+src/Pages/Projects/ProjectIssues.tsx(28,18): error TS2304: Cannot find name 'serverTimestamp'.
+src/Pages/Projects/ProjectIssues.tsx(35,11): error TS2304: Cannot find name 'updateDoc'.
+src/Pages/Projects/ProjectIssues.tsx(35,21): error TS2304: Cannot find name 'doc'.
+src/Pages/Projects/ProjectIssues.tsx(35,25): error TS2304: Cannot find name 'db'.
+src/Pages/QueryScreen.tsx(37,22): error TS2345: Argument of type 'Question' is not assignable to parameter of type 'Query'.
+  Property 'date' is missing in type 'Question' but required in type 'Query'.
+src/service/api.ts(19,5): error TS7053: Element implicitly has an 'any' type because expression of type '"Authorization"' can't be used to index type 'HeadersInit'.
+  Property 'Authorization' does not exist on type 'HeadersInit'.
+src/service/marketplaceServiceNew.ts(242,3): error TS6133: 'project' is declared but its value is never read.
+src/service/secureCodeExecution_new.ts(33,11): error TS6196: 'BattleResult' is declared but never used.
+src/service/users.ts(59,49): error TS6133: 'user' is declared but its value is never read.
+src/service/users.ts(59,60): error TS6133: 'name' is declared but its value is never read.
