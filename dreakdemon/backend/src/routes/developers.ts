@@ -1,4 +1,4 @@
-import { Response, Router } from 'express';
+import { NextFunction, Response, Router } from 'express';
 import mongoose from 'mongoose';
 import { authenticate, AuthRequest } from '../middleware/auth';
 import { BoardTask } from '../models/Board';
@@ -97,7 +97,13 @@ router.get('/', authenticate, async (req: AuthRequest, res: Response): Promise<v
 });
 
 // Get developer by ID
-router.get('/:developerId', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
+router.get('/:developerId', authenticate, async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  // Let specific single-segment routes defined later handle their own paths
+  const reservedPaths = ['tech-reviews', 'help-requests'];
+  if (reservedPaths.includes(req.params.developerId)) {
+    next();
+    return;
+  }
   try {
     const user = await User.findById(req.params.developerId)
       .select('-password') as any;

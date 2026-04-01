@@ -12,7 +12,9 @@ export async function fetchProjects(params?: {
   if (params?.category) query.set('category', params.category);
   if (params?.status) query.set('status', params.status);
   if (params?.sort) query.set('sort', params.sort);
-  return apiRequest<Project[]>('GET', `/projects?${query.toString()}`);
+  const data = await apiRequest<{ projects: Project[] } | Project[]>('GET', `/projects?${query.toString()}`);
+  if (Array.isArray(data)) return data;
+  return (data as any)?.projects || [];
 }
 
 export async function fetchProjectById(id: string): Promise<Project> {
@@ -20,11 +22,13 @@ export async function fetchProjectById(id: string): Promise<Project> {
 }
 
 export async function fetchMyProjects(): Promise<Project[]> {
-  return apiRequest<Project[]>('GET', '/projects/my');
+  const data = await apiRequest<{ projects: Project[] } | Project[]>('GET', '/projects/my/projects');
+  if (Array.isArray(data)) return data;
+  return (data as any)?.projects || [];
 }
 
 export async function sendJoinRequest(projectId: string, role?: string, message?: string): Promise<void> {
-  return apiRequest<void>('POST', '/joinRequests', { projectId, role, message });
+  return apiRequest<void>('POST', '/join-requests', { projectId, role, message });
 }
 
 export async function fetchMyJoinRequests(): Promise<JoinRequest[]> {
@@ -32,11 +36,22 @@ export async function fetchMyJoinRequests(): Promise<JoinRequest[]> {
 }
 
 export async function fetchUserJoinRequests(userId: string): Promise<JoinRequest[]> {
-  return apiRequest<JoinRequest[]>('GET', `/joinRequests/user/${userId}`);
+  const data = await apiRequest<{ requests: JoinRequest[] } | JoinRequest[]>('GET', `/join-requests/user/${userId}`);
+  if (Array.isArray(data)) return data;
+  return (data as any)?.requests || [];
 }
 
 export async function fetchMyIdeas(): Promise<any[]> {
   return apiRequest<any[]>('GET', '/ideas/my/ideas');
+}
+
+export async function fetchMyCompletedTasks(userId: string): Promise<{ count: number; completedTasks: any[] }> {
+  try {
+    const data = await apiRequest<any>('GET', `/users/${userId}/completed-tasks`);
+    return { count: data?.count || 0, completedTasks: data?.completedTasks || [] };
+  } catch {
+    return { count: 0, completedTasks: [] };
+  }
 }
 
 export async function updateIdea(ideaId: string, data: { title: string; description: string; category: string; timeline?: string }): Promise<any> {
@@ -65,5 +80,7 @@ export async function likeIdea(ideaId: string): Promise<void> {
 }
 
 export async function fetchMyProjectsList(): Promise<Project[]> {
-  return apiRequest<Project[]>('GET', '/projects/my/projects');
+  const data = await apiRequest<{ projects: Project[] } | Project[]>('GET', '/projects/my/projects');
+  if (Array.isArray(data)) return data;
+  return (data as any)?.projects || [];
 }

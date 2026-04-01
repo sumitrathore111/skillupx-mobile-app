@@ -21,7 +21,7 @@ export type BottomTabParamList = {
 export type ConnectStackParamList = {
   ConnectHome: undefined;
   DevProfile: { developerId: string };
-  Chat: { participantId: string; participantName: string; participantAvatar?: string };
+  Chat: { participantId: string; participantName: string; participantAvatar?: string; isOnline?: boolean };
   GroupChat: { groupId: string; groupName: string };
   WriteReview: undefined;
   SubmitHelpRequest: undefined;

@@ -315,4 +315,21 @@ router.get('/:chatId', authenticate, async (req: AuthRequest, res: Response): Pr
   }
 });
 
+// Mark all unread messages in a chat as read
+router.patch('/:chatId/read', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    await ChatMessage.updateMany(
+      {
+        chatId: req.params.chatId,
+        senderId: { $ne: req.user?.id },
+        isRead: false
+      },
+      { isRead: true }
+    );
+    res.json({ success: true });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 export default router;

@@ -35,20 +35,35 @@ export async function fetchConversations(): Promise<Conversation[]> {
   return apiRequest<Conversation[]>('GET', '/chats');
 }
 
-export async function fetchOrCreateChat(participantId: string): Promise<{ chatId: string; messages: Message[] }> {
-  return apiRequest<{ chatId: string; messages: Message[] }>('POST', '/chats/open', { participantId });
+export async function fetchOrCreateChat(
+  currentUserId: string,
+  currentUserName: string,
+  currentUserAvatar: string,
+  participantId: string,
+  participantName: string,
+  participantAvatar: string
+): Promise<any> {
+  return apiRequest<any>('POST', '/chats', {
+    participantIds: [currentUserId, participantId],
+    participantNames: [currentUserName, participantName],
+    participantAvatars: [currentUserAvatar, participantAvatar],
+  });
 }
 
 export async function sendMessage(chatId: string, content: string): Promise<Message> {
-  return apiRequest<Message>('POST', `/chats/${chatId}/messages`, { content });
+  return apiRequest<Message>('POST', `/chats/${chatId}/messages`, { message: content });
 }
 
 export async function editMessage(chatId: string, messageId: string, content: string): Promise<Message> {
-  return apiRequest<Message>('PUT', `/chats/${chatId}/messages/${messageId}`, { content });
+  return apiRequest<Message>('PATCH', `/chats/${chatId}/messages/${messageId}`, { message: content });
 }
 
 export async function deleteMessage(chatId: string, messageId: string): Promise<void> {
   return apiRequest<void>('DELETE', `/chats/${chatId}/messages/${messageId}`);
+}
+
+export async function fetchMessages(chatId: string): Promise<Message[]> {
+  return apiRequest<Message[]>('GET', `/chats/${chatId}/messages`);
 }
 
 export async function markChatRead(chatId: string): Promise<void> {
@@ -58,7 +73,8 @@ export async function markChatRead(chatId: string): Promise<void> {
 // ============ STUDY GROUPS ============
 export async function fetchStudyGroups(search?: string): Promise<StudyGroup[]> {
   const query = search ? `?search=${encodeURIComponent(search)}` : '';
-  return apiRequest<StudyGroup[]>('GET', `/study-groups${query}`);
+  const data = await apiRequest<{ groups: StudyGroup[] } | StudyGroup[]>('GET', `/study-groups${query}`);
+  return (data as any).groups ?? (data as StudyGroup[]) ?? [];
 }
 
 export async function createStudyGroup(data: {
@@ -72,7 +88,7 @@ export async function createStudyGroup(data: {
 }
 
 export async function requestJoinGroup(groupId: string): Promise<void> {
-  return apiRequest<void>('POST', `/study-groups/${groupId}/request`, {});
+  return apiRequest<void>('POST', `/study-groups/${groupId}/join`, {});
 }
 
 export async function fetchGroupMessages(groupId: string): Promise<any[]> {
@@ -81,6 +97,11 @@ export async function fetchGroupMessages(groupId: string): Promise<any[]> {
 
 export async function sendGroupMessage(groupId: string, content: string): Promise<any> {
   return apiRequest<any>('POST', `/study-groups/${groupId}/messages`, { content });
+}
+
+export async function fetchGroupDetail(groupId: string): Promise<any> {
+  const data = await apiRequest<any>('GET', `/study-groups/${groupId}`);
+  return data.group ?? data;
 }
 
 export async function deleteStudyGroup(groupId: string): Promise<void> {
@@ -98,26 +119,41 @@ export async function rejectJoinRequest(groupId: string, requestId: string): Pro
 // ============ TECH REVIEWS ============
 export async function fetchTechReviews(search?: string): Promise<TechReview[]> {
   const query = search ? `?search=${encodeURIComponent(search)}` : '';
-  return apiRequest<TechReview[]>('GET', `/discussions${query}`);
+  const data = await apiRequest<{ reviews: TechReview[] } | TechReview[]>('GET', `/developers/tech-reviews${query}`);
+  return (data as any).reviews ?? (data as TechReview[]) ?? [];
 }
 
 export async function createTechReview(data: Partial<TechReview>): Promise<TechReview> {
-  return apiRequest<TechReview>('POST', '/discussions', data);
+  const res = await apiRequest<{ review: TechReview } | TechReview>('POST', '/developers/tech-reviews', data);
+  return (res as any).review ?? (res as TechReview);
 }
 
 // ============ HELP REQUESTS ============
 export async function fetchHelpRequests(): Promise<HelpRequest[]> {
-  return apiRequest<HelpRequest[]>('GET', '/discussions/help');
+  const data = await apiRequest<{ requests: HelpRequest[] } | HelpRequest[]>('GET', '/developers/help-requests');
+  return (data as any).requests ?? (data as HelpRequest[]) ?? [];
 }
 
 export async function createHelpRequest(data: {
   title: string;
   description: string;
-  tags: string;
+  tags: string | string[];
 }): Promise<HelpRequest> {
-  return apiRequest<HelpRequest>('POST', '/discussions/help', data);
+  const tags = Array.isArray(data.tags)
+    ? data.tags
+    : data.tags ? data.tags.split(',').map((t: string) => t.trim()) : [];
+  const res = await apiRequest<{ request: HelpRequest } | HelpRequest>('POST', '/developers/help-requests', { ...data, tags });
+  return (res as any).request ?? (res as HelpRequest);
 }
 
 export async function replyToHelpRequest(requestId: string, content: string): Promise<void> {
-  return apiRequest<void>('POST', `/discussions/help/${requestId}/reply`, { content });
+  return apiRequest<void>('POST', `/developers/help-requests/${requestId}/respond`, { content });
+}
+
+export async function likeReview(reviewId: string): Promise<void> {
+  return apiRequest<void>('POST', `/developers/tech-reviews/${reviewId}/like`, {});
+}
+
+export async function markHelpful(reviewId: string): Promise<void> {
+  return apiRequest<void>('POST', `/developers/tech-reviews/${reviewId}/helpful`, {});
 }

@@ -1,36 +1,36 @@
 export const COLORS = {
-  // Backgrounds
-  background: '#0A0A0F',
-  surface: '#13131A',
-  surfaceElevated: '#1A1A24',
-  border: '#1E1E2E',
-  borderLight: '#2A2A3E',
+  // Backgrounds — matches website dark mode
+  background: '#000000',
+  surface: '#111827',
+  surfaceElevated: '#1F2937',
+  border: '#374151',
+  borderLight: '#4B5563',
 
-  // Brand
-  primary: '#6C63FF',
-  primaryDark: '#5A52E0',
-  primaryLight: '#8B85FF',
-  accent: '#00D9FF',
-  accentDark: '#00B8D9',
+  // Brand — matches website primary #00ADB5
+  primary: '#00ADB5',
+  primaryDark: '#008F96',
+  primaryLight: '#00C4CD',
+  accent: '#00ADB5',
+  accentDark: '#008F96',
 
   // Status
-  success: '#00E676',
-  successDark: '#00C853',
-  warning: '#FFB300',
-  warningDark: '#FF8F00',
-  danger: '#FF4757',
-  dangerDark: '#D63031',
+  success: '#22C55E',
+  successDark: '#16A34A',
+  warning: '#F59E0B',
+  warningDark: '#D97706',
+  danger: '#EF4444',
+  dangerDark: '#DC2626',
 
   // Difficulty
-  easy: '#00E676',
-  medium: '#FFB300',
-  hard: '#FF4757',
+  easy: '#22C55E',
+  medium: '#F59E0B',
+  hard: '#EF4444',
 
   // Text
   textPrimary: '#FFFFFF',
-  textSecondary: '#C9D1D9',
-  textMuted: '#6B7280',
-  textDisabled: '#3D3D5C',
+  textSecondary: '#D1D5DB',
+  textMuted: '#9CA3AF',
+  textDisabled: '#4B5563',
 
   // Overlays
   overlay: 'rgba(0,0,0,0.7)',

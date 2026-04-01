@@ -22,6 +22,8 @@ export interface AuthState {
 // ==================== DEVELOPER CONNECT TYPES ====================
 export interface DeveloperProfile {
   id: string;
+  _id?: string;
+  userId?: string;
   name: string;
   username: string;
   avatar: string;
@@ -38,30 +40,45 @@ export interface DeveloperProfile {
 
 export interface Message {
   id: string;
+  _id?: string;
   senderId: string;
   receiverId: string;
   content: string;
+  message?: string;  // backend field alias
+  text?: string;     // backend text alias
   createdAt: string;
+  timestamp?: string;
   status?: 'sent' | 'delivered' | 'read';
   isEdited?: boolean;
+  isRead?: boolean;
+  senderName?: string;
+  senderAvatar?: string;
+  sender?: { _id?: string; id?: string; name?: string };
 }
 
 export interface Conversation {
   id: string;
-  participant: DeveloperProfile;
-  lastMessage?: Message;
+  _id?: string;
+  chatId?: string;
+  participant?: DeveloperProfile;
+  participantId?: string;
+  participantName?: string;
+  participantAvatar?: string;
+  lastMessage?: Message | string;
+  lastMessageAt?: string;
   unreadCount: number;
-  updatedAt: string;
+  updatedAt?: string;
 }
 
 export interface StudyGroup {
   id: string;
+  _id?: string;
   name: string;
   description: string;
   topic: string;
   level: 'Beginner' | 'Intermediate' | 'Advanced';
   maxMembers: number;
-  members: number;
+  members: number | { userId: string; name: string; avatar?: string; role: string; joinedAt: string }[];
   creatorId: string;
   creatorName: string;
   createdAt: string;

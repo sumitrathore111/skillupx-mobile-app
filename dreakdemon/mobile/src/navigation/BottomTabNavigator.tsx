@@ -36,7 +36,7 @@ export default function BottomTabNavigator() {
 
           switch (route.name) {
             case 'Dashboard':
-              iconName = focused ? 'newspaper' : 'newspaper-outline';
+              iconName = focused ? 'home' : 'home-outline';
               break;
             case 'Connect':
               iconName = focused ? 'people' : 'people-outline';
@@ -56,7 +56,7 @@ export default function BottomTabNavigator() {
         },
       })}
     >
-      <Tab.Screen name="Dashboard" component={DashboardNavigator} options={{ tabBarLabel: 'Feed' }} />
+      <Tab.Screen name="Dashboard" component={DashboardNavigator} options={{ tabBarLabel: 'Dashboard' }} />
       <Tab.Screen name="Connect" component={ConnectNavigator} options={{ tabBarLabel: 'Connect' }} />
       <Tab.Screen name="Arena" component={ArenaNavigator} options={{ tabBarLabel: 'Arena' }} />
       <Tab.Screen name="Roadmaps" component={RoadmapNavigator} options={{ tabBarLabel: 'Learn' }} />
