@@ -2,11 +2,11 @@ import express, { Response } from 'express';
 import mongoose from 'mongoose';
 import { auth, AuthRequest, optionalAuth } from '../middleware/auth';
 import {
-    CareerInfo,
-    InterviewQuestion,
-    LearningProgress,
-    Roadmap,
-    Topic
+  CareerInfo,
+  InterviewQuestion,
+  LearningProgress,
+  Roadmap,
+  Topic
 } from '../models/Roadmap';
 
 const router = express.Router();
@@ -155,6 +155,7 @@ router.get('/:slug', optionalAuth, async (req: AuthRequest, res: Response) => {
 
       // Group topics by phase
       const topicsByPhase = {
+        foundation: topics.filter(t => t.phase === 'foundation'),
         beginner: topics.filter(t => t.phase === 'beginner'),
         intermediate: topics.filter(t => t.phase === 'intermediate'),
         advanced: topics.filter(t => t.phase === 'advanced'),

@@ -5,12 +5,12 @@ import { useNavigation } from '@react-navigation/native';
 import { getLearningDashboard, PHASE_LABELS } from '@services/roadmapService';
 import { useEffect, useState } from 'react';
 import {
-    ActivityIndicator, RefreshControl,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  ActivityIndicator, RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -102,7 +102,7 @@ export default function LearningDashboardScreen() {
         {dashboard?.roadmapProgress && dashboard.roadmapProgress.length > 0 && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Continue Learning</Text>
-            {dashboard.roadmapProgress.map(rp => {
+            {dashboard.roadmapProgress.filter(rp => rp.roadmap).map(rp => {
               const roadmap = rp.roadmap;
               return (
                 <TouchableOpacity

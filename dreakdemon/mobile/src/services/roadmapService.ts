@@ -109,6 +109,7 @@ export const DIFFICULTY_LABELS: Record<string, string> = {
 };
 
 export const PHASE_LABELS: Record<string, { label: string; color: string; icon: string }> = {
+  'foundation': { label: 'Foundation', color: '#3B82F6', icon: '🏗️' },
   'beginner': { label: 'Beginner', color: '#10B981', icon: '🌱' },
   'intermediate': { label: 'Intermediate', color: '#F59E0B', icon: '📈' },
   'advanced': { label: 'Advanced', color: '#EF4444', icon: '🚀' },
