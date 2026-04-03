@@ -15,7 +15,7 @@ export interface ITopic extends Document {
   roadmapId: mongoose.Types.ObjectId;
   title: string;
   description: string;
-  phase: 'foundation' | 'beginner' | 'intermediate' | 'advanced' | 'interview';
+  phase: 'beginner' | 'intermediate' | 'advanced' | 'interview';
   order: number;
   estimatedHours: number;
   resources: IResource[];
@@ -157,7 +157,7 @@ const TopicSchema: Schema = new Schema({
   description: { type: String, required: true },
   phase: {
     type: String,
-    enum: ['foundation', 'beginner', 'intermediate', 'advanced', 'interview'],
+    enum: ['beginner', 'intermediate', 'advanced', 'interview'],
     required: true
   },
   order: { type: Number, default: 0 },
