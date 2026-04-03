@@ -3,18 +3,18 @@ import { COLORS, RADIUS } from '@constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import {
-    DIFFICULTY_LABELS,
-    enrollInRoadmap,
-    getRoadmapBySlug,
-    markTopicComplete,
-    markTopicIncomplete,
-    PHASE_LABELS
+  DIFFICULTY_LABELS,
+  enrollInRoadmap,
+  getRoadmapBySlug,
+  markTopicComplete,
+  markTopicIncomplete,
+  PHASE_LABELS
 } from '@services/roadmapService';
 import { useEffect, useState } from 'react';
 import {
-    ActivityIndicator, Alert, RefreshControl,
-    ScrollView, StyleSheet, Text,
-    TouchableOpacity, View,
+  ActivityIndicator, Alert, RefreshControl,
+  ScrollView, StyleSheet, Text,
+  TouchableOpacity, View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -102,7 +102,8 @@ export default function RoadmapDetailScreen() {
   const isEnrolled = userProgress?.isEnrolled ?? false;
   const completedIds = new Set(userProgress?.completedTopicIds || []);
   const totalTopics = roadmap.totalTopics;
-  const completedTopics = userProgress?.completedTopics ?? 0;
+  const rawCompleted = userProgress?.completedTopics;
+  const completedTopics = typeof rawCompleted === 'number' ? rawCompleted : (Array.isArray(rawCompleted) ? rawCompleted.length : 0);
   const progress = userProgress?.progressPercent ?? 0;
 
   return (
