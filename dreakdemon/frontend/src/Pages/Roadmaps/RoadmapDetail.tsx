@@ -1,35 +1,35 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-    ArrowLeft,
-    BookOpen,
-    Briefcase,
-    Check,
-    ChevronDown,
-    ChevronRight,
-    Clock,
-    Code,
-    ExternalLink,
-    GraduationCap,
-    HelpCircle,
-    Map,
-    Play,
-    Star,
-    Target,
-    TrendingUp,
-    Users,
-    Zap
+  ArrowLeft,
+  BookOpen,
+  Briefcase,
+  Check,
+  ChevronDown,
+  ChevronRight,
+  Clock,
+  Code,
+  ExternalLink,
+  GraduationCap,
+  HelpCircle,
+  Map,
+  Play,
+  Star,
+  Target,
+  TrendingUp,
+  Users,
+  Zap
 } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useAuth } from '../../Context/AuthContext';
 import {
-    enrollInRoadmap,
-    getRoadmapBySlug,
-    markTopicComplete,
-    markTopicIncomplete,
-    PHASE_LABELS,
-    type RoadmapDetail,
-    type Topic
+  enrollInRoadmap,
+  getRoadmapBySlug,
+  markTopicComplete,
+  markTopicIncomplete,
+  PHASE_LABELS,
+  type RoadmapDetail,
+  type Topic
 } from '../../service/roadmapService';
 
 export default function RoadmapDetailPage() {
@@ -181,6 +181,7 @@ export default function RoadmapDetailPage() {
   const progressPercent = totalTopics > 0 ? Math.round((completedCount / totalTopics) * 100) : 0;
 
   const phases = [
+    { key: 'foundation', topics: topicsByPhase.foundation || [] },
     { key: 'beginner', topics: topicsByPhase.beginner },
     { key: 'intermediate', topics: topicsByPhase.intermediate },
     { key: 'advanced', topics: topicsByPhase.advanced },
