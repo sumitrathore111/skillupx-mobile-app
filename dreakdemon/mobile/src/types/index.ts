@@ -123,100 +123,299 @@ export interface HelpReply {
 // ==================== CREATOR CORNER TYPES ====================
 export interface Project {
   id: string;
+  _id?: string;
   projectId?: string;
   title: string;
   description: string;
   category: string;
   creator: string;
   creatorId: string;
-  members: number;
+  creatorName?: string;
+  ownerName?: string;
+  owner?: string;
+  members: number | ProjectMember[];
+  memberCount?: number;
   status: string;
   progress: number;
   tags: string[];
+  techStack: string[];
+  rolesNeeded?: string[];
+  githubRepo?: string;
+  repositoryUrl?: string;
+  visibility?: string;
   createdAt: string;
   isCompleted?: boolean;
 }
 
+export interface ProjectMember {
+  userId: string;
+  name: string;
+  email?: string;
+  role: string;
+  joinedAt: string;
+  status?: string;
+  avatar?: string;
+}
+
+export interface ProjectIssue {
+  id: string;
+  _id?: string;
+  title: string;
+  description: string;
+  status: 'Open' | 'Resolved' | 'In Progress';
+  createdBy: string;
+  creatorName: string;
+  resolvedBy?: string | null;
+  resolvedAt?: string | null;
+  createdAt: string;
+}
+
+export interface KanbanTask {
+  id: string;
+  _id?: string;
+  title: string;
+  description?: string;
+  status: 'To Do' | 'In Progress' | 'In Review' | 'Done';
+  priority: 'low' | 'medium' | 'high' | 'critical';
+  assignee?: string;
+  assigneeName?: string;
+  assignedTo?: string;
+  dueDate?: string;
+  labels?: string[];
+  checklist?: { text: string; completed: boolean }[];
+  comments?: any[];
+  sprintId?: string;
+  completedAt?: string;
+  completedBy?: string;
+  completedByName?: string;
+  pendingVerification?: boolean;
+  verified?: boolean;
+  verificationFeedback?: string;
+  verifiedBy?: string;
+  verifiedByName?: string;
+  verifiedAt?: string;
+  reviewStatus?: 'pending' | 'approved' | 'changes_requested' | 'not_submitted';
+  reviewComment?: string;
+  createdAt?: string;
+}
+
+export interface Sprint {
+  id: string;
+  _id?: string;
+  name: string;
+  goal?: string;
+  startDate: string;
+  endDate: string;
+  status: 'planning' | 'active' | 'completed';
+  tasks?: string[];
+}
+
+export interface LeaderboardEntry {
+  userId: string;
+  name: string;
+  email?: string;
+  issuesResolved: number;
+  projectsContributed: number;
+  messagesSent: number;
+  totalScore: number;
+  githubUsername?: string;
+  avatar?: string;
+}
+
 export interface Idea {
   id: string;
+  _id?: string;
   title: string;
   description: string;
   tags: string[];
+  category?: string;
+  expectedTimeline?: string;
   authorId: string;
   authorName: string;
   authorAvatar: string;
   likes: number;
   isLiked?: boolean;
+  status?: 'pending' | 'approved' | 'rejected';
+  submittedAt?: string;
   createdAt: string;
 }
 
 export interface JoinRequest {
   id: string;
-  projectId: string;
+  _id?: string;
+  projectId: string | { _id: string };
   projectTitle: string;
   userId: string;
+  userName?: string;
+  userEmail?: string;
+  role?: string;
+  message?: string;
+  skills?: string;
+  experience?: string;
+  motivation?: string;
   status: 'pending' | 'approved' | 'rejected';
+  requestedAt?: string;
   createdAt: string;
 }
 
 // ==================== ROADMAP TYPES ====================
+export interface Resource {
+  title: string;
+  url: string;
+  type: 'video' | 'article' | 'course' | 'documentation' | 'tutorial';
+  platform: string;
+  duration?: string;
+  isFree: boolean;
+}
+
+export interface Topic {
+  _id: string;
+  roadmapId: string;
+  title: string;
+  description: string;
+  phase: 'beginner' | 'intermediate' | 'advanced' | 'interview';
+  order: number;
+  estimatedHours: number;
+  resources: Resource[];
+  relatedProjects: string[];
+  prerequisites: string[];
+  keyPoints: string[];
+  icon: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface InterviewQuestion {
+  _id: string;
+  roadmapId: string;
+  topicId?: string;
+  question: string;
+  answer: string;
+  difficulty: 'easy' | 'medium' | 'hard';
+  company?: string;
+  category: string;
+  tags: string[];
+  createdAt: string;
+}
+
+export interface CareerInfo {
+  _id: string;
+  roadmapId: string;
+  jobTitle: string;
+  description: string;
+  salaryRange: {
+    min: number;
+    max: number;
+    currency: string;
+    period: string;
+  };
+  demandLevel: 'low' | 'medium' | 'high' | 'very-high';
+  requiredSkills: string[];
+  preferredSkills: string[];
+  experienceLevel: 'fresher' | 'junior' | 'mid' | 'senior' | 'lead';
+  growthPath: string[];
+  companies: string[];
+  createdAt: string;
+}
+
+export interface UserProgress {
+  isEnrolled: boolean;
+  completedTopics: number;
+  completedTopicIds?: string[];
+  progressPercent: number;
+  lastAccessedAt?: string;
+  startedAt?: string;
+  currentStreak?: number;
+  badges?: Array<{ id: string; name: string; earnedAt: string }>;
+}
+
 export interface Roadmap {
   _id: string;
   title: string;
   slug: string;
   description: string;
-  category: string;
-  difficulty: string;
-  estimatedHours: number;
-  enrolledCount: number;
-  rating: number;
+  longDescription: string;
+  icon: string;
+  color: string;
+  category: 'web' | 'data' | 'mobile' | 'devops' | 'cloud' | 'ai-ml' | 'database' | 'security' | 'other';
+  difficulty: 'beginner' | 'intermediate' | 'advanced' | 'all-levels';
+  estimatedWeeks: number;
   totalTopics: number;
-  completedTopics?: number;
-  isEnrolled?: boolean;
+  totalResources: number;
+  totalProjects: number;
+  totalQuestions: number;
+  isPublished: boolean;
+  isFeatured: boolean;
+  prerequisites: string[];
+  outcomes: string[];
+  tags: string[];
+  enrolledCount: number;
+  completedCount: number;
+  rating: number;
+  reviewCount: number;
   createdAt: string;
-}
-
-export interface Topic {
-  _id: string;
-  title: string;
-  description: string;
-  phase: string;
-  estimatedMinutes: number;
-  resources: Resource[];
-  isCompleted?: boolean;
-}
-
-export interface Resource {
-  type: 'video' | 'article' | 'documentation' | 'practice';
-  title: string;
-  url: string;
+  updatedAt: string;
+  userProgress?: UserProgress;
 }
 
 export interface RoadmapDetail {
   roadmap: Roadmap;
-  topicsByPhase: Record<string, Topic[]>;
-  userProgress?: {
-    completedTopicIds: string[];
-    enrolledAt: string;
-    lastActivity: string;
+  topicsByPhase: {
+    beginner: Topic[];
+    intermediate: Topic[];
+    advanced: Topic[];
+    interview: Topic[];
   };
+  careerInfo: CareerInfo[];
+  questionStats: Array<{ _id: string; count: number }>;
+  userProgress: UserProgress | null;
 }
 
-export interface LearningDashboard {
-  totalCompleted: number;
-  activeRoadmaps: number;
-  currentStreak: number;
-  totalXP: number;
-  enrolledRoadmaps: Roadmap[];
-  recentlyCompleted: Topic[];
-  badges: Badge[];
+export interface TopicDetail {
+  topic: Topic & { roadmapId: { title: string; slug: string } };
+  questions: InterviewQuestion[];
+  navigation: {
+    prevTopic: { _id: string; title: string } | null;
+    nextTopic: { _id: string; title: string } | null;
+  };
+  isCompleted: boolean;
+}
+
+export interface DashboardData {
+  stats: {
+    totalRoadmaps: number;
+    totalCompleted: number;
+    totalTopics: number;
+    overallProgress: number;
+    totalTimeSpent: number;
+    currentStreak: number;
+    longestStreak: number;
+    badgeCount: number;
+  };
+  roadmapProgress: Array<{
+    roadmap: Roadmap;
+    completedTopics: number;
+    totalTopics: number;
+    progressPercent: number;
+    lastAccessedAt: string;
+    startedAt: string;
+  }>;
+  recentActivity: Array<{
+    roadmapId: string;
+    roadmapTitle: string;
+    topicId: string;
+    topicTitle: string;
+    phase: string;
+    completedAt: string;
+  }>;
+  badges: Array<{ id: string; name: string; earnedAt: string }>;
 }
 
 export interface Badge {
   id: string;
   name: string;
   icon: string;
-  unlockedAt?: string;
+  earnedAt?: string;
 }
 
 // ==================== CODE ARENA TYPES ====================

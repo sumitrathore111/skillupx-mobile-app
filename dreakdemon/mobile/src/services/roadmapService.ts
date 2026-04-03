@@ -1,79 +1,123 @@
-import type { LearningDashboard, Roadmap, RoadmapDetail } from '@apptypes/index';
+import type {
+    CareerInfo,
+    DashboardData,
+    InterviewQuestion,
+    Roadmap,
+    RoadmapDetail,
+    TopicDetail,
+} from '@apptypes/index';
 import { apiRequest } from './api';
 
-export async function fetchAllRoadmaps(params?: {
-  search?: string;
+// ==================== API FUNCTIONS ====================
+
+// Get all roadmaps (matches frontend getAllRoadmaps)
+export async function getAllRoadmaps(filters?: {
   category?: string;
   difficulty?: string;
+  featured?: boolean;
+  search?: string;
 }): Promise<Roadmap[]> {
-  const query = new URLSearchParams();
-  if (params?.search) query.set('search', params.search);
-  if (params?.category && params.category !== 'all') query.set('category', params.category);
-  if (params?.difficulty && params.difficulty !== 'all') query.set('difficulty', params.difficulty);
-  return apiRequest<Roadmap[]>('GET', `/roadmaps?${query.toString()}`);
+  const params = new URLSearchParams();
+  if (filters?.category && filters.category !== 'all') params.append('category', filters.category);
+  if (filters?.difficulty && filters.difficulty !== 'all') params.append('difficulty', filters.difficulty);
+  if (filters?.featured) params.append('featured', 'true');
+  if (filters?.search) params.append('search', filters.search);
+  return apiRequest<Roadmap[]>('GET', `/roadmaps?${params.toString()}`);
 }
 
-export async function fetchRoadmapBySlug(slug: string): Promise<RoadmapDetail> {
+// Get single roadmap with details
+export async function getRoadmapBySlug(slug: string): Promise<RoadmapDetail> {
   return apiRequest<RoadmapDetail>('GET', `/roadmaps/${slug}`);
 }
 
-export async function enrollInRoadmap(roadmapId: string): Promise<void> {
-  return apiRequest<void>('POST', `/roadmaps/${roadmapId}/enroll`, {});
+// Get topic detail
+export async function getTopicDetail(topicId: string): Promise<TopicDetail> {
+  return apiRequest<TopicDetail>('GET', `/roadmaps/topic/${topicId}`);
 }
 
-export async function markTopicComplete(roadmapId: string, topicId: string): Promise<void> {
-  return apiRequest<void>('PATCH', `/roadmaps/${roadmapId}/topics/${topicId}/complete`, {});
+// Enroll in roadmap
+export async function enrollInRoadmap(roadmapId: string): Promise<{ message: string }> {
+  return apiRequest<{ message: string }>('POST', `/roadmaps/${roadmapId}/enroll`, {});
 }
 
-export async function markTopicIncomplete(roadmapId: string, topicId: string): Promise<void> {
-  return apiRequest<void>('PATCH', `/roadmaps/${roadmapId}/topics/${topicId}/incomplete`, {});
+// Mark topic as complete
+export async function markTopicComplete(
+  topicId: string,
+  timeSpent?: number
+): Promise<{ message: string; progress: any }> {
+  return apiRequest<{ message: string; progress: any }>('POST', `/roadmaps/topic/${topicId}/complete`, { timeSpent });
 }
 
-export async function fetchLearningDashboard(): Promise<LearningDashboard> {
-  return apiRequest<LearningDashboard>('GET', '/roadmaps/dashboard');
+// Mark topic as incomplete
+export async function markTopicIncomplete(topicId: string): Promise<{ message: string }> {
+  return apiRequest<{ message: string }>('POST', `/roadmaps/topic/${topicId}/uncomplete`, {});
 }
 
-export async function fetchCareerInfo(roadmapId: string): Promise<any> {
-  return apiRequest<any>('GET', `/roadmaps/${roadmapId}/career-info`);
+// Get user dashboard
+export async function getLearningDashboard(): Promise<DashboardData> {
+  return apiRequest<DashboardData>('GET', '/roadmaps/user/dashboard');
 }
 
-export async function fetchInterviewQuestions(roadmapId: string, filters?: {
-  difficulty?: string;
-  category?: string;
-  company?: string;
-  page?: number;
-  limit?: number;
-}): Promise<{ questions: any[]; total: number }> {
-  const query = new URLSearchParams();
-  if (filters?.difficulty && filters.difficulty !== 'all') query.set('difficulty', filters.difficulty);
-  if (filters?.category && filters.category !== 'all') query.set('category', filters.category);
-  if (filters?.company && filters.company !== 'all') query.set('company', filters.company);
-  if (filters?.page) query.set('page', String(filters.page));
-  if (filters?.limit) query.set('limit', String(filters.limit || 20));
-  return apiRequest<{ questions: any[]; total: number }>('GET', `/roadmaps/${roadmapId}/interview-questions?${query.toString()}`);
+// Get interview questions
+export async function getInterviewQuestions(
+  roadmapId: string,
+  filters?: {
+    difficulty?: string;
+    company?: string;
+    category?: string;
+    page?: number;
+    limit?: number;
+  }
+): Promise<{
+  questions: InterviewQuestion[];
+  pagination: { page: number; limit: number; total: number; totalPages: number };
+  filters: { categories: string[]; companies: string[] };
+}> {
+  const params = new URLSearchParams();
+  if (filters?.difficulty && filters.difficulty !== 'all') params.append('difficulty', filters.difficulty);
+  if (filters?.company && filters.company !== 'all') params.append('company', filters.company);
+  if (filters?.category && filters.category !== 'all') params.append('category', filters.category);
+  if (filters?.page) params.append('page', filters.page.toString());
+  if (filters?.limit) params.append('limit', filters.limit.toString());
+  return apiRequest('GET', `/roadmaps/${roadmapId}/questions?${params.toString()}`);
 }
+
+// Get career info
+export async function getCareerInfo(roadmapId: string): Promise<CareerInfo[]> {
+  return apiRequest<CareerInfo[]>('GET', `/roadmaps/${roadmapId}/careers`);
+}
+
+// ==================== LABEL CONSTANTS ====================
 
 export const CATEGORY_LABELS: Record<string, string> = {
-  frontend: 'Frontend',
-  backend: 'Backend',
-  mobile: 'Mobile',
-  devops: 'DevOps',
-  data_science: 'Data Science',
-  system_design: 'System Design',
-  dsa: 'DSA / Algorithms',
-  cloud: 'Cloud',
-  security: 'Security',
+  'web': 'Web Development',
+  'data': 'Data Science',
+  'mobile': 'Mobile Development',
+  'devops': 'DevOps',
+  'cloud': 'Cloud Computing',
+  'ai-ml': 'AI & Machine Learning',
+  'database': 'Databases',
+  'security': 'Security',
+  'other': 'Other',
 };
 
 export const DIFFICULTY_LABELS: Record<string, string> = {
-  beginner: 'Beginner',
-  intermediate: 'Intermediate',
-  advanced: 'Advanced',
+  'beginner': 'Beginner',
+  'intermediate': 'Intermediate',
+  'advanced': 'Advanced',
+  'all-levels': 'All Levels',
 };
 
-export const PHASE_LABELS: Record<string, string> = {
-  beginner: '🟢 Beginner',
-  intermediate: '🟡 Intermediate',
-  advanced: '🔴 Advanced',
-  expert: '🟣 Expert',
+export const PHASE_LABELS: Record<string, { label: string; color: string; icon: string }> = {
+  'beginner': { label: 'Beginner', color: '#10B981', icon: '🌱' },
+  'intermediate': { label: 'Intermediate', color: '#F59E0B', icon: '📈' },
+  'advanced': { label: 'Advanced', color: '#EF4444', icon: '🚀' },
+  'interview': { label: 'Interview Prep', color: '#8B5CF6', icon: '💼' },
+};
+
+export const DEMAND_LABELS: Record<string, { label: string; color: string }> = {
+  'low': { label: 'Low Demand', color: '#6B7280' },
+  'medium': { label: 'Medium Demand', color: '#F59E0B' },
+  'high': { label: 'High Demand', color: '#10B981' },
+  'very-high': { label: 'Very High Demand', color: '#EF4444' },
 };

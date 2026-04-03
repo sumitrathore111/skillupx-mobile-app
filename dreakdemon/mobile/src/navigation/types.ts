@@ -46,8 +46,8 @@ export type ArenaStackParamList = {
 export type RoadmapStackParamList = {
   LearningDashboard: undefined;
   RoadmapList: undefined;
-  RoadmapDetail: { slug: string; title: string };
-  TopicDetail: { topicId: string; roadmapId: string; title: string };
+  RoadmapDetail: { slug: string; title?: string };
+  TopicDetail: { topicId: string; roadmapSlug?: string };
   CareerInfo: { roadmapId: string; title?: string };
   InterviewPrep: { roadmapId: string; title?: string };
 };

@@ -1,76 +1,124 @@
+import type { CareerInfo } from '@apptypes/index';
 import { COLORS, RADIUS } from '@constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { fetchCareerInfo } from '@services/roadmapService';
+import { DEMAND_LABELS, getCareerInfo } from '@services/roadmapService';
 import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-const DEMAND_COLORS: Record<string, string> = { high: COLORS.success, medium: COLORS.warning, low: COLORS.danger };
-const EXP_TABS = ['All', 'Fresher', 'Junior', 'Mid', 'Senior', 'Lead'];
+const EXP_TABS = ['All', 'fresher', 'junior', 'mid', 'senior', 'lead'];
+const EXP_DISPLAY: Record<string, string> = { fresher: 'Fresher', junior: 'Junior', mid: 'Mid', senior: 'Senior', lead: 'Lead' };
+
+function formatSalary(val: number, currency: string): string {
+  if (currency === 'INR') return `₹${(val / 100000).toFixed(1)}L`;
+  return `${currency} ${val.toLocaleString()}`;
+}
 
 export default function CareerInfoScreen() {
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
   const { roadmapId, title } = route.params || {};
-  const [data, setData] = useState<any>(null);
+  const [careers, setCareers] = useState<CareerInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [expFilter, setExpFilter] = useState('All');
 
   const load = useCallback(async () => {
-    try { const res = await fetchCareerInfo(roadmapId); setData(res); }
+    try { const res = await getCareerInfo(roadmapId); setCareers(res || []); }
     catch (e) { console.error(e); }
     finally { setLoading(false); }
   }, [roadmapId]);
 
   useEffect(() => { load(); }, [load]);
 
-  const roles = (data?.roles || data?.careers || []).filter((r: any) =>
-    expFilter === 'All' || (r.experienceLevel || '').toLowerCase() === expFilter.toLowerCase()
+  const filtered = careers.filter(c =>
+    expFilter === 'All' || c.experienceLevel === expFilter
   );
 
-  const renderRole = ({ item }: { item: any }) => {
-    const demand = (item.demandLevel || 'medium').toLowerCase();
+  const renderRole = ({ item }: { item: CareerInfo }) => {
+    const demandInfo = DEMAND_LABELS[item.demandLevel] || { label: item.demandLevel, color: COLORS.textMuted };
     return (
       <View style={styles.card}>
         <View style={styles.cardHeader}>
-          <Text style={styles.roleName}>{item.title || item.role}</Text>
-          <View style={[styles.demandBadge, { backgroundColor: (DEMAND_COLORS[demand] || COLORS.textMuted) + '20' }]}>
-            <View style={[styles.demandDot, { backgroundColor: DEMAND_COLORS[demand] || COLORS.textMuted }]} />
-            <Text style={[styles.demandText, { color: DEMAND_COLORS[demand] || COLORS.textMuted }]}>{demand} demand</Text>
+          <Text style={styles.roleName}>{item.jobTitle}</Text>
+          <View style={[styles.demandBadge, { backgroundColor: `${demandInfo.color}20` }]}>
+            <View style={[styles.demandDot, { backgroundColor: demandInfo.color }]} />
+            <Text style={[styles.demandText, { color: demandInfo.color }]}>{demandInfo.label}</Text>
           </View>
         </View>
 
         {item.experienceLevel && (
           <View style={styles.expRow}>
-            <Ionicons name="briefcase-outline" size={14} color={COLORS.accent} />
-            <Text style={styles.expText}>{item.experienceLevel}</Text>
+            <Ionicons name="briefcase-outline" size={14} color={COLORS.primary} />
+            <Text style={styles.expText}>{EXP_DISPLAY[item.experienceLevel] || item.experienceLevel}</Text>
           </View>
         )}
 
-        {(item.salaryMin || item.salaryMax || item.salary) && (
+        {item.salaryRange && (
           <View style={styles.salaryRow}>
             <Ionicons name="cash-outline" size={14} color={COLORS.success} />
             <Text style={styles.salaryText}>
-              {item.salary || `₹${(item.salaryMin / 100000).toFixed(1)}L - ₹${(item.salaryMax / 100000).toFixed(1)}L`}
+              {formatSalary(item.salaryRange.min, item.salaryRange.currency)} - {formatSalary(item.salaryRange.max, item.salaryRange.currency)}
+              {item.salaryRange.period ? ` / ${item.salaryRange.period}` : ''}
             </Text>
           </View>
         )}
 
-        {item.skills?.length > 0 && (
-          <View style={styles.skillsWrap}>
-            {item.skills.map((s: string) => (
-              <View key={s} style={styles.skillTag}><Text style={styles.skillTagText}>{s}</Text></View>
-            ))}
+        {item.description ? <Text style={styles.roleDescription}>{item.description}</Text> : null}
+
+        {/* Required Skills */}
+        {item.requiredSkills?.length > 0 && (
+          <View style={styles.skillsSection}>
+            <Text style={styles.skillsLabel}>Required Skills</Text>
+            <View style={styles.skillsWrap}>
+              {item.requiredSkills.map(s => (
+                <View key={s} style={styles.skillTag}><Text style={styles.skillTagText}>{s}</Text></View>
+              ))}
+            </View>
           </View>
         )}
 
-        {item.description && <Text style={styles.roleDescription}>{item.description}</Text>}
+        {/* Preferred Skills */}
+        {item.preferredSkills?.length > 0 && (
+          <View style={styles.skillsSection}>
+            <Text style={styles.skillsLabel}>Nice to Have</Text>
+            <View style={styles.skillsWrap}>
+              {item.preferredSkills.map(s => (
+                <View key={s} style={styles.prefSkillTag}><Text style={styles.prefSkillText}>{s}</Text></View>
+              ))}
+            </View>
+          </View>
+        )}
 
-        {item.growthPath && (
-          <View style={styles.growthRow}>
-            <Ionicons name="trending-up" size={14} color={COLORS.primary} />
-            <Text style={styles.growthText}>{item.growthPath}</Text>
+        {/* Growth Path */}
+        {item.growthPath?.length > 0 && (
+          <View style={styles.growthSection}>
+            <Text style={styles.skillsLabel}>Growth Path</Text>
+            <View style={styles.growthRow}>
+              {item.growthPath.map((step, i) => (
+                <View key={i} style={styles.growthStep}>
+                  <View style={styles.growthDot}>
+                    <Text style={styles.growthDotText}>{i + 1}</Text>
+                  </View>
+                  <Text style={styles.growthText}>{step}</Text>
+                  {i < item.growthPath.length - 1 && (
+                    <Ionicons name="arrow-forward" size={10} color={COLORS.textMuted} style={{ marginLeft: 4 }} />
+                  )}
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
+
+        {/* Companies */}
+        {item.companies?.length > 0 && (
+          <View style={styles.companiesSection}>
+            <Text style={styles.skillsLabel}>Companies Hiring</Text>
+            <View style={styles.skillsWrap}>
+              {item.companies.map(c => (
+                <View key={c} style={styles.companyBadge}><Text style={styles.companyBadgeText}>{c}</Text></View>
+              ))}
+            </View>
           </View>
         )}
       </View>
@@ -93,7 +141,9 @@ export default function CareerInfoScreen() {
         renderItem={({ item }) => (
           <TouchableOpacity style={[styles.expChip, expFilter === item && styles.expChipActive]}
             onPress={() => setExpFilter(item)}>
-            <Text style={[styles.expChipText, expFilter === item && { color: '#fff' }]}>{item}</Text>
+            <Text style={[styles.expChipText, expFilter === item && { color: '#fff' }]}>
+              {item === 'All' ? 'All' : EXP_DISPLAY[item] || item}
+            </Text>
           </TouchableOpacity>
         )}
       />
@@ -101,26 +151,8 @@ export default function CareerInfoScreen() {
       {loading ? (
         <View style={styles.centered}><ActivityIndicator size="large" color={COLORS.primary} /></View>
       ) : (
-        <FlatList data={roles} renderItem={renderRole} keyExtractor={(i, idx) => i._id || String(idx)}
+        <FlatList data={filtered} renderItem={renderRole} keyExtractor={(i) => i._id}
           contentContainerStyle={{ padding: 16, gap: 12, paddingBottom: 40 }}
-          ListHeaderComponent={
-            data?.overview ? (
-              <View style={styles.overviewCard}>
-                <Text style={styles.overviewTitle}>Market Overview</Text>
-                <View style={styles.overviewGrid}>
-                  {data.overview.highDemandRoles !== undefined && (
-                    <View style={styles.overviewItem}><Text style={styles.overviewValue}>{data.overview.highDemandRoles}</Text><Text style={styles.overviewLabel}>High Demand</Text></View>
-                  )}
-                  {data.overview.fresherFriendly !== undefined && (
-                    <View style={styles.overviewItem}><Text style={styles.overviewValue}>{data.overview.fresherFriendly}</Text><Text style={styles.overviewLabel}>Fresher-Friendly</Text></View>
-                  )}
-                  {data.overview.maxSalary && (
-                    <View style={styles.overviewItem}><Text style={styles.overviewValue}>{data.overview.maxSalary}</Text><Text style={styles.overviewLabel}>Max Salary</Text></View>
-                  )}
-                </View>
-              </View>
-            ) : null
-          }
           ListEmptyComponent={<View style={styles.centered}><Ionicons name="briefcase-outline" size={48} color={COLORS.textMuted} /><Text style={styles.emptyText}>No career data available</Text></View>}
         />
       )}
@@ -138,12 +170,6 @@ const styles = StyleSheet.create({
   expChip: { paddingHorizontal: 14, paddingVertical: 7, borderRadius: RADIUS.full, backgroundColor: COLORS.surface, borderWidth: 1, borderColor: COLORS.border },
   expChipActive: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
   expChipText: { fontSize: 12, fontWeight: '600', color: COLORS.textMuted },
-  overviewCard: { backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, padding: 16, borderWidth: 1, borderColor: COLORS.border, gap: 12, marginBottom: 4 },
-  overviewTitle: { fontSize: 15, fontWeight: '700', color: COLORS.textPrimary },
-  overviewGrid: { flexDirection: 'row', gap: 10 },
-  overviewItem: { flex: 1, alignItems: 'center', gap: 4, backgroundColor: COLORS.background, padding: 10, borderRadius: RADIUS.md },
-  overviewValue: { fontSize: 18, fontWeight: '800', color: COLORS.primary },
-  overviewLabel: { fontSize: 10, color: COLORS.textMuted },
   card: { backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, padding: 14, borderWidth: 1, borderColor: COLORS.border, gap: 8 },
   cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 },
   roleName: { flex: 1, fontSize: 15, fontWeight: '700', color: COLORS.textPrimary },
@@ -154,11 +180,22 @@ const styles = StyleSheet.create({
   expText: { fontSize: 12, color: COLORS.textSecondary },
   salaryRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   salaryText: { fontSize: 13, fontWeight: '600', color: COLORS.success },
-  skillsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 4 },
-  skillTag: { backgroundColor: COLORS.primary + '15', paddingHorizontal: 8, paddingVertical: 3, borderRadius: RADIUS.full },
-  skillTagText: { fontSize: 10, color: COLORS.primary, fontWeight: '600' },
   roleDescription: { fontSize: 12, color: COLORS.textSecondary, lineHeight: 18 },
-  growthRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  growthText: { fontSize: 12, color: COLORS.primary, fontWeight: '600' },
+  skillsSection: { gap: 6 },
+  skillsLabel: { fontSize: 11, fontWeight: '700', color: COLORS.textMuted, textTransform: 'uppercase', letterSpacing: 0.5 },
+  skillsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 4 },
+  skillTag: { backgroundColor: `${COLORS.primary}15`, paddingHorizontal: 8, paddingVertical: 3, borderRadius: RADIUS.full },
+  skillTagText: { fontSize: 10, color: COLORS.primary, fontWeight: '600' },
+  prefSkillTag: { backgroundColor: `${COLORS.warning}15`, paddingHorizontal: 8, paddingVertical: 3, borderRadius: RADIUS.full },
+  prefSkillText: { fontSize: 10, color: COLORS.warning, fontWeight: '600' },
+  growthSection: { gap: 6 },
+  growthRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 4 },
+  growthStep: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  growthDot: { width: 18, height: 18, borderRadius: 9, backgroundColor: `${COLORS.primary}20`, justifyContent: 'center', alignItems: 'center' },
+  growthDotText: { fontSize: 9, fontWeight: '800', color: COLORS.primary },
+  growthText: { fontSize: 11, color: COLORS.primary, fontWeight: '600' },
+  companiesSection: { gap: 6 },
+  companyBadge: { backgroundColor: COLORS.background, paddingHorizontal: 8, paddingVertical: 3, borderRadius: RADIUS.full, borderWidth: 1, borderColor: COLORS.border },
+  companyBadgeText: { fontSize: 10, color: COLORS.textSecondary, fontWeight: '600' },
   emptyText: { fontSize: 14, color: COLORS.textMuted, marginTop: 12 },
 });
