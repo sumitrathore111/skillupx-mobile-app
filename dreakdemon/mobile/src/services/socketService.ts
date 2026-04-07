@@ -77,69 +77,73 @@ export function offStopTyping() {
 }
 
 // ============ BATTLE EVENTS ============
+// IMPORTANT: Backend uses hyphen-separated event names (not camelCase)
+
 export function joinBattleLobby() {
-  socket?.emit('joinBattleLobby');
+  socket?.emit('join-battle-lobby');
+  console.log('⚔️ Joined battle lobby room');
 }
 
 export function leaveBattleLobby() {
-  socket?.emit('leaveBattleLobby');
+  socket?.emit('leave-battle-lobby');
+  console.log('⚔️ Left battle lobby room');
+}
+
+export function onBattleCreated(callback: (data: any) => void) {
+  socket?.on('battle-created', callback);
+}
+
+export function offBattleCreated(callback?: (data: any) => void) {
+  socket?.off('battle-created', callback);
+}
+
+export function onBattleRemoved(callback: (data: any) => void) {
+  socket?.on('battle-removed', callback);
+}
+
+export function offBattleRemoved(callback?: (data: any) => void) {
+  socket?.off('battle-removed', callback);
 }
 
 export function onBattleMatched(callback: (data: any) => void) {
-  socket?.on('battleMatched', callback);
+  socket?.on('battle-matched', callback);
 }
 
-export function offBattleMatched() {
-  socket?.off('battleMatched');
-}
-
-export function onBattleStarted(callback: (data: any) => void) {
-  socket?.on('battleStarted', callback);
-}
-
-export function offBattleStarted() {
-  socket?.off('battleStarted');
-}
-
-export function onBattleEnded(callback: (data: any) => void) {
-  socket?.on('battleEnded', callback);
-}
-
-export function offBattleEnded() {
-  socket?.off('battleEnded');
-}
-
-export function onOpponentSubmitted(callback: (data: any) => void) {
-  socket?.on('opponentSubmitted', callback);
-}
-
-export function offOpponentSubmitted() {
-  socket?.off('opponentSubmitted');
+export function offBattleMatched(callback?: (data: any) => void) {
+  socket?.off('battle-matched', callback);
 }
 
 export function onBattleInviteReceived(callback: (data: any) => void) {
-  socket?.on('battleInviteReceived', callback);
+  socket?.on('battle-invite-received', callback);
 }
 
-export function offBattleInviteReceived() {
-  socket?.off('battleInviteReceived');
+export function offBattleInviteReceived(callback?: (data: any) => void) {
+  socket?.off('battle-invite-received', callback);
+}
+
+export function onBattleInviteRejected(callback: (data: any) => void) {
+  socket?.on('battle-invite-rejected', callback);
+}
+
+export function offBattleInviteRejected(callback?: (data: any) => void) {
+  socket?.off('battle-invite-rejected', callback);
 }
 
 // ============ STUDY GROUP EVENTS ============
 export function joinGroup(groupId: string) {
-  socket?.emit('joinGroup', groupId);
+  socket?.emit('join-group', groupId);
 }
 
 export function leaveGroup(groupId: string) {
-  socket?.emit('leaveGroup', groupId);
+  socket?.emit('leave-group', groupId);
 }
 
 export function onGroupMessage(callback: (message: any) => void) {
-  socket?.on('groupMessage', callback);
+  socket?.on('newGroupMessage', callback);
 }
 
 export function offGroupMessage() {
-  socket?.off('groupMessage');
+  socket?.off('newGroupMessage');
 }
 
 // ============ ONLINE STATUS ============

@@ -4,8 +4,7 @@ import type {
     ChallengeDetail,
     LeaderboardEntry,
     SubmissionResult,
-    WaitingBattle,
-    Wallet,
+    WaitingBattle
 } from '@apptypes/index';
 import { apiRequest } from './api';
 
@@ -61,60 +60,130 @@ export async function getUserProgress(userId: string) {
   return data?.progress || { solvedChallenges: [], attemptedChallenges: [] };
 }
 
+// ============ BATTLE REQUEST TYPE (matches frontend) ============
+export interface BattleRequest {
+  difficulty: 'easy' | 'medium' | 'hard';
+  entryFee: number;
+  userId: string;
+  userName: string;
+  userAvatar: string;
+  rating: number;
+  originalBattleId?: string;
+}
+
 // ============ BATTLES ============
-export async function fetchWaitingBattles(): Promise<WaitingBattle[]> {
-  const data = await apiRequest<{ battles: WaitingBattle[] }>('GET', '/battles?status=waiting');
-  return data?.battles || [];
+
+/** Fetch waiting battles, optionally by difficulty */
+export async function fetchWaitingBattles(difficulty?: string): Promise<WaitingBattle[]> {
+  const q = difficulty ? `?status=waiting&difficulty=${difficulty}` : '?status=waiting';
+  const data = await apiRequest<any>('GET', `/battles${q}`);
+  // Backend may return array directly or { battles: [] }
+  return Array.isArray(data) ? data : (data?.battles || []);
 }
 
-export async function createBattle(params: {
-  challengeId?: string;
-  difficulty: string;
-  entryFee?: number;
-  timeLimit?: number;
-  userName?: string;
-  userAvatar?: string;
-  rating?: number;
-}): Promise<Battle> {
-  return apiRequest<Battle>('POST', '/battles/create', params);
+/** Find an available battle to join (same as frontend findAvailableBattle) */
+export async function findAvailableBattle(difficulty: string, entryFee: number): Promise<any | null> {
+  try {
+    const data = await apiRequest<any>('GET', `/battles/find?difficulty=${difficulty}&entryFee=${entryFee}`);
+    return data?.battle || data || null;
+  } catch {
+    return null;
+  }
 }
 
-export async function joinBattle(battleId: string): Promise<Battle> {
-  return apiRequest<Battle>('POST', `/battles/${battleId}/join`, {});
+/** Create a new random battle (same as frontend createRandomBattle) */
+export async function createBattle(params: BattleRequest): Promise<string> {
+  const data = await apiRequest<any>('POST', '/battles/create', params);
+  return data?.battleId || data?._id || data?.id || '';
 }
 
-export async function getBattle(battleId: string): Promise<Battle> {
-  return apiRequest<Battle>('GET', `/battles/${battleId}`);
+/**
+ * Join or create battle — the core matching flow from frontend.
+ * First tries to find an existing battle, if not found creates a new one.
+ */
+export async function joinOrCreateBattle(params: BattleRequest): Promise<string> {
+  // Try to find an existing battle first
+  const existing = await findAvailableBattle(params.difficulty, params.entryFee);
+  if (existing && (existing._id || existing.id)) {
+    const battleId = existing._id || existing.id;
+    // Join existing battle
+    await joinBattle(battleId, params.userName, params.userAvatar, params.rating);
+    return battleId;
+  }
+  // No existing battle found — create a new one
+  return createBattle(params);
+}
+
+/** Join an existing battle — passes userName, userAvatar, rating like frontend */
+export async function joinBattle(
+  battleId: string,
+  userName: string,
+  userAvatar: string,
+  rating: number
+): Promise<any> {
+  return apiRequest<any>('POST', `/battles/${battleId}/join`, {
+    userName,
+    userAvatar,
+    rating,
+  });
+}
+
+/** Get battle by ID — returns battle data (handles both wrapped and unwrapped response) */
+export async function getBattle(battleId: string): Promise<any> {
+  const data = await apiRequest<any>('GET', `/battles/${battleId}`);
+  return data?.battle || data;
 }
 
 export async function forfeitBattle(battleId: string): Promise<void> {
   return apiRequest<void>('POST', `/battles/${battleId}/forfeit`, {});
 }
 
+/** Cancel/delete a waiting battle */
+export async function cancelBattle(battleId: string): Promise<void> {
+  return apiRequest<void>('DELETE', `/battles/${battleId}`);
+}
+
 export async function getBattleHistory(): Promise<Battle[]> {
-  const data = await apiRequest<{ battles: Battle[] }>('GET', '/battles/user/my-battles');
-  return data?.battles || [];
+  const data = await apiRequest<any>('GET', '/battles/user/my-battles');
+  return Array.isArray(data) ? data : (data?.battles || []);
 }
 
-export async function createBotBattle(difficulty: string): Promise<Battle> {
-  return apiRequest<Battle>('POST', '/battles/create-bot-battle', { difficulty });
+/** Create bot battle — passes full BattleRequest like frontend */
+export async function createBotBattle(params: BattleRequest): Promise<{ battleId: string; botProfile?: any }> {
+  return apiRequest<{ battleId: string; botProfile?: any }>('POST', '/battles/create-bot-battle', params);
 }
 
+/** Invite user to battle — matches frontend inviteUserToBattle */
 export async function inviteUserToBattle(params: {
-  username: string;
-  difficulty: string;
+  targetUserId: string;
+  difficulty: 'easy' | 'medium' | 'hard';
   entryFee: number;
-}): Promise<void> {
-  return apiRequest<void>('POST', '/battles/invite', params);
+  userId: string;
+  userName: string;
+  userAvatar: string;
+  rating: number;
+}): Promise<string> {
+  const data = await apiRequest<any>('POST', '/battles/invite', params);
+  return data?.battleId || data?._id || '';
 }
 
 export async function getBattleInvites(): Promise<any[]> {
-  const data = await apiRequest<{ invites: any[] }>('GET', '/battles/my-invites');
-  return data?.invites || [];
+  const data = await apiRequest<any>('GET', '/battles/my-invites');
+  return Array.isArray(data) ? data : (data?.invites || []);
 }
 
-export async function acceptBattleInvite(battleId: string): Promise<Battle> {
-  return apiRequest<Battle>('POST', `/battles/${battleId}/accept-invite`, {});
+/** Accept invite — passes userName, userAvatar, rating like frontend */
+export async function acceptBattleInvite(
+  battleId: string,
+  userName: string,
+  userAvatar: string,
+  rating: number
+): Promise<any> {
+  return apiRequest<any>('POST', `/battles/${battleId}/accept-invite`, {
+    userName,
+    userAvatar,
+    rating,
+  });
 }
 
 export async function rejectBattleInvite(battleId: string): Promise<void> {
@@ -138,10 +207,94 @@ export async function fetchMonthlyLeaderboard(): Promise<LeaderboardEntry[]> {
 }
 
 // ============ WALLET ============
-export async function fetchWallet(userId?: string): Promise<Wallet & { stats: any; transactions: any[] }> {
-  if (!userId) return { balance: 0, coins: 0, stats: {}, transactions: [] } as any;
-  const data = await apiRequest<{ wallet: any }>('GET', `/wallet/${userId}`);
-  const w = data?.wallet || {};
-  // Backend returns 'achievements' — expose as 'stats' for screen compatibility
-  return { ...w, stats: w.achievements || {}, transactions: w.transactions || [] };
+export async function fetchWallet(userId: string): Promise<any> {
+  if (!userId) return { coins: 0, rating: 1000, achievements: {}, streak: {} };
+  const data = await apiRequest<any>('GET', `/wallet/${userId}`);
+  const w = data?.wallet || data || {};
+  return {
+    ...w,
+    coins: w.coins ?? 0,
+    rating: w.rating ?? 1000,
+    stats: w.achievements || {},
+    transactions: w.transactions || [],
+  };
+}
+
+/** Initialize wallet if it doesn't exist */
+export async function initializeWallet(userId: string): Promise<any> {
+  const data = await apiRequest<any>('POST', `/wallet`, { userId });
+  return data?.wallet || data;
+}
+
+/** Get user battle stats (optimized endpoint) */
+export async function getUserBattleStats(userId: string): Promise<any> {
+  try {
+    const data = await apiRequest<any>('GET', `/battles/user-stats/${userId}`);
+    return data || {};
+  } catch {
+    return {};
+  }
+}
+
+// ============ SEARCH USERS (same endpoint as frontend) ============
+export async function searchUsersForInvite(query: string): Promise<any[]> {
+  const data = await apiRequest<any>('GET', `/battles/search-users?q=${encodeURIComponent(query)}`);
+  return Array.isArray(data) ? data : (data?.users || []);
+}
+
+// ============ REMATCH (matches frontend createRematchBattle) ============
+export async function createRematchBattle(
+  params: BattleRequest & { originalBattleId?: string },
+  targetOpponentId: string,
+  targetOpponentName: string
+): Promise<string> {
+  const data = await apiRequest<any>('POST', `/battles/${params.originalBattleId}/rematch`, {
+    to: targetOpponentId,
+    toName: targetOpponentName,
+    fromName: params.userName,
+    difficulty: params.difficulty,
+    entryFee: params.entryFee,
+    userName: params.userName,
+    userAvatar: params.userAvatar,
+    rating: params.rating,
+  });
+  return data?.battleId || data?._id || data?.id || '';
+}
+
+// ============ BOT PROGRESS ============
+export async function getBotProgress(battleId: string): Promise<any> {
+  return apiRequest<any>('GET', `/battles/${battleId}/bot-progress`);
+}
+
+// ============ START BATTLE ============
+export async function startBattle(battleId: string): Promise<void> {
+  return apiRequest<void>('POST', `/battles/${battleId}/start`, {});
+}
+
+// ============ SUBMIT BATTLE CODE ============
+export async function submitBattleCode(battleId: string, code: string, language: string): Promise<any> {
+  return apiRequest<any>('POST', `/battles/${battleId}/submit`, { code, language });
+}
+
+// ============ AI SERVICES ============
+export async function getAIHint(params: { challengeId: string; level: number; code?: string }): Promise<{ hint: string }> {
+  return apiRequest<{ hint: string }>('POST', '/ai/hint', params);
+}
+
+export async function analyzeCodeAI(params: { code: string; language: string; challengeId: string }): Promise<any> {
+  return apiRequest<any>('POST', '/ai/analyze', params);
+}
+
+// ============ DISCUSSIONS ============
+export async function getDiscussions(challengeId: string): Promise<any[]> {
+  const data = await apiRequest<{ discussions: any[] }>('GET', `/discussions/${challengeId}`);
+  return data?.discussions || [];
+}
+
+export async function createDiscussion(challengeId: string, title: string, content: string): Promise<any> {
+  return apiRequest<any>('POST', `/discussions/${challengeId}`, { title, content });
+}
+
+export async function voteDiscussion(discussionId: string): Promise<void> {
+  return apiRequest<void>('POST', `/discussions/${discussionId}/vote`, {});
 }

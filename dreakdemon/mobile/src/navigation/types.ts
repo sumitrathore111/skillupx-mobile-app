@@ -38,7 +38,7 @@ export type ArenaStackParamList = {
   CodeEditor: { challengeId: string; challengeTitle: string; difficulty: string };
   BattleLobby: undefined;
   BattleRoom: { battleId: string };
-  BattleResult: { battleId: string; won: boolean; coinsChange: number };
+  BattleResult: { battleId: string; won?: boolean; coinsChange?: number; winnerId?: string; coinsEarned?: number; result?: string };
   BattleHistory: undefined;
   Leaderboard: undefined;
   Wallet: undefined;
