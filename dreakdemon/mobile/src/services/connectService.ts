@@ -1,4 +1,6 @@
 import type {
+    ConnectionRequest,
+    ConnectionStatus,
     Conversation,
     DeveloperProfile,
     HelpRequest,
@@ -27,7 +29,47 @@ export async function fetchDevelopers(params?: {
 }
 
 export async function fetchDeveloperById(id: string): Promise<DeveloperProfile> {
-  return apiRequest<DeveloperProfile>('GET', `/developers/${id}`);
+  const res = await apiRequest<{ developer: DeveloperProfile } | DeveloperProfile>('GET', `/developers/${id}`);
+  return (res as any).developer ?? (res as DeveloperProfile);
+}
+
+// ============ CONNECTION REQUESTS (Instagram-like) ============
+export async function sendConnectionRequest(receiverId: string): Promise<ConnectionRequest> {
+  const res = await apiRequest<{ request: ConnectionRequest } | ConnectionRequest>('POST', `/connections/request/${receiverId}`, {});
+  return (res as any).request ?? (res as ConnectionRequest);
+}
+
+export async function acceptConnectionRequest(requestId: string): Promise<ConnectionRequest> {
+  const res = await apiRequest<{ request: ConnectionRequest } | ConnectionRequest>('PATCH', `/connections/accept/${requestId}`, {});
+  return (res as any).request ?? (res as ConnectionRequest);
+}
+
+export async function rejectConnectionRequest(requestId: string): Promise<ConnectionRequest> {
+  const res = await apiRequest<{ request: ConnectionRequest } | ConnectionRequest>('PATCH', `/connections/reject/${requestId}`, {});
+  return (res as any).request ?? (res as ConnectionRequest);
+}
+
+export async function removeConnection(userId: string): Promise<void> {
+  return apiRequest<void>('DELETE', `/connections/remove/${userId}`);
+}
+
+export async function fetchMyConnections(): Promise<{ userId: string; name: string; avatar: string; connectedAt: string }[]> {
+  const res = await apiRequest<{ connections: any[] }>('GET', '/connections/my-connections');
+  return res.connections ?? [];
+}
+
+export async function fetchReceivedRequests(): Promise<ConnectionRequest[]> {
+  const res = await apiRequest<{ requests: ConnectionRequest[] }>('GET', '/connections/requests/received');
+  return res.requests ?? [];
+}
+
+export async function fetchSentRequests(): Promise<ConnectionRequest[]> {
+  const res = await apiRequest<{ requests: ConnectionRequest[] }>('GET', '/connections/requests/sent');
+  return res.requests ?? [];
+}
+
+export async function fetchConnectionStatus(userId: string): Promise<ConnectionStatus> {
+  return apiRequest<ConnectionStatus>('GET', `/connections/status/${userId}`);
 }
 
 // ============ 1:1 MESSAGES ============
@@ -35,18 +77,9 @@ export async function fetchConversations(): Promise<Conversation[]> {
   return apiRequest<Conversation[]>('GET', '/chats');
 }
 
-export async function fetchOrCreateChat(
-  currentUserId: string,
-  currentUserName: string,
-  currentUserAvatar: string,
-  participantId: string,
-  participantName: string,
-  participantAvatar: string
-): Promise<any> {
+export async function fetchOrCreateChat(participantId: string): Promise<any> {
   return apiRequest<any>('POST', '/chats', {
-    participantIds: [currentUserId, participantId],
-    participantNames: [currentUserName, participantName],
-    participantAvatars: [currentUserAvatar, participantAvatar],
+    participantIds: [participantId],
   });
 }
 
@@ -83,6 +116,7 @@ export async function createStudyGroup(data: {
   topic: string;
   level: string;
   maxMembers: number;
+  isPrivate?: boolean;
 }): Promise<StudyGroup> {
   return apiRequest<StudyGroup>('POST', '/study-groups', data);
 }
@@ -91,12 +125,15 @@ export async function requestJoinGroup(groupId: string): Promise<void> {
   return apiRequest<void>('POST', `/study-groups/${groupId}/join`, {});
 }
 
-export async function fetchGroupMessages(groupId: string): Promise<any[]> {
-  return apiRequest<any[]>('GET', `/study-groups/${groupId}/messages`);
+export async function fetchGroupMessages(groupId: string, roomId?: string): Promise<any[]> {
+  const query = roomId ? `?roomId=${encodeURIComponent(roomId)}` : '';
+  const data = await apiRequest<any>('GET', `/study-groups/${groupId}/messages${query}`);
+  return Array.isArray(data) ? data : (data?.messages ?? []);
 }
 
-export async function sendGroupMessage(groupId: string, content: string): Promise<any> {
-  return apiRequest<any>('POST', `/study-groups/${groupId}/messages`, { content });
+export async function sendGroupMessage(groupId: string, content: string, roomId?: string): Promise<any> {
+  const data = await apiRequest<any>('POST', `/study-groups/${groupId}/messages`, { message: content, roomId: roomId || 'general' });
+  return data?.message ?? data;
 }
 
 export async function fetchGroupDetail(groupId: string): Promise<any> {
@@ -108,12 +145,37 @@ export async function deleteStudyGroup(groupId: string): Promise<void> {
   return apiRequest<void>('DELETE', `/study-groups/${groupId}`);
 }
 
+export async function removeMemberFromGroup(groupId: string, userId: string): Promise<void> {
+  return apiRequest<void>('DELETE', `/study-groups/${groupId}/members/${userId}`);
+}
+
+export async function leaveGroup(groupId: string): Promise<void> {
+  return apiRequest<void>('POST', `/study-groups/${groupId}/leave`, {});
+}
+
 export async function approveJoinRequest(groupId: string, requestId: string): Promise<void> {
   return apiRequest<void>('POST', `/study-groups/${groupId}/approve/${requestId}`, {});
 }
 
 export async function rejectJoinRequest(groupId: string, requestId: string): Promise<void> {
   return apiRequest<void>('POST', `/study-groups/${groupId}/reject/${requestId}`, {});
+}
+
+export async function editGroupMessage(groupId: string, messageId: string, content: string): Promise<any> {
+  return apiRequest<any>('PATCH', `/study-groups/${groupId}/messages/${messageId}`, { content });
+}
+
+export async function deleteGroupMessage(groupId: string, messageId: string): Promise<void> {
+  return apiRequest<void>('DELETE', `/study-groups/${groupId}/messages/${messageId}`);
+}
+
+// ============ ROOMS (Discord-like channels) ============
+export async function createRoom(groupId: string, name: string, type: string = 'text'): Promise<any> {
+  return apiRequest<any>('POST', `/study-groups/${groupId}/rooms`, { name, type });
+}
+
+export async function deleteRoom(groupId: string, roomId: string): Promise<any> {
+  return apiRequest<any>('DELETE', `/study-groups/${groupId}/rooms/${roomId}`);
 }
 
 // ============ TECH REVIEWS ============

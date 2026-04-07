@@ -23,6 +23,8 @@ export type ConnectStackParamList = {
   DevProfile: { developerId: string };
   Chat: { participantId: string; participantName: string; participantAvatar?: string; isOnline?: boolean };
   GroupChat: { groupId: string; groupName: string };
+  VoiceRoom: { groupId: string; roomId: string; roomName: string; groupName: string };
+  ConnectionRequests: undefined;
   WriteReview: undefined;
   SubmitHelpRequest: undefined;
 };

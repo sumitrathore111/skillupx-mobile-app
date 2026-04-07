@@ -33,16 +33,14 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       const [token, user] = await Promise.all([getStoredToken(), getStoredUser()]);
 
       if (token && user) {
-        set({ token, user, isAuthenticated: true });
-        // Re-fetch fresh user data in background
-        try {
-          const freshUser = await fetchCurrentUser();
-          set({ user: freshUser });
-        } catch {
-          // Token might be expired — stay logged in with cached data
-        }
-        // Connect socket
-        await initializeSocket();
+        set({ token, user, isAuthenticated: true, isLoading: false });
+        // Re-fetch fresh user data in background (non-blocking)
+        fetchCurrentUser()
+          .then((freshUser) => set({ user: freshUser }))
+          .catch(() => { /* Token might be expired — stay logged in with cached data */ });
+        // Connect socket in background (non-blocking)
+        initializeSocket().catch(() => {});
+        return;
       }
     } catch (error) {
       set({ user: null, token: null, isAuthenticated: false });

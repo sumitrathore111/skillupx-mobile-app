@@ -28,6 +28,7 @@
       },
       "package": "com.dreakdemon.app",
       "versionCode": 1,
+      "softwareKeyboardLayoutMode": "adjustResize",
       "permissions": [
         "NOTIFICATIONS",
         "VIBRATE",

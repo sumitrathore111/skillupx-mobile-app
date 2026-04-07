@@ -2,6 +2,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IGroupMessage extends Document {
   groupId: string;
+  roomId: string;
   senderId: string;
   senderName: string;
   senderAvatar: string;
@@ -12,6 +13,7 @@ export interface IGroupMessage extends Document {
 
 const GroupMessageSchema: Schema = new Schema({
   groupId: { type: String, required: true, index: true },
+  roomId: { type: String, default: 'general' },
   senderId: { type: String, required: true },
   senderName: { type: String, required: true },
   senderAvatar: { type: String, default: '' },
@@ -20,7 +22,7 @@ const GroupMessageSchema: Schema = new Schema({
   timestamps: true
 });
 
-// Index for faster message retrieval by group
-GroupMessageSchema.index({ groupId: 1, createdAt: -1 });
+// Index for faster message retrieval by group + room
+GroupMessageSchema.index({ groupId: 1, roomId: 1, createdAt: -1 });
 
 export default mongoose.model<IGroupMessage>('GroupMessage', GroupMessageSchema);

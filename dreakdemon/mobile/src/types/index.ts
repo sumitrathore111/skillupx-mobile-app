@@ -36,6 +36,56 @@ export interface DeveloperProfile {
   roadmapScore?: number;
   creatorScore?: number;
   rank?: number;
+  interests?: string[];
+  github?: string;
+  linkedin?: string;
+  portfolio?: string;
+  stats?: {
+    problemsSolved?: number;
+    battlesWon?: number;
+    roadmapsCompleted?: number;
+    currentStreak?: number;
+  };
+  // Full profile fields from backend
+  location?: string;
+  institute?: string;
+  phone?: string;
+  yearOfStudy?: number;
+  languages?: string[];
+  resume_objective?: string;
+  githubUsername?: string;
+  profileCompletion?: number;
+  education?: { degree: string; school: string; year: string }[];
+  experience?: { title: string; company: string; year: string; desc: string }[];
+  links?: { platform: string; url: string }[];
+  achievements?: string[];
+  target_company?: string[];
+  badges?: { id: string; name: string; icon: string; description: string; earnedAt: string; category: string }[];
+  marathon_score?: number;
+  streakCount?: number;
+  challenges_solved?: number;
+  battlesWon?: number;
+  battleRating?: number;
+  joinedDate?: string;
+}
+
+export interface ConnectionRequest {
+  id: string;
+  _id?: string;
+  senderId: string;
+  senderName: string;
+  senderAvatar: string;
+  receiverId: string;
+  receiverName: string;
+  receiverAvatar: string;
+  status: 'pending' | 'accepted' | 'rejected';
+  createdAt: string;
+}
+
+export interface ConnectionStatus {
+  status: 'none' | 'pending' | 'accepted' | 'rejected';
+  requestId?: string;
+  isSender?: boolean;
 }
 
 export interface Message {
@@ -78,10 +128,13 @@ export interface StudyGroup {
   topic: string;
   level: 'Beginner' | 'Intermediate' | 'Advanced';
   maxMembers: number;
-  members: number | { userId: string; name: string; avatar?: string; role: string; joinedAt: string }[];
+  members: number | { userId: string; userName: string; userAvatar?: string; role: string; joinedAt: string }[];
+  joinRequests?: { userId: string; userName: string; userAvatar?: string; status: string; requestedAt: string }[];
   creatorId: string;
   creatorName: string;
   createdAt: string;
+  isPrivate: boolean;
+  category?: string;
 }
 
 export interface TechReview {

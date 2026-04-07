@@ -7,7 +7,7 @@ import { Platform } from 'react-native';
 // Auto-detect: web uses localhost, Android emulator uses 10.0.2.2, physical device uses LAN IP
 // To switch: set USE_EMULATOR=true for emulator, or update PHYSICAL_DEVICE_IP for real device
 const USE_EMULATOR = false; // set true when running on Android emulator
-const PHYSICAL_DEVICE_IP = '172.29.189.47'; // run `ipconfig` → IPv4 Address
+const PHYSICAL_DEVICE_IP = '192.168.29.224'; // run `ipconfig` → IPv4 Address
 
 const BASE_HOST =
   Platform.OS === 'web'

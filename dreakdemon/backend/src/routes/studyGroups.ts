@@ -45,6 +45,13 @@ const transformGroup = (group: any) => ({
   avatar: group.avatar,
   resources: group.resources,
   schedule: group.schedule,
+  rooms: group.rooms?.map((r: any) => ({
+    roomId: r.roomId,
+    name: r.name,
+    type: r.type,
+    createdBy: r.createdBy,
+    createdAt: r.createdAt
+  })) || [{ roomId: 'general', name: 'general', type: 'text' }],
   createdAt: group.createdAt,
   updatedAt: group.updatedAt
 });
@@ -106,7 +113,10 @@ router.post('/', authenticate, async (req: AuthRequest, res: Response): Promise<
         userAvatar: creatorAvatar || '',
         role: 'admin',
         joinedAt: new Date()
-      }]
+      }],
+      rooms: [
+        { roomId: 'general', name: 'general', type: 'text', createdBy: req.user!.id, createdAt: new Date() }
+      ]
     });
 
     // Send email notification to all users about new study group (async, don't wait)
@@ -512,7 +522,8 @@ router.get('/:id/messages', authenticate, async (req: AuthRequest, res: Response
       return;
     }
 
-    const messages = await GroupMessage.find({ groupId: req.params.id })
+    const roomId = (req.query.roomId as string) || 'general';
+    const messages = await GroupMessage.find({ groupId: req.params.id, roomId })
       .sort({ createdAt: 1 })
       .limit(100);
 
@@ -535,7 +546,7 @@ router.get('/:id/messages', authenticate, async (req: AuthRequest, res: Response
 // Send message to group
 router.post('/:id/messages', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { message, senderName, senderAvatar } = req.body;
+    const { message, senderName, senderAvatar, roomId } = req.body;
 
     if (!message || !message.trim()) {
       res.status(400).json({ error: 'Message is required' });
@@ -557,6 +568,7 @@ router.post('/:id/messages', authenticate, async (req: AuthRequest, res: Respons
 
     const newMessage = await GroupMessage.create({
       groupId: req.params.id,
+      roomId: roomId || 'general',
       senderId: req.user!.id,
       senderName: senderName || req.user!.name || 'User',
       senderAvatar: senderAvatar || '',
@@ -683,6 +695,80 @@ router.delete('/:id/messages/:messageId', authenticate, async (req: AuthRequest,
     }
 
     res.json({ success: true });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ─── Room CRUD (Discord-like channels) ────────────────────────────
+
+// Create room (admin only)
+router.post('/:id/rooms', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { name, type } = req.body;
+    if (!name || !name.trim()) { res.status(400).json({ error: 'Room name is required' }); return; }
+
+    const group = await StudyGroup.findById(req.params.id);
+    if (!group) { res.status(404).json({ error: 'Group not found' }); return; }
+
+    const member = group.members.find(m => m.userId === req.user!.id);
+    if (!member || (member.role !== 'admin' && group.createdBy !== req.user!.id)) {
+      res.status(403).json({ error: 'Only admins can create rooms' }); return;
+    }
+
+    const roomId = name.trim().toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-');
+    if (group.rooms?.some(r => r.roomId === roomId)) {
+      res.status(400).json({ error: 'Room with this name already exists' }); return;
+    }
+
+    if (!group.rooms) group.rooms = [];
+    group.rooms.push({
+      roomId,
+      name: name.trim().toLowerCase(),
+      type: type || 'text',
+      createdBy: req.user!.id,
+      createdAt: new Date()
+    });
+    await group.save();
+
+    const io = getIO(req);
+    if (io) {
+      io.to(`group:${req.params.id}`).emit('roomCreated', { groupId: req.params.id, room: group.rooms[group.rooms.length - 1] });
+    }
+
+    res.status(201).json({ group: transformGroup(group) });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Delete room (admin only, cannot delete general)
+router.delete('/:id/rooms/:roomId', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    if (req.params.roomId === 'general') {
+      res.status(400).json({ error: 'Cannot delete the general room' }); return;
+    }
+
+    const group = await StudyGroup.findById(req.params.id);
+    if (!group) { res.status(404).json({ error: 'Group not found' }); return; }
+
+    const member = group.members.find(m => m.userId === req.user!.id);
+    if (!member || (member.role !== 'admin' && group.createdBy !== req.user!.id)) {
+      res.status(403).json({ error: 'Only admins can delete rooms' }); return;
+    }
+
+    group.rooms = (group.rooms || []).filter(r => r.roomId !== req.params.roomId);
+    await group.save();
+
+    // Delete messages in that room
+    await GroupMessage.deleteMany({ groupId: req.params.id, roomId: req.params.roomId });
+
+    const io = getIO(req);
+    if (io) {
+      io.to(`group:${req.params.id}`).emit('roomDeleted', { groupId: req.params.id, roomId: req.params.roomId });
+    }
+
+    res.json({ group: transformGroup(group) });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
