@@ -211,10 +211,17 @@ export default function CreatorHomeScreen() {
 
   const isMember = (projectId: string) => userMemberships.has(String(projectId));
 
+  const getOwnerId = (project: Project) => {
+    const o = (project as any).owner;
+    if (o && typeof o === 'object') return String(o._id || o.id || '');
+    if (o) return String(o);
+    return String(project.creatorId || '');
+  };
+
   const getButtonState = (project: Project) => {
     const pid    = (project as any)._id || project.id;
     const status = getJoinStatus(pid);
-    const isOwner  = String(project.creatorId) === String(user?.id);
+    const isOwner  = getOwnerId(project) === String(user?.id);
     const isCompleted = (project as any).isCompleted || project.status === 'completed' || project.status === 'Completed';
 
     if (!user)     return { label: 'Login to Join',  action: 'none' as const,    color: COLORS.textMuted, disabled: true };
@@ -345,7 +352,7 @@ export default function CreatorHomeScreen() {
     const btn         = getButtonState(item);
     const isCompleted = (item as any).isCompleted || item.status === 'completed' || item.status === 'Completed';
     const pid = (item as any)._id || item.id;
-    const isOwner = String(item.creatorId) === String(user?.id);
+    const isOwner = getOwnerId(item) === String(user?.id);
     const pendingCount = projectPendingRequests[pid] || 0;
 
     return (
