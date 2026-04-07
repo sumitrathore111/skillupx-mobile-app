@@ -1,4 +1,4 @@
-import type { Idea, JoinRequest, Project } from '@apptypes/index';
+import type { Idea, InvitableDeveloper, JoinRequest, Project, ProjectInvite } from '@apptypes/index';
 import { apiRequest } from './api';
 
 // ── Projects ──────────────────────────────────────────────
@@ -113,6 +113,57 @@ export async function respondToJoinRequest(
   return apiRequest<void>('PUT', `/join-requests/${requestId}/respond`, { status: response });
 }
 
+// ── Project Invitations ───────────────────────────────────
+export async function getInvitableDevelopers(
+  projectId: string,
+  page = 1,
+  search = '',
+): Promise<{ developers: InvitableDeveloper[]; total: number; page: number }> {
+  const query = new URLSearchParams();
+  query.set('page', String(page));
+  query.set('limit', '10');
+  if (search) query.set('search', search);
+  const data = await apiRequest<any>('GET', `/project-invites/developers/${projectId}?${query.toString()}`);
+  return {
+    developers: data?.developers || data || [],
+    total: data?.total || 0,
+    page: data?.page || page,
+  };
+}
+
+export async function sendProjectInvite(
+  projectId: string,
+  invitedUserId: string,
+  message?: string,
+): Promise<{ inviteLink?: string }> {
+  const data = await apiRequest<any>('POST', '/project-invites', {
+    projectId,
+    invitedUserId,
+    message,
+  });
+  return { inviteLink: data?.invite?.inviteLink || null };
+}
+
+export async function fetchMyInvites(): Promise<ProjectInvite[]> {
+  const data = await apiRequest<any>('GET', '/project-invites/my-invites');
+  if (Array.isArray(data)) return data;
+  return data?.invites || [];
+}
+
+export async function respondToInvite(
+  inviteId: string,
+  response: 'accepted' | 'declined',
+): Promise<{ projectId?: string }> {
+  const data = await apiRequest<any>('PUT', `/project-invites/${inviteId}/respond`, { response });
+  return data || {};
+}
+
+export async function fetchProjectMembers(projectId: string): Promise<any[]> {
+  const data = await apiRequest<any>('GET', `/projects/${projectId}/members`);
+  if (Array.isArray(data)) return data;
+  return data?.members || [];
+}
+
 // ── Completed Tasks ───────────────────────────────────────
 export async function fetchMyCompletedTasks(
   userId: string,
@@ -123,11 +174,4 @@ export async function fetchMyCompletedTasks(
   } catch {
     return { count: 0, completedTasks: [] };
   }
-}
-
-// ── Members ───────────────────────────────────────────────
-export async function fetchProjectMembers(projectId: string): Promise<any[]> {
-  const data = await apiRequest<any>('GET', `/projects/${projectId}/members`);
-  if (Array.isArray(data)) return data;
-  return (data as any)?.members || [];
 }
