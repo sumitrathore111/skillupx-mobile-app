@@ -18,6 +18,7 @@ module.exports = function (api) {
             '@navigation': './src/navigation',
             '@hooks': './src/hooks',
             '@types': './src/types',
+            '@apptypes': './src/types',
           },
         },
       ],

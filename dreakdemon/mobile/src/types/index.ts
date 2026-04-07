@@ -311,6 +311,39 @@ export interface JoinRequest {
   createdAt: string;
 }
 
+export interface ProjectInvite {
+  id: string;
+  _id?: string;
+  projectId: {
+    _id: string;
+    title: string;
+    description?: string;
+    status?: string;
+    category?: string;
+  };
+  invitedBy: {
+    _id: string;
+    name: string;
+    email?: string;
+    avatar?: string;
+  };
+  invitedUserId?: string;
+  message?: string;
+  inviteLink?: string;
+  status: 'pending' | 'accepted' | 'declined' | 'expired';
+  expiresAt: string;
+  createdAt: string;
+}
+
+export interface InvitableDeveloper {
+  _id: string;
+  name: string;
+  email: string;
+  skills?: string[];
+  avatar?: string;
+  institute?: string;
+}
+
 // ==================== ROADMAP TYPES ====================
 export interface Resource {
   title: string;

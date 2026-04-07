@@ -62,4 +62,8 @@ export type CreatorStackParamList = {
   MyProjects: undefined;
   IdeasFeed: undefined;
   SubmitIdea: { editIdea?: any } | undefined;
+  InviteMember: { projectId: string; projectTitle: string };
+  MyInvites: undefined;
+  TaskDetail: { taskId: string; projectId: string; isCreator?: boolean };
+  GitHubConnect: { projectId: string; projectTitle: string };
 };

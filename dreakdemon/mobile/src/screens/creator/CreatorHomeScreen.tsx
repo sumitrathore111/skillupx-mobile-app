@@ -6,6 +6,7 @@ import {
     deleteIdea,
     fetchMyCompletedTasks,
     fetchMyIdeas,
+    fetchMyInvites,
     fetchMyProjectsList,
     fetchProjectMembers,
     fetchProjects,
@@ -13,6 +14,9 @@ import {
     sendJoinRequest,
 } from '@services/creatorService';
 import { useAuthStore } from '@store/authStore';
+import { LinearGradient } from 'expo-linear-gradient';
+import * as Print from 'expo-print';
+import * as Sharing from 'expo-sharing';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
     ActivityIndicator,
@@ -28,6 +32,9 @@ import {
     View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+const GLASS = 'rgba(255,255,255,0.05)';
+const GLASS_BORDER = 'rgba(255,255,255,0.08)';
 
 // ──────────────────────────────────────────────────────────
 // Types & constants – matching frontend BrowseProjects
@@ -81,6 +88,9 @@ export default function CreatorHomeScreen() {
   // ── Details modal ────────────────────────────────────────
   const [detailsVisible, setDetailsVisible]     = useState(false);
   const [detailProject, setDetailProject]       = useState<Project | null>(null);
+
+  // ── Pending invites count ────────────────────────────────
+  const [pendingInviteCount, setPendingInviteCount] = useState(0);
 
   // ─────────────────────────────────────────────────────────
   // Data loading – matching frontend loadProjects + loadAccessData
@@ -156,6 +166,16 @@ export default function CreatorHomeScreen() {
     } catch (e) { console.error(e); }
     finally { setCompletedLoading(false); }
   }, [user]);
+
+  // Load invite count on mount
+  useEffect(() => {
+    (async () => {
+      try {
+        const invites = await fetchMyInvites();
+        setPendingInviteCount(invites.filter((i: any) => i.status === 'pending').length);
+      } catch { /* ignore */ }
+    })();
+  }, []);
 
   useEffect(() => {
     if (activeTab === 'browse')     { setLoading(true); loadBrowseData(); }
@@ -245,6 +265,51 @@ export default function CreatorHomeScreen() {
     if (typeof project.memberCount === 'number') return project.memberCount;
     if (typeof project.members === 'number') return project.members;
     return 0;
+  };
+
+  const handleDownloadCertificate = async () => {
+    try {
+      const userName = user?.name || user?.username || 'Developer';
+      const dateStr = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+      const html = `
+        <html>
+        <head>
+          <style>
+            body { margin: 0; padding: 40px; font-family: Georgia, serif; background: #ffffff; }
+            .cert { border: 8px double ${PRIMARY}; padding: 60px 40px; text-align: center; min-height: 600px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+            .logo { font-size: 28px; font-weight: bold; color: ${PRIMARY}; letter-spacing: 4px; margin-bottom: 10px; }
+            .subtitle { font-size: 14px; color: #666; letter-spacing: 2px; margin-bottom: 40px; }
+            .title { font-size: 22px; color: #333; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 3px; }
+            .name { font-size: 36px; font-weight: bold; color: ${PRIMARY}; margin: 20px 0; border-bottom: 3px solid ${PRIMARY}; padding-bottom: 10px; display: inline-block; }
+            .desc { font-size: 16px; color: #555; line-height: 1.8; max-width: 500px; margin: 20px auto; }
+            .tasks { font-size: 18px; font-weight: bold; color: ${PRIMARY}; margin: 10px 0 30px; }
+            .date { font-size: 14px; color: #888; margin-top: 40px; }
+            .badge { font-size: 48px; margin-bottom: 20px; }
+          </style>
+        </head>
+        <body>
+          <div class="cert">
+            <div class="badge">🏆</div>
+            <div class="logo">SKILLUPX</div>
+            <div class="subtitle">PROJECT COLLABORATION HUB</div>
+            <div class="title">Certificate of Achievement</div>
+            <div style="font-size: 14px; color: #888;">This is to certify that</div>
+            <div class="name">${userName}</div>
+            <div class="desc">has successfully completed <strong>${completedCount}</strong> verified tasks across multiple collaborative projects, demonstrating exceptional skill and dedication.</div>
+            <div class="tasks">${completedCount} Tasks Completed</div>
+            <div class="date">Issued on ${dateStr}</div>
+          </div>
+        </body>
+        </html>`;
+      const { uri } = await Print.printToFileAsync({ html, base64: false });
+      if (await Sharing.isAvailableAsync()) {
+        await Sharing.shareAsync(uri, { mimeType: 'application/pdf', dialogTitle: 'SkillUpX Certificate' });
+      } else {
+        Alert.alert('Certificate Saved', `Certificate saved to: ${uri}`);
+      }
+    } catch (e: any) {
+      Alert.alert('Error', e.message || 'Failed to generate certificate');
+    }
   };
 
   // ── Filtered + sorted projects ───────────────────────────
@@ -495,14 +560,25 @@ export default function CreatorHomeScreen() {
 
       {/* ── Header ───────────────────────────────────────── */}
       <View style={S.header}>
+        <LinearGradient colors={[PRIMARY + '15', 'transparent']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={S.headerGradient} />
         <View style={{ flex: 1 }}>
           <Text style={S.headerTitle}>Project Collaboration Hub</Text>
           <Text style={S.headerSub}>Join exciting projects or submit your own idea</Text>
         </View>
-        <TouchableOpacity style={S.submitBtn} onPress={() => navigation.navigate('SubmitIdea')}>
-          <Ionicons name="bulb-outline" size={15} color="#fff" />
-          <Text style={S.submitBtnText}>Submit Idea</Text>
-        </TouchableOpacity>
+        <View style={{ flexDirection: 'row', gap: 8 }}>
+          <TouchableOpacity style={S.inviteBtn} onPress={() => navigation.navigate('MyInvites')}>
+            <Ionicons name="mail-outline" size={17} color={PRIMARY} />
+            {pendingInviteCount > 0 && (
+              <View style={S.inviteBadge}>
+                <Text style={S.inviteBadgeText}>{pendingInviteCount}</Text>
+              </View>
+            )}
+          </TouchableOpacity>
+          <TouchableOpacity style={S.submitBtn} onPress={() => navigation.navigate('SubmitIdea')}>
+            <Ionicons name="bulb-outline" size={15} color="#fff" />
+            <Text style={S.submitBtnText}>Submit Idea</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* ── 3-Tab bar ────────────────────────────────────── */}
@@ -623,9 +699,15 @@ export default function CreatorHomeScreen() {
               <View style={[S.progressFill, { width: `${Math.min((completedCount / TASKS_REQUIRED) * 100, 100)}%` as any }]} />
             </View>
             {completedCount >= TASKS_REQUIRED ? (
-              <Text style={[S.certDesc, { color: COLORS.success, fontWeight: '700', marginTop: 10 }]}>
-                🎉 You've earned your certificate! Visit your profile to download it.
-              </Text>
+              <View style={{ gap: 10, marginTop: 10 }}>
+                <Text style={[S.certDesc, { color: COLORS.success, fontWeight: '700' }]}>
+                  🎉 You've earned your certificate!
+                </Text>
+                <TouchableOpacity style={S.downloadCertBtn} onPress={handleDownloadCertificate}>
+                  <Ionicons name="download-outline" size={16} color="#fff" />
+                  <Text style={S.downloadCertText}>Download Certificate (PDF)</Text>
+                </TouchableOpacity>
+              </View>
             ) : (
               <Text style={[S.certDesc, { marginTop: 10 }]}>
                 Complete <Text style={{ color: PRIMARY, fontWeight: '700' }}>{TASKS_REQUIRED - completedCount}</Text> more tasks to earn your Verified Certificate.
@@ -880,11 +962,15 @@ const S = StyleSheet.create({
   root:    { flex: 1, backgroundColor: COLORS.background },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: 48 },
 
-  header:        { flexDirection: 'row', alignItems: 'flex-start', paddingHorizontal: 16, paddingTop: 12, paddingBottom: 10, gap: 12 },
-  headerTitle:   { fontSize: 18, fontWeight: '900', color: COLORS.textPrimary, lineHeight: 22 },
-  headerSub:     { fontSize: 12, color: COLORS.textMuted, marginTop: 2 },
-  submitBtn:     { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: PRIMARY, paddingHorizontal: 12, paddingVertical: 9, borderRadius: RADIUS.lg },
+  header:        { flexDirection: 'row', alignItems: 'flex-start', paddingHorizontal: 16, paddingTop: 12, paddingBottom: 14, gap: 12, overflow: 'hidden' },
+  headerGradient:{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 },
+  headerTitle:   { fontSize: 20, fontWeight: '900', color: COLORS.textPrimary, lineHeight: 24, letterSpacing: -0.3 },
+  headerSub:     { fontSize: 12, color: COLORS.textMuted, marginTop: 3 },
+  submitBtn:     { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: PRIMARY, paddingHorizontal: 14, paddingVertical: 10, borderRadius: RADIUS.lg, ...SHADOWS.primary },
   submitBtnText: { color: '#fff', fontSize: 12, fontWeight: '700' },
+  inviteBtn:     { width: 38, height: 38, borderRadius: 19, backgroundColor: GLASS, borderWidth: 1, borderColor: GLASS_BORDER, justifyContent: 'center', alignItems: 'center' },
+  inviteBadge:   { position: 'absolute', top: -3, right: -3, minWidth: 18, height: 18, borderRadius: 9, backgroundColor: COLORS.danger, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 4 },
+  inviteBadgeText:{ fontSize: 9, fontWeight: '900', color: '#fff' },
 
   tabBar:        { flexDirection: 'row', marginHorizontal: 16, marginBottom: 10, backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, padding: 3, borderWidth: 1, borderColor: COLORS.border },
   tabItem:       { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, paddingVertical: 10, borderRadius: RADIUS.md },
@@ -912,7 +998,7 @@ const S = StyleSheet.create({
   countText: { fontSize: 12, color: COLORS.textMuted },
   list: { padding: 16, gap: 14, paddingBottom: 40 },
 
-  card: { backgroundColor: COLORS.surface, borderRadius: RADIUS.xl, borderWidth: 1, borderColor: COLORS.border, padding: 16, ...SHADOWS.sm },
+  card: { backgroundColor: GLASS, borderRadius: RADIUS.xl, borderWidth: 1, borderColor: GLASS_BORDER, padding: 16, ...SHADOWS.sm },
   cardTop:   { flexDirection: 'row', marginBottom: 12 },
   cardTitle: { fontSize: 15, fontWeight: '800', color: COLORS.textPrimary, lineHeight: 20 },
   cardDesc:  { fontSize: 13, color: COLORS.textMuted, lineHeight: 18, marginTop: 4 },
@@ -956,6 +1042,8 @@ const S = StyleSheet.create({
   certTitle:   { fontSize: 18, fontWeight: '900', color: COLORS.textPrimary, marginBottom: 12 },
   certSub:     { fontSize: 13, color: COLORS.textMuted },
   certDesc:    { fontSize: 12, color: COLORS.textMuted },
+  downloadCertBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: PRIMARY, paddingVertical: 12, borderRadius: RADIUS.md },
+  downloadCertText: { fontSize: 14, fontWeight: '700', color: '#fff' },
   sectionTitle:{ fontSize: 17, fontWeight: '800', color: COLORS.textPrimary, marginBottom: 12 },
   taskRow:     { flexDirection: 'row', alignItems: 'center', paddingVertical: 8, borderTopWidth: 1, borderTopColor: COLORS.border, gap: 8 },
   taskIdx:     { fontSize: 14, color: COLORS.success, fontWeight: '700', width: 24 },

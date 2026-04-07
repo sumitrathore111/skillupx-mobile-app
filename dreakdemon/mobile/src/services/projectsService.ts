@@ -162,13 +162,18 @@ export const getBoardTasks = async (projectId: string): Promise<KanbanTask[]> =>
 export const createBoardTask = async (projectId: string, task: Partial<KanbanTask>) => {
   const { boardId, columns } = await getOrCreateBoard(projectId);
   const columnId = statusToColumnId(columns, task.status || 'To Do');
-  const { data } = await api.post(`/boards/${boardId}/tasks`, {
+  const payload: any = {
     title: task.title,
     description: task.description,
     priority: task.priority || 'medium',
     columnId,
-    assignees: task.assignee ? [task.assignee] : [],
-  });
+    assignees: (task as any).assignees?.length ? (task as any).assignees : task.assignee ? [task.assignee] : [],
+  };
+  if ((task as any).labels?.length) payload.labels = (task as any).labels;
+  if ((task as any).dueDate) payload.dueDate = (task as any).dueDate;
+  if ((task as any).estimatedHours) payload.estimatedHours = (task as any).estimatedHours;
+  if ((task as any).storyPoints) payload.storyPoints = (task as any).storyPoints;
+  const { data } = await api.post(`/boards/${boardId}/tasks`, payload);
   return data;
 };
 
@@ -349,4 +354,89 @@ export const getProjectActivity = async (projectId: string, limit = 30): Promise
 // ── Idea Status ───────────────────────────────────────────
 export const updateIdeaStatus = async (ideaId: string, status: string): Promise<void> => {
   await api.put(`/ideas/${ideaId}/status`, { status });
+};
+
+// ── GitHub Full Flow ──────────────────────────────────────
+export const startGitHubAuth = async (): Promise<{ authUrl: string }> => {
+  const { data } = await api.get('/github/auth');
+  return data;
+};
+
+export const getGitHubUserStatus = async (): Promise<{ connected: boolean; username?: string }> => {
+  try {
+    const { data } = await api.get('/github/status');
+    return { connected: !!data?.connected, username: data?.username };
+  } catch {
+    return { connected: false };
+  }
+};
+
+export const getUserGitHubRepos = async (page = 1, perPage = 30): Promise<any[]> => {
+  const { data } = await api.get(`/github/repos?page=${page}&per_page=${perPage}`);
+  return data?.repositories || data || [];
+};
+
+export const connectProjectToGitHub = async (
+  projectId: string,
+  repoOwner: string,
+  repoName: string,
+  syncSettings?: { syncIssues?: boolean; syncPRs?: boolean; syncCommits?: boolean },
+) => {
+  const { data } = await api.post(`/github/projects/${projectId}/connect`, {
+    repoOwner,
+    repoName,
+    syncSettings: syncSettings || { syncIssues: true, syncPRs: true, syncCommits: true },
+  });
+  return data;
+};
+
+export const disconnectProjectFromGitHub = async (projectId: string) => {
+  const { data } = await api.delete(`/github/projects/${projectId}/disconnect`);
+  return data;
+};
+
+// ── GitHub Repo Details ─────────────────────────────────────
+export const getRepoCommits = async (owner: string, repo: string, page = 1): Promise<any[]> => {
+  try {
+    const { data } = await api.get(`/github/repos/${owner}/${repo}/commits?page=${page}`);
+    return data?.commits || data || [];
+  } catch { return []; }
+};
+
+export const getRepoPulls = async (owner: string, repo: string, page = 1): Promise<any[]> => {
+  try {
+    const { data } = await api.get(`/github/repos/${owner}/${repo}/pulls?page=${page}`);
+    return data?.pullRequests || data || [];
+  } catch { return []; }
+};
+
+export const getRepoBranches = async (owner: string, repo: string): Promise<any[]> => {
+  try {
+    const { data } = await api.get(`/github/repos/${owner}/${repo}/branches`);
+    return data?.branches || data || [];
+  } catch { return []; }
+};
+
+export const getRepoContributors = async (owner: string, repo: string): Promise<any[]> => {
+  try {
+    const { data } = await api.get(`/github/repos/${owner}/${repo}/contributors`);
+    return data?.contributors || data || [];
+  } catch { return []; }
+};
+
+// ── GitHub Collaborators ──────────────────────────────────
+export const getGitHubCollaborators = async (projectId: string): Promise<any[]> => {
+  try {
+    const { data } = await api.get(`/github/projects/${projectId}/collaborators`);
+    return data?.collaborators || data || [];
+  } catch { return []; }
+};
+
+export const inviteGitHubCollaborator = async (projectId: string, username: string) => {
+  const { data } = await api.post(`/github/projects/${projectId}/collaborators`, { username });
+  return data;
+};
+
+export const removeGitHubCollaborator = async (projectId: string, username: string) => {
+  await api.delete(`/github/projects/${projectId}/collaborators/${username}`);
 };
