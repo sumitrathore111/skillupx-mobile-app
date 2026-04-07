@@ -37,11 +37,11 @@ export function disconnectSocket(): void {
 
 // ============ CHAT EVENTS ============
 export function joinUserRoom(userId: string) {
-  socket?.emit('joinUserRoom', userId);
+  socket?.emit('join-user', userId);
 }
 
 export function leaveUserRoom(userId: string) {
-  socket?.emit('leaveUserRoom', userId);
+  socket?.emit('leave-user', userId);
 }
 
 export function emitTyping(chatId: string, userId: string) {

@@ -10,10 +10,22 @@ const router = Router();
 // Create or get existing chat between participants
 router.post('/', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { participantIds, participantNames, participantAvatars } = req.body;
+    let { participantIds, participantNames, participantAvatars } = req.body;
 
-    if (!participantIds || participantIds.length < 2) {
-      res.status(400).json({ error: 'At least 2 participant IDs are required' });
+    if (!participantIds || !Array.isArray(participantIds) || participantIds.length < 1) {
+      res.status(400).json({ error: 'At least 1 participant ID is required' });
+      return;
+    }
+
+    // Auto-include the current user if not already in the list
+    if (!participantIds.includes(req.user!.id)) {
+      participantIds = [req.user!.id, ...participantIds];
+      participantNames = [req.user!.name || 'You', ...(participantNames || [])];
+      participantAvatars = ['', ...(participantAvatars || [])];
+    }
+
+    if (participantIds.length < 2) {
+      res.status(400).json({ error: 'Cannot create a chat with yourself' });
       return;
     }
 
@@ -178,7 +190,7 @@ router.post('/:chatId/messages', authenticate, async (req: AuthRequest, res: Res
       timestamp: chatMessage.createdAt
     };
 
-    // Emit real-time event to chat room
+    // Emit real-time event to chat room + participant user rooms
     const io = req.app.get('io');
     if (io) {
       io.to(`chat:${req.params.chatId}`).emit('newMessage', messagePayload);
@@ -187,6 +199,15 @@ router.post('/:chatId/messages', authenticate, async (req: AuthRequest, res: Res
     // Send email notification to the other participant (async, don't wait)
     try {
       const chat = await Chat.findById(req.params.chatId);
+      if (chat && io) {
+        // Notify each participant's user room so their conversations list updates
+        const sendingUserId = senderId || req.user?.id;
+        chat.participantIds.forEach((pid: string) => {
+          if (pid !== sendingUserId) {
+            io.to(`user:${pid}`).emit('conversationUpdated', { chatId: req.params.chatId });
+          }
+        });
+      }
       if (chat) {
         const sendingUserId = senderId || req.user?.id;
         const otherParticipantId = chat.participantIds.find(id => id !== sendingUserId);

@@ -23,7 +23,15 @@ export default function ProfileScreen() {
     name: '', email: '', phone: '', institute: '', github: '',
     yearOfStudy: '', location: '', bio: '', avatar: '',
     skills: [] as string[], skillInput: '',
+    education: [] as { degree: string; school: string; year: string }[],
+    experience: [] as { title: string; company: string; year: string; desc: string }[],
+    achievements: [] as string[],
+    links: [] as { platform: string; url: string }[],
   });
+  const [newEdu, setNewEdu] = useState({ degree: '', school: '', year: '' });
+  const [newExp, setNewExp] = useState({ title: '', company: '', year: '', desc: '' });
+  const [newAch, setNewAch] = useState('');
+  const [newLink, setNewLink] = useState({ platform: '', url: '' });
 
   const load = useCallback(async () => {
     try {
@@ -31,10 +39,14 @@ export default function ProfileScreen() {
       setProfile(data);
       setForm({
         name: data.name || '', email: data.email || '', phone: data.phone || '',
-        institute: data.institute || '', github: (data as any).github || '',
+        institute: data.institute || '', github: (data as any).github || (data as any).githubUsername || '',
         yearOfStudy: String(data.yearOfStudy || ''), location: data.location || '',
         bio: data.bio || '', avatar: (data as any).avatar || '',
         skills: data.skills || [], skillInput: '',
+        education: data.education || [],
+        experience: data.experience || [],
+        achievements: data.achievements || [],
+        links: data.links || [],
       });
     } catch (e) { console.error(e); }
     finally { setLoading(false); }
@@ -59,8 +71,39 @@ export default function ProfileScreen() {
       setForm(p => ({ ...p, skills: [...p.skills, p.skillInput.trim()], skillInput: '' }));
     }
   };
-
   const removeSkill = (s: string) => setForm(p => ({ ...p, skills: p.skills.filter(x => x !== s) }));
+
+  const addEducation = () => {
+    if (newEdu.degree && newEdu.school && newEdu.year) {
+      setForm(p => ({ ...p, education: [...p.education, { ...newEdu }] }));
+      setNewEdu({ degree: '', school: '', year: '' });
+    }
+  };
+  const removeEducation = (i: number) => setForm(p => ({ ...p, education: p.education.filter((_, idx) => idx !== i) }));
+
+  const addExperience = () => {
+    if (newExp.title && newExp.company) {
+      setForm(p => ({ ...p, experience: [...p.experience, { ...newExp }] }));
+      setNewExp({ title: '', company: '', year: '', desc: '' });
+    }
+  };
+  const removeExperience = (i: number) => setForm(p => ({ ...p, experience: p.experience.filter((_, idx) => idx !== i) }));
+
+  const addAchievement = () => {
+    if (newAch.trim()) {
+      setForm(p => ({ ...p, achievements: [...p.achievements, newAch.trim()] }));
+      setNewAch('');
+    }
+  };
+  const removeAchievement = (i: number) => setForm(p => ({ ...p, achievements: p.achievements.filter((_, idx) => idx !== i) }));
+
+  const addLink = () => {
+    if (newLink.platform && newLink.url) {
+      setForm(p => ({ ...p, links: [...p.links, { ...newLink }] }));
+      setNewLink({ platform: '', url: '' });
+    }
+  };
+  const removeLink = (i: number) => setForm(p => ({ ...p, links: p.links.filter((_, idx) => idx !== i) }));
 
   if (loading) return <SafeAreaView style={styles.container}><View style={styles.centered}><ActivityIndicator size="large" color={COLORS.primary} /></View></SafeAreaView>;
 
@@ -156,9 +199,170 @@ export default function ProfileScreen() {
                   onChangeText={v => setForm(p => ({ ...p, skillInput: v }))}
                   placeholder="Add skill..." placeholderTextColor={COLORS.textMuted}
                   onSubmitEditing={addSkill} returnKeyType="done" />
-                <TouchableOpacity onPress={addSkill} style={styles.addSkillBtn}>
+                <TouchableOpacity onPress={addSkill} style={styles.addBtn}>
                   <Ionicons name="add" size={20} color="#fff" />
                 </TouchableOpacity>
+              </View>
+            )}
+          </View>
+
+          {/* Education */}
+          <View style={styles.fieldCard}>
+            <View style={styles.fieldHeader}>
+              <Ionicons name="school" size={16} color="#6366f1" />
+              <Text style={styles.fieldLabel}>Education</Text>
+            </View>
+            {form.education.map((edu, i) => (
+              <View key={i} style={styles.listItem}>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.listTitle}>{edu.degree}</Text>
+                  <Text style={styles.listSub}>{edu.school} · {edu.year}</Text>
+                </View>
+                {editing && (
+                  <TouchableOpacity onPress={() => removeEducation(i)}>
+                    <Ionicons name="close-circle" size={20} color={COLORS.danger} />
+                  </TouchableOpacity>
+                )}
+              </View>
+            ))}
+            {form.education.length === 0 && !editing && (
+              <Text style={styles.emptyText}>No education added</Text>
+            )}
+            {editing && (
+              <View style={styles.addForm}>
+                <TextInput style={styles.fieldInput} value={newEdu.degree}
+                  onChangeText={v => setNewEdu(p => ({ ...p, degree: v }))}
+                  placeholder="Degree" placeholderTextColor={COLORS.textMuted} />
+                <TextInput style={styles.fieldInput} value={newEdu.school}
+                  onChangeText={v => setNewEdu(p => ({ ...p, school: v }))}
+                  placeholder="School" placeholderTextColor={COLORS.textMuted} />
+                <View style={styles.addFormRow}>
+                  <TextInput style={[styles.fieldInput, { flex: 1 }]} value={newEdu.year}
+                    onChangeText={v => setNewEdu(p => ({ ...p, year: v }))}
+                    placeholder="Year" placeholderTextColor={COLORS.textMuted} />
+                  <TouchableOpacity onPress={addEducation} style={styles.addBtn}>
+                    <Ionicons name="add" size={20} color="#fff" />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
+          </View>
+
+          {/* Experience */}
+          <View style={styles.fieldCard}>
+            <View style={styles.fieldHeader}>
+              <Ionicons name="briefcase" size={16} color="#eab308" />
+              <Text style={styles.fieldLabel}>Experience / Projects</Text>
+            </View>
+            {form.experience.map((exp, i) => (
+              <View key={i} style={styles.listItem}>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.listTitle}>{exp.title}</Text>
+                  <Text style={styles.listSub}>{exp.company}{exp.year ? ` · ${exp.year}` : ''}</Text>
+                  {!!exp.desc && <Text style={styles.listDesc}>{exp.desc}</Text>}
+                </View>
+                {editing && (
+                  <TouchableOpacity onPress={() => removeExperience(i)}>
+                    <Ionicons name="close-circle" size={20} color={COLORS.danger} />
+                  </TouchableOpacity>
+                )}
+              </View>
+            ))}
+            {form.experience.length === 0 && !editing && (
+              <Text style={styles.emptyText}>No experience added</Text>
+            )}
+            {editing && (
+              <View style={styles.addForm}>
+                <TextInput style={styles.fieldInput} value={newExp.title}
+                  onChangeText={v => setNewExp(p => ({ ...p, title: v }))}
+                  placeholder="Title" placeholderTextColor={COLORS.textMuted} />
+                <TextInput style={styles.fieldInput} value={newExp.company}
+                  onChangeText={v => setNewExp(p => ({ ...p, company: v }))}
+                  placeholder="Company" placeholderTextColor={COLORS.textMuted} />
+                <TextInput style={styles.fieldInput} value={newExp.year}
+                  onChangeText={v => setNewExp(p => ({ ...p, year: v }))}
+                  placeholder="Year" placeholderTextColor={COLORS.textMuted} />
+                <View style={styles.addFormRow}>
+                  <TextInput style={[styles.fieldInput, { flex: 1 }]} value={newExp.desc}
+                    onChangeText={v => setNewExp(p => ({ ...p, desc: v }))}
+                    placeholder="Description" placeholderTextColor={COLORS.textMuted} />
+                  <TouchableOpacity onPress={addExperience} style={styles.addBtn}>
+                    <Ionicons name="add" size={20} color="#fff" />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
+          </View>
+
+          {/* Achievements */}
+          <View style={styles.fieldCard}>
+            <View style={styles.fieldHeader}>
+              <Ionicons name="trophy" size={16} color="#22c55e" />
+              <Text style={styles.fieldLabel}>Achievements</Text>
+            </View>
+            <View style={styles.tagsWrap}>
+              {form.achievements.map((ach, i) => (
+                <View key={i} style={[styles.tag, { backgroundColor: '#22c55e20' }]}>
+                  <Text style={[styles.tagText, { color: '#22c55e' }]}>{ach}</Text>
+                  {editing && (
+                    <TouchableOpacity onPress={() => removeAchievement(i)}>
+                      <Ionicons name="close-circle" size={14} color={COLORS.danger} />
+                    </TouchableOpacity>
+                  )}
+                </View>
+              ))}
+            </View>
+            {form.achievements.length === 0 && !editing && (
+              <Text style={styles.emptyText}>No achievements added</Text>
+            )}
+            {editing && (
+              <View style={styles.addSkillRow}>
+                <TextInput style={[styles.fieldInput, { flex: 1 }]} value={newAch}
+                  onChangeText={setNewAch}
+                  placeholder="New achievement..." placeholderTextColor={COLORS.textMuted}
+                  onSubmitEditing={addAchievement} returnKeyType="done" />
+                <TouchableOpacity onPress={addAchievement} style={styles.addBtn}>
+                  <Ionicons name="add" size={20} color="#fff" />
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
+
+          {/* Links */}
+          <View style={styles.fieldCard}>
+            <View style={styles.fieldHeader}>
+              <Ionicons name="globe" size={16} color="#3b82f6" />
+              <Text style={styles.fieldLabel}>Links</Text>
+            </View>
+            {form.links.map((link, i) => (
+              <View key={i} style={styles.listItem}>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.listTitle}>{link.platform}</Text>
+                  <Text style={[styles.listSub, { color: '#3b82f6' }]} numberOfLines={1}>{link.url}</Text>
+                </View>
+                {editing && (
+                  <TouchableOpacity onPress={() => removeLink(i)}>
+                    <Ionicons name="close-circle" size={20} color={COLORS.danger} />
+                  </TouchableOpacity>
+                )}
+              </View>
+            ))}
+            {form.links.length === 0 && !editing && (
+              <Text style={styles.emptyText}>No links added</Text>
+            )}
+            {editing && (
+              <View style={styles.addForm}>
+                <TextInput style={styles.fieldInput} value={newLink.platform}
+                  onChangeText={v => setNewLink(p => ({ ...p, platform: v }))}
+                  placeholder="Platform (e.g. LinkedIn)" placeholderTextColor={COLORS.textMuted} />
+                <View style={styles.addFormRow}>
+                  <TextInput style={[styles.fieldInput, { flex: 1 }]} value={newLink.url}
+                    onChangeText={v => setNewLink(p => ({ ...p, url: v }))}
+                    placeholder="URL" placeholderTextColor={COLORS.textMuted} />
+                  <TouchableOpacity onPress={addLink} style={styles.addBtn}>
+                    <Ionicons name="add" size={20} color="#fff" />
+                  </TouchableOpacity>
+                </View>
               </View>
             )}
           </View>
@@ -209,7 +413,14 @@ const styles = StyleSheet.create({
   tag: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: COLORS.primary + '20', paddingHorizontal: 10, paddingVertical: 5, borderRadius: RADIUS.full },
   tagText: { fontSize: 12, color: COLORS.primary, fontWeight: '600' },
   addSkillRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 },
-  addSkillBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: COLORS.primary, justifyContent: 'center', alignItems: 'center' },
+  addBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: COLORS.primary, justifyContent: 'center', alignItems: 'center' },
+  listItem: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 8, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: COLORS.border },
+  listTitle: { fontSize: 14, fontWeight: '700', color: COLORS.textPrimary },
+  listSub: { fontSize: 12, color: COLORS.textMuted, marginTop: 1 },
+  listDesc: { fontSize: 12, color: COLORS.textSecondary, marginTop: 4, lineHeight: 18 },
+  emptyText: { fontSize: 13, color: COLORS.textMuted, fontStyle: 'italic' },
+  addForm: { gap: 8, marginTop: 8 },
+  addFormRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   statsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   statCard: { flex: 1, minWidth: '45%', backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, padding: 14, alignItems: 'center', gap: 4, borderWidth: 1, borderColor: COLORS.border },
   statValue: { fontSize: 20, fontWeight: '800', color: COLORS.textPrimary },

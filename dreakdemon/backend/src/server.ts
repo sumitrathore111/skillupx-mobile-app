@@ -17,6 +17,7 @@ import battleRoutes from './routes/battles';
 import boardRoutes from './routes/boards';
 import challengeRoutes from './routes/challenges';
 import chatRoutes from './routes/chats';
+import connectionRoutes from './routes/connections';
 import developerRoutes from './routes/developers';
 import discussionRoutes from './routes/discussions';
 import executeRoutes from './routes/execute';
@@ -61,6 +62,24 @@ const io = new SocketIOServer(httpServer, {
 const socketUserMap = new Map<string, string>();
 // Track online users: Set of userIds
 const onlineUsers = new Set<string>();
+// Track voice room participants: Map<groupId:roomId, Set<{socketId, userId, userName}>>
+const voiceRoomParticipants = new Map<string, Map<string, { socketId: string; userId: string; userName: string }>>();
+
+function getVoiceRoomKey(groupId: string, roomId: string) {
+  return `${groupId}:${roomId}`;
+}
+
+function getVoiceParticipants(groupId: string, roomId: string) {
+  const key = getVoiceRoomKey(groupId, roomId);
+  if (!voiceRoomParticipants.has(key)) voiceRoomParticipants.set(key, new Map());
+  return voiceRoomParticipants.get(key)!;
+}
+
+function broadcastVoiceParticipants(groupId: string, roomId: string) {
+  const participants = getVoiceParticipants(groupId, roomId);
+  const list = Array.from(participants.values()).map(p => ({ userId: p.userId, userName: p.userName }));
+  io.to(`group:${groupId}`).emit('voiceRoomParticipants', { groupId, roomId, participants: list });
+}
 
 // Socket.io connection handling
 io.on('connection', (socket) => {
@@ -234,7 +253,110 @@ io.on('connection', (socket) => {
     console.log(`👤 Socket ${socket.id} left user:${userId}`);
   });
 
+  // ==================== VOICE ROOM (WebRTC Signaling) ====================
+
+  // Join a voice room
+  socket.on('join-voice-room', (data: { groupId: string; roomId: string; userId: string; userName: string }) => {
+    const { groupId, roomId, userId, userName } = data;
+    const participants = getVoiceParticipants(groupId, roomId);
+
+    // Leave any other voice room this socket is in
+    for (const [key, pMap] of voiceRoomParticipants.entries()) {
+      if (pMap.has(socket.id)) {
+        pMap.delete(socket.id);
+        const [gId, rId] = key.split(':');
+        socket.leave(`voice:${key}`);
+        broadcastVoiceParticipants(gId, rId);
+      }
+    }
+
+    // Join the voice room
+    participants.set(socket.id, { socketId: socket.id, userId, userName });
+    socket.join(`voice:${groupId}:${roomId}`);
+    console.log(`🎙️ ${userName} joined voice room ${roomId} in group ${groupId}`);
+
+    // Notify existing participants about the new peer
+    socket.to(`voice:${groupId}:${roomId}`).emit('voice-user-joined', {
+      groupId, roomId, userId, userName, socketId: socket.id
+    });
+
+    // Send the list of existing participants to the new joiner (so they can create offers)
+    const existingPeers = Array.from(participants.values())
+      .filter(p => p.socketId !== socket.id)
+      .map(p => ({ userId: p.userId, userName: p.userName, socketId: p.socketId }));
+    socket.emit('voice-existing-peers', { groupId, roomId, peers: existingPeers });
+
+    broadcastVoiceParticipants(groupId, roomId);
+  });
+
+  // Leave a voice room
+  socket.on('leave-voice-room', (data: { groupId: string; roomId: string }) => {
+    const { groupId, roomId } = data;
+    const participants = getVoiceParticipants(groupId, roomId);
+    const participant = participants.get(socket.id);
+    if (participant) {
+      participants.delete(socket.id);
+      socket.leave(`voice:${groupId}:${roomId}`);
+      console.log(`🎙️ ${participant.userName} left voice room ${roomId} in group ${groupId}`);
+      socket.to(`voice:${groupId}:${roomId}`).emit('voice-user-left', {
+        groupId, roomId, userId: participant.userId, socketId: socket.id
+      });
+      broadcastVoiceParticipants(groupId, roomId);
+    }
+  });
+
+  // WebRTC signaling: relay offer to a specific peer
+  socket.on('voice-offer', (data: { targetSocketId: string; offer: any; groupId: string; roomId: string }) => {
+    io.to(data.targetSocketId).emit('voice-offer', {
+      fromSocketId: socket.id,
+      offer: data.offer,
+      groupId: data.groupId,
+      roomId: data.roomId
+    });
+  });
+
+  // WebRTC signaling: relay answer to a specific peer
+  socket.on('voice-answer', (data: { targetSocketId: string; answer: any; groupId: string; roomId: string }) => {
+    io.to(data.targetSocketId).emit('voice-answer', {
+      fromSocketId: socket.id,
+      answer: data.answer,
+      groupId: data.groupId,
+      roomId: data.roomId
+    });
+  });
+
+  // WebRTC signaling: relay ICE candidate to a specific peer
+  socket.on('voice-ice-candidate', (data: { targetSocketId: string; candidate: any; groupId: string; roomId: string }) => {
+    io.to(data.targetSocketId).emit('voice-ice-candidate', {
+      fromSocketId: socket.id,
+      candidate: data.candidate,
+      groupId: data.groupId,
+      roomId: data.roomId
+    });
+  });
+
+  // Get voice room participants
+  socket.on('get-voice-participants', (data: { groupId: string; roomId: string }) => {
+    const participants = getVoiceParticipants(data.groupId, data.roomId);
+    const list = Array.from(participants.values()).map(p => ({ userId: p.userId, userName: p.userName }));
+    socket.emit('voiceRoomParticipants', { groupId: data.groupId, roomId: data.roomId, participants: list });
+  });
+
   socket.on('disconnect', () => {
+    // Clean up voice rooms
+    for (const [key, pMap] of voiceRoomParticipants.entries()) {
+      if (pMap.has(socket.id)) {
+        const participant = pMap.get(socket.id)!;
+        pMap.delete(socket.id);
+        const [gId, rId] = key.split(':');
+        io.to(`voice:${key}`).emit('voice-user-left', {
+          groupId: gId, roomId: rId, userId: participant.userId, socketId: socket.id
+        });
+        broadcastVoiceParticipants(gId, rId);
+        if (pMap.size === 0) voiceRoomParticipants.delete(key);
+      }
+    }
+
     // Handle user going offline
     const userId = socketUserMap.get(socket.id);
     if (userId) {
@@ -303,6 +425,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/developers', developerRoutes);
 app.use('/api/chats', chatRoutes);
+app.use('/api/connections', connectionRoutes);
 app.use('/api/discussions', discussionRoutes);
 app.use('/api/wallet', walletRoutes);
 app.use('/api/execute', executeRoutes);
@@ -337,6 +460,5 @@ httpServer.listen(PORT, () => {
   console.log(`🌐 CORS enabled for: ${process.env.FRONTEND_URL || 'http://localhost:5173'}`);
   console.log(`🔌 Socket.io enabled for real-time updates`);
 });
-
 export { io };
 export default app;

@@ -40,6 +40,13 @@ export interface IStudyGroup extends Document {
     date: Date;
     duration: number;
   }>;
+  rooms: Array<{
+    roomId: string;
+    name: string;
+    type: 'text' | 'announcement' | 'voice';
+    createdBy: string;
+    createdAt: Date;
+  }>;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -83,6 +90,13 @@ const StudyGroupSchema: Schema = new Schema({
     description: { type: String },
     date: { type: Date },
     duration: { type: Number }
+  }],
+  rooms: [{
+    roomId: { type: String, required: true },
+    name: { type: String, required: true },
+    type: { type: String, enum: ['text', 'announcement', 'voice'], default: 'text' },
+    createdBy: { type: String },
+    createdAt: { type: Date, default: Date.now }
   }]
 }, {
   timestamps: true

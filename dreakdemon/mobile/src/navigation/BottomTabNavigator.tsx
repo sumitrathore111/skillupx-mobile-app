@@ -1,6 +1,7 @@
 import { COLORS } from '@constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { BottomTabParamList } from './types';
 
 // Import screen stacks
@@ -13,6 +14,9 @@ import RoadmapNavigator from './RoadmapNavigator';
 const Tab = createBottomTabNavigator<BottomTabParamList>();
 
 export default function BottomTabNavigator() {
+  const insets = useSafeAreaInsets();
+  const bottomPadding = Math.max(insets.bottom, 10);
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -23,8 +27,8 @@ export default function BottomTabNavigator() {
           backgroundColor: COLORS.surface,
           borderTopColor: COLORS.border,
           borderTopWidth: 1,
-          height: 65,
-          paddingBottom: 10,
+          height: 55 + bottomPadding,
+          paddingBottom: bottomPadding,
           paddingTop: 8,
         },
         tabBarLabelStyle: {
