@@ -80,9 +80,11 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   },
 
   logoutUser: async () => {
-    disconnectSocket();
-    await logout();
+    // Clear state immediately so navigation switches to login
     set({ user: null, token: null, isAuthenticated: false, error: null });
+    // Clean up in background
+    try { disconnectSocket(); } catch (e) { console.warn('Socket disconnect error:', e); }
+    try { await logout(); } catch (e) { console.warn('Logout cleanup error:', e); }
   },
 
   clearError: () => set({ error: null }),

@@ -241,8 +241,9 @@ export default function BrowseProjects() {
 
       // STEP 4: Build user access status from join requests (fast, no API calls)
       const userRequests = allJoinRequests.filter((req: any) => {
+        if (!req.userId) return false;
         const reqUserId = typeof req.userId === 'object' ? (req.userId.id || req.userId._id) : req.userId;
-        return String(reqUserId) === String(user.id);
+        return String(reqUserId) === String(user?.id);
       });
 
       const requestsMap: Record<string, any> = {};

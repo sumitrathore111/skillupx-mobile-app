@@ -12,6 +12,19 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 const EMOJI_LIST = ['😀','😎','🤓','🧑‍💻','👨‍💻','👩‍💻','🦊','🐱','🐶','🐼','🦁','🐸','🐵','🦄','🐲','🔥','⚡','🚀','💎','🎯','🏆','⭐','🌟','💡','🎨','🎮','🎵','🌈','💜','💙','💚','💛','🧡','❤️','🖤','🤍','💀','👻','🤖','👾'];
 
+const confirmLogout = (onConfirm: () => void) => {
+  if (Platform.OS === 'web') {
+    if (window.confirm('Are you sure you want to logout?')) {
+      onConfirm();
+    }
+  } else {
+    Alert.alert('Logout', 'Are you sure you want to logout?', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Logout', style: 'destructive', onPress: onConfirm },
+    ]);
+  }
+};
+
 export default function ProfileScreen() {
   const { user, logoutUser } = useAuthStore();
   const [profile, setProfile] = useState<any>(null);
@@ -388,10 +401,8 @@ export default function ProfileScreen() {
           {/* Logout */}
           <TouchableOpacity
             style={styles.logoutBtn}
-            onPress={() => Alert.alert('Logout', 'Are you sure you want to logout?', [
-              { text: 'Cancel', style: 'cancel' },
-              { text: 'Logout', style: 'destructive', onPress: () => logoutUser() },
-            ])}
+            onPress={() => confirmLogout(() => { logoutUser().catch(e => console.warn('Logout failed:', e)); })}
+            activeOpacity={0.7}
           >
             <Ionicons name="log-out-outline" size={18} color={COLORS.danger} />
             <Text style={styles.logoutText}>Logout</Text>
