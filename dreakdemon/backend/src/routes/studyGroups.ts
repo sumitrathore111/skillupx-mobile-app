@@ -5,6 +5,7 @@ import GroupMessage from '../models/GroupMessage';
 import StudyGroup from '../models/StudyGroup';
 import User from '../models/User';
 import emailNotifications from '../services/emailService';
+import { sendPushToUsers } from '../services/pushService';
 
 // Helper to get socket.io instance from app
 const getIO = (req: Request): SocketIOServer | null => {
@@ -612,6 +613,23 @@ router.post('/:id/messages', authenticate, async (req: AuthRequest, res: Respons
       }
     } catch (emailError) {
       console.error('Failed to send study group message email notification:', emailError);
+    }
+
+    // Send push notification to other group members (async, don't wait)
+    try {
+      const otherMemberIds = group.members
+        .filter((m: any) => m.userId !== req.user!.id)
+        .map((m: any) => m.userId);
+      if (otherMemberIds.length > 0) {
+        sendPushToUsers(
+          otherMemberIds,
+          `${group.name}`,
+          `${senderName || req.user?.name || 'Someone'}: ${message.trim().length > 80 ? message.trim().slice(0, 80) + '…' : message.trim()}`,
+          { type: 'groupChat', groupId: req.params.id, groupName: group.name },
+        ).catch(() => {});
+      }
+    } catch (pushError) {
+      console.error('Failed to send group push notification:', pushError);
     }
 
     res.status(201).json({ message: formattedMessage });

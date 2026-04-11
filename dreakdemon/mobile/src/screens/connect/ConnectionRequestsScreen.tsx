@@ -13,6 +13,7 @@ import {
     ActivityIndicator,
     Alert,
     FlatList,
+    Image,
     StyleSheet,
     Text,
     TouchableOpacity,
@@ -20,7 +21,9 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-const EMOJIS = ['😎', '🚀', '💻', '🔥', '⚡', '🎯', '🧠', '✨', '🎮', '🤖'];
+function getDiceBearUri(seed: string): string {
+  return `https://api.dicebear.com/9.x/adventurer/png?seed=${encodeURIComponent(seed)}&size=96`;
+}
 
 export default function ConnectionRequestsScreen() {
   const navigation = useNavigation<any>();
@@ -75,12 +78,11 @@ export default function ConnectionRequestsScreen() {
 
   function renderReceived({ item }: { item: ConnectionRequest }) {
     const reqId = item.id || item._id!;
-    const emoji = EMOJIS[item.senderId.charCodeAt(0) % EMOJIS.length];
     const isProcessing = processing === reqId;
     return (
       <View style={s.row}>
         <View style={s.avatar}>
-          <Text style={s.avatarEmoji}>{emoji}</Text>
+          <Image source={{ uri: getDiceBearUri(item.senderId) }} style={{ width: 44, height: 44, borderRadius: 22 }} />
         </View>
         <View style={{ flex: 1 }}>
           <Text style={s.name}>{item.senderName}</Text>
@@ -109,11 +111,10 @@ export default function ConnectionRequestsScreen() {
   }
 
   function renderSent({ item }: { item: ConnectionRequest }) {
-    const emoji = EMOJIS[item.receiverId.charCodeAt(0) % EMOJIS.length];
     return (
       <View style={s.row}>
         <View style={s.avatar}>
-          <Text style={s.avatarEmoji}>{emoji}</Text>
+          <Image source={{ uri: getDiceBearUri(item.receiverId) }} style={{ width: 44, height: 44, borderRadius: 22 }} />
         </View>
         <View style={{ flex: 1 }}>
           <Text style={s.name}>{item.receiverName}</Text>

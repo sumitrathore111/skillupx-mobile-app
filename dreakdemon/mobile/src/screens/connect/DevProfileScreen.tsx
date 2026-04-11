@@ -14,6 +14,7 @@ import { useEffect, useState } from 'react';
 import {
     ActivityIndicator,
     Alert,
+    Image,
     Linking,
     ScrollView,
     StyleSheet,
@@ -25,7 +26,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 type RouteParams = { developerId: string };
 
-const EMOJIS = ['😎', '🚀', '💻', '🔥', '⚡', '🎯', '🧠', '✨', '🎮', '🤖'];
+function getDiceBearUri(seed: string): string {
+  return `https://api.dicebear.com/9.x/adventurer/png?seed=${encodeURIComponent(seed)}&size=96`;
+}
 
 export default function DevProfileScreen() {
   const navigation = useNavigation<any>();
@@ -38,7 +41,7 @@ export default function DevProfileScreen() {
   const [actionLoading, setActionLoading] = useState(false);
   const [chatLoading, setChatLoading] = useState(false);
 
-  const emoji = EMOJIS[developerId.charCodeAt(0) % EMOJIS.length];
+  const avatarUri = getDiceBearUri(developerId);
 
   useEffect(() => {
     loadProfile();
@@ -151,7 +154,7 @@ export default function DevProfileScreen() {
           {/* Avatar with emoji */}
           <View style={s.avatarWrap}>
             <View style={s.avatar}>
-              <Text style={s.avatarEmoji}>{emoji}</Text>
+              <Image source={{ uri: avatarUri }} style={{ width: 80, height: 80, borderRadius: 40 }} />
             </View>
             {developer.isOnline && <View style={s.onlineDot} />}
           </View>

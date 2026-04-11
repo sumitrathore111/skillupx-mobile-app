@@ -1,17 +1,17 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-  AtSign,
-  Check,
-  ChevronRight,
-  Clock,
-  Coins,
-  Shield,
-  Swords,
-  Trophy,
-  UserPlus,
-  Users,
-  X,
-  Zap
+    AtSign,
+    Check,
+    ChevronRight,
+    Clock,
+    Coins,
+    Shield,
+    Swords,
+    Trophy,
+    UserPlus,
+    Users,
+    X,
+    Zap
 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -20,29 +20,29 @@ import { useDataContext } from '../../Context/UserDataContext';
 import { apiRequest } from '../../service/api';
 import { joinOrCreateBattle } from '../../service/battleService';
 import {
-  acceptBattleInvite,
-  createBotBattle,
-  getMyBattleInvites,
-  inviteUserToBattle,
-  rejectBattleInvite,
-  searchUsersForInvite
+    acceptBattleInvite,
+    createBotBattle,
+    getMyBattleInvites,
+    inviteUserToBattle,
+    rejectBattleInvite,
+    searchUsersForInvite
 } from '../../service/battleServiceNew';
 import {
-  initializeSocket,
-  joinBattleLobby,
-  joinUserRoom,
-  leaveBattleLobby,
-  leaveUserRoom,
-  offBattleCreated,
-  offBattleInviteReceived,
-  offBattleInviteRejected,
-  offBattleMatched,
-  offBattleRemoved,
-  onBattleCreated,
-  onBattleInviteReceived,
-  onBattleInviteRejected,
-  onBattleMatched,
-  onBattleRemoved
+    initializeSocket,
+    joinBattleLobby,
+    joinUserRoom,
+    leaveBattleLobby,
+    leaveUserRoom,
+    offBattleCreated,
+    offBattleInviteReceived,
+    offBattleInviteRejected,
+    offBattleMatched,
+    offBattleRemoved,
+    onBattleCreated,
+    onBattleInviteReceived,
+    onBattleInviteRejected,
+    onBattleMatched,
+    onBattleRemoved
 } from '../../service/socketService';
 
 interface Wallet {
@@ -713,7 +713,7 @@ const BattleLobby = ({ wallet }: BattleLobbyProps) => {
               <div className="flex items-center gap-3 relative z-10">
                 <div className="relative">
                   <img
-                    src={invite.creatorAvatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${invite.fromUserId}`}
+                    src={invite.creatorAvatar || `https://api.dicebear.com/9.x/adventurer/svg?seed=${invite.fromUserId}`}
                     alt={invite.fromUsername}
                     className="w-10 h-10 rounded-full ring-2 ring-purple-500/30"
                   />
@@ -1006,7 +1006,7 @@ const BattleLobby = ({ wallet }: BattleLobbyProps) => {
               >
                 <div className="flex items-center gap-3">
                   <img
-                    src={battle.creatorProfilePic || `https://api.dicebear.com/7.x/avataaars/svg?seed=${battle.creatorId}`}
+                    src={battle.creatorProfilePic || `https://api.dicebear.com/9.x/adventurer/svg?seed=${battle.creatorId}`}
                     alt={battle.creatorName}
                     className="w-9 h-9 rounded-full ring-1 ring-gray-200 dark:ring-gray-700"
                   />

@@ -70,6 +70,7 @@ export interface IUser extends Document {
   rating: number;
   certificates: number;
   teamsJoined: number;
+  pushTokens: string[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -144,7 +145,8 @@ const UserSchema: Schema = new Schema({
   }],
   rating: { type: Number, default: 0 },
   certificates: { type: Number, default: 0 },
-  teamsJoined: { type: Number, default: 0 }
+  teamsJoined: { type: Number, default: 0 },
+  pushTokens: [{ type: String }]
 }, {
   timestamps: true,
   toJSON: {

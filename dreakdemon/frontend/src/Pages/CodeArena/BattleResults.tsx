@@ -1,20 +1,20 @@
 import { motion } from 'framer-motion';
 import {
-  CheckCircle,
-  Clock,
-  Coins,
-  Crown,
-  Home,
-  Loader2,
-  Medal,
-  RotateCcw,
-  Star,
-  Swords,
-  Target,
-  TrendingDown,
-  TrendingUp,
-  Trophy,
-  X
+    CheckCircle,
+    Clock,
+    Coins,
+    Crown,
+    Home,
+    Loader2,
+    Medal,
+    RotateCcw,
+    Star,
+    Swords,
+    Target,
+    TrendingDown,
+    TrendingUp,
+    Trophy,
+    X
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -237,7 +237,7 @@ const BattleResults = () => {
           entryFee,
           userId: user.id,
           userName: userprofile?.name || user?.name || 'Player',
-          userAvatar: userprofile?.profilePic || userprofile?.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`,
+          userAvatar: userprofile?.profilePic || userprofile?.avatarUrl || `https://api.dicebear.com/9.x/adventurer/svg?seed=${user.id}`,
           rating: myData?.rating || 1000,
           originalBattleId: battleId // Pass the original battle ID for rematch
         },

@@ -17,6 +17,7 @@ import {
     ActivityIndicator,
     Alert,
     FlatList,
+    Image,
     KeyboardAvoidingView,
     Platform,
     StyleSheet,
@@ -34,7 +35,9 @@ type RouteParams = {
   isOnline?: boolean;
 };
 
-const EMOJIS = ['😎', '🚀', '💻', '🔥', '⚡', '🎯', '🧠', '✨', '🎮', '🤖'];
+function getDiceBearUri(seed: string): string {
+  return `https://api.dicebear.com/9.x/adventurer/png?seed=${encodeURIComponent(seed)}&size=96`;
+}
 
 export default function ChatScreen() {
   const navigation = useNavigation<any>();
@@ -52,7 +55,7 @@ export default function ChatScreen() {
   const flatListRef = useRef<FlatList>(null);
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const emoji = EMOJIS[participantId.charCodeAt(0) % EMOJIS.length];
+  const avatarUri = getDiceBearUri(participantId);
 
   useEffect(() => {
     initChat();
@@ -207,7 +210,7 @@ export default function ChatScreen() {
           <Ionicons name="chevron-back" size={24} color={COLORS.textPrimary} />
         </TouchableOpacity>
         <View style={st.headerAvatar}>
-          <Text style={st.headerEmojiMain}>{emoji}</Text>
+          <Image source={{ uri: avatarUri }} style={{ width: 38, height: 38, borderRadius: 19 }} />
           {isOnline && <View style={st.headerOnline} />}
         </View>
         <View style={{ flex: 1 }}>
@@ -230,6 +233,7 @@ export default function ChatScreen() {
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+        enabled={Platform.OS === 'ios'}
       >
         <FlatList
           ref={flatListRef}
@@ -251,7 +255,7 @@ export default function ChatScreen() {
           }
           ListEmptyComponent={
             <View style={{ alignItems: 'center', marginTop: 80 }}>
-              <Text style={{ fontSize: 36 }}>{emoji}</Text>
+              <Image source={{ uri: avatarUri }} style={{ width: 64, height: 64, borderRadius: 32 }} />
               <Text style={{ color: COLORS.textMuted, fontSize: 14, marginTop: 8 }}>
                 Say hi to {participantName}!
               </Text>

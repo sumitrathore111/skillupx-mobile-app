@@ -14,6 +14,7 @@ import { useEffect, useRef, useState } from 'react';
 import {
     Alert,
     Animated,
+    Image,
     StyleSheet,
     Text,
     TouchableOpacity,
@@ -23,11 +24,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 type RouteParams = { groupId: string; roomId: string; roomName: string; groupName: string };
 
-const EMOJIS = ['😎', '🚀', '💻', '🔥', '⚡', '🎯', '🧠', '💡', '🎨', '🛠️', '✨', '🌟', '👾', '🤖', '🦊'];
-function getEmoji(name: string): string {
-  let h = 0;
-  for (let i = 0; i < name.length; i++) h = name.charCodeAt(i) + ((h << 5) - h);
-  return EMOJIS[Math.abs(h) % EMOJIS.length];
+function getDiceBearUri(seed: string): string {
+  return `https://api.dicebear.com/9.x/adventurer/png?seed=${encodeURIComponent(seed)}&size=96`;
 }
 
 export default function VoiceRoomScreen() {
@@ -129,7 +127,7 @@ export default function VoiceRoomScreen() {
             <View style={st.participantCard}>
               <Animated.View style={[st.avatarRing, !muted && { borderColor: COLORS.success }, { transform: [{ scale: !muted ? pulseAnim : 1 }] }]}>
                 <View style={st.avatar}>
-                  <Text style={st.avatarEmoji}>{getEmoji(user?.name || 'U')}</Text>
+                  <Image source={{ uri: getDiceBearUri(user?.name || 'U') }} style={{ width: 54, height: 54, borderRadius: 27 }} />
                 </View>
               </Animated.View>
               <Text style={st.participantName} numberOfLines={1}>You</Text>
@@ -142,7 +140,7 @@ export default function VoiceRoomScreen() {
                 <View key={p.userId} style={st.participantCard}>
                   <View style={[st.avatarRing, { borderColor: COLORS.success }]}>
                     <View style={st.avatar}>
-                      <Text style={st.avatarEmoji}>{getEmoji(p.userName)}</Text>
+                      <Image source={{ uri: getDiceBearUri(p.userName) }} style={{ width: 54, height: 54, borderRadius: 27 }} />
                     </View>
                   </View>
                   <Text style={st.participantName} numberOfLines={1}>{p.userName}</Text>

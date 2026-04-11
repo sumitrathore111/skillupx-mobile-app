@@ -331,4 +331,42 @@ router.get('/:userId/badges', authenticate, async (req: AuthRequest, res: Respon
   }
 });
 
+// Save push token for the authenticated user
+router.post('/push-token', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { pushToken } = req.body;
+    if (!pushToken || typeof pushToken !== 'string') {
+      res.status(400).json({ error: 'pushToken is required' });
+      return;
+    }
+    // Add token if not already stored (avoid duplicates)
+    await User.findByIdAndUpdate(req.user!.id, {
+      $addToSet: { pushTokens: pushToken },
+    });
+    res.json({ success: true });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Remove push token (on logout)
+router.delete('/push-token', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { pushToken } = req.body;
+    if (pushToken) {
+      await User.findByIdAndUpdate(req.user!.id, {
+        $pull: { pushTokens: pushToken },
+      });
+    } else {
+      // Remove all tokens for this user (full logout)
+      await User.findByIdAndUpdate(req.user!.id, {
+        $set: { pushTokens: [] },
+      });
+    }
+    res.json({ success: true });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 export default router;
