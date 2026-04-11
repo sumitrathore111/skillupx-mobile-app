@@ -1,7 +1,6 @@
 import SkillUpXLogo from '@components/SkillUpXLogo';
 import { COLORS, RADIUS } from '@constants/theme';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
 import { useAuthStore } from '@store/authStore';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useEffect, useRef, useState } from 'react';
@@ -15,7 +14,6 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function LoginScreen() {
-  const navigation = useNavigation<any>();
   const { login, isLoading, error, clearError } = useAuthStore();
 
   const [email, setEmail] = useState('');
@@ -180,22 +178,7 @@ export default function LoginScreen() {
               </LinearGradient>
             </TouchableOpacity>
 
-            {/* Divider */}
-            <View style={styles.divider}>
-              <View style={styles.dividerLine} />
-              <Text style={styles.dividerLabel}>OR</Text>
-              <View style={styles.dividerLine} />
-            </View>
 
-            {/* Register */}
-            <TouchableOpacity
-              style={styles.registerBtn}
-              onPress={() => navigation.navigate('Register')}
-              activeOpacity={0.8}
-            >
-              <Ionicons name="person-add-outline" size={16} color={COLORS.primary} />
-              <Text style={styles.registerText}>Create New Account</Text>
-            </TouchableOpacity>
           </Animated.View>
 
           {/* ─── Feature Pills ─── */}
@@ -287,25 +270,6 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   signInText: { color: '#fff', fontSize: 16, fontWeight: '700' },
-
-  /* Divider */
-  divider: { flexDirection: 'row', alignItems: 'center', marginVertical: 20 },
-  dividerLine: { flex: 1, height: StyleSheet.hairlineWidth, backgroundColor: COLORS.border },
-  dividerLabel: {
-    color: COLORS.textMuted,
-    fontSize: 11,
-    fontWeight: '600',
-    letterSpacing: 1.5,
-    paddingHorizontal: 14,
-  },
-
-  /* Register */
-  registerBtn: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
-    borderWidth: 1.5, borderColor: COLORS.primary,
-    borderRadius: RADIUS.md, height: 50,
-  },
-  registerText: { color: COLORS.primary, fontSize: 15, fontWeight: '700' },
 
   /* Pills */
   pills: {
