@@ -62,7 +62,7 @@ export default function MyInvitesScreen() {
         Alert.alert('Declined', 'Invitation has been declined.');
       }
     } catch (e: any) {
-      Alert.alert('Error', e?.response?.data?.message || e.message || 'Failed to respond');
+      Alert.alert('Error', e?.response?.data?.error || e?.response?.data?.message || e.message || 'Failed to respond');
     } finally {
       setResponding(null);
     }

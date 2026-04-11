@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import {
     deleteIdea,
+    fetchAllIdeas,
     fetchMyCompletedTasks,
     fetchMyIdeas,
     fetchMyInvites,
@@ -105,6 +106,33 @@ export default function CreatorHomeScreen() {
       else if (sortMode === 'trending') params.sort = 'trending';
 
       const data = await fetchProjects(params);
+
+      // Cross-reference ideas to detect website-completed projects
+      try {
+        const allIdeas = await fetchAllIdeas();
+        const completedIdeaIds = new Set<string>();
+        const ideaToProject = new Map<string, string>();
+        for (const idea of allIdeas) {
+          if (idea.status === 'completed') {
+            const iid = String(idea._id || idea.id);
+            completedIdeaIds.add(iid);
+            if (idea.projectId) {
+              const pid = String(idea.projectId._id || idea.projectId.id || idea.projectId);
+              ideaToProject.set(pid, iid);
+            }
+          }
+        }
+        for (const p of data) {
+          const pid = String((p as any)._id || p.id);
+          const pIdeaId = (p as any).ideaId;
+          const ideaIdStr = pIdeaId ? String(typeof pIdeaId === 'object' ? (pIdeaId._id || pIdeaId.id) : pIdeaId) : '';
+          if ((ideaIdStr && completedIdeaIds.has(ideaIdStr)) || ideaToProject.has(pid)) {
+            (p as any).isCompleted = true;
+            (p as any).status = 'completed';
+          }
+        }
+      } catch { /* ideas fetch failed, rely on project status only */ }
+
       setProjects(data);
 
       // Load user access data (join requests + memberships) like frontend
@@ -113,12 +141,23 @@ export default function CreatorHomeScreen() {
           const requests = await fetchUserJoinRequests(user.id);
           setUserJoinRequests(requests);
 
-          // Build memberships set from approved requests
+          // Build memberships set from approved requests + project member lists
           const memberSet = new Set<string>();
           requests.forEach((r: any) => {
             if (r.status === 'approved') {
               const pid = typeof r.projectId === 'object' ? r.projectId?._id : r.projectId;
               if (pid) memberSet.add(String(pid));
+            }
+          });
+          // Also check project members arrays (covers invite-accepted users)
+          const uid = String(user.id || (user as any)._id);
+          data.forEach((p: any) => {
+            const pid = String(p._id || p.id);
+            const members = p.members || [];
+            if (Array.isArray(members) && members.some((m: any) =>
+              String(m.userId?._id || m.userId?.id || m.userId) === uid
+            )) {
+              memberSet.add(pid);
             }
           });
           setUserMemberships(memberSet);
@@ -146,15 +185,77 @@ export default function CreatorHomeScreen() {
     setMyProjectsLoading(true);
     try {
       if (myProjectsView === 'projects') {
-        const data = await fetchMyProjectsList();
-        setMyProjects(data);
+        // Match website: build "My Projects" from user's approved/completed ideas
+        const allIdeas = await fetchAllIdeas();
+        const uid = String(user?.id || (user as any)?._id || '');
+        const userApprovedIdeas = allIdeas.filter((idea: any) => {
+          const ideaUserId = String(
+            idea.userId || idea.submittedBy?._id || idea.submittedBy?.id || idea.submittedBy || ''
+          );
+          return ideaUserId === uid && (idea.status === 'approved' || idea.status === 'completed');
+        });
+
+        // Also fetch actual project data to enrich with real members/progress/techStack
+        let realProjects: Project[] = [];
+        try { realProjects = await fetchMyProjectsList(); } catch { /* ignore */ }
+        const projectMap = new Map<string, any>();
+        for (const p of realProjects) {
+          const pid = String((p as any)._id || p.id);
+          projectMap.set(pid, p);
+          if ((p as any).ideaId) {
+            const iid = typeof (p as any).ideaId === 'object'
+              ? String((p as any).ideaId._id || (p as any).ideaId.id)
+              : String((p as any).ideaId);
+            projectMap.set(iid, p);
+          }
+        }
+
+        const mergedProjects: Project[] = userApprovedIdeas.map((idea: any) => {
+          const ideaId = String(idea._id || idea.id);
+          const linkedProjectId = idea.projectId
+            ? String(idea.projectId._id || idea.projectId.id || idea.projectId)
+            : ideaId;
+          const real = projectMap.get(linkedProjectId) || projectMap.get(ideaId);
+
+          return {
+            ...(real || {}),
+            _id: real ? ((real as any)._id || real.id) : linkedProjectId,
+            id: real ? (real.id || (real as any)._id) : linkedProjectId,
+            title: idea.title,
+            description: idea.description,
+            category: idea.category,
+            creatorId: uid,
+            creatorName: idea.submittedByName || idea.userName || user?.name || '',
+            ownerName: idea.submittedByName || idea.userName || user?.name || '',
+            status: idea.status === 'completed' ? 'completed' : (real?.status || 'active'),
+            isCompleted: idea.status === 'completed',
+            progress: real?.progress || 0,
+            members: real?.members || [],
+            memberCount: real ? (Array.isArray(real.members) ? real.members.length : (real.memberCount || 1)) : 1,
+            techStack: real?.techStack || [],
+            tags: real?.tags || [idea.category],
+            ideaId: ideaId,
+            createdAt: idea.submittedAt || idea.createdAt || new Date().toISOString(),
+          } as any;
+        });
+
+        // Also include projects where user is member but not idea owner
+        const mergedIds = new Set(mergedProjects.map(p => String((p as any)._id || p.id)));
+        for (const p of realProjects) {
+          const pid = String((p as any)._id || p.id);
+          if (!mergedIds.has(pid)) {
+            mergedProjects.push(p);
+          }
+        }
+
+        setMyProjects(mergedProjects);
       } else {
         const data = await fetchMyIdeas();
         setMyIdeas(data);
       }
     } catch (e) { console.error(e); }
     finally { setMyProjectsLoading(false); }
-  }, [myProjectsView]);
+  }, [myProjectsView, user]);
 
   const loadCompletedTasks = useCallback(async () => {
     if (!user) return;
@@ -267,6 +368,8 @@ export default function CreatorHomeScreen() {
     return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   };
 
+  const stripHtml = (str: string) => (str || '').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+
   const getMemberCount = (project: Project): number => {
     if (Array.isArray(project.members)) return project.members.length;
     if (typeof project.memberCount === 'number') return project.memberCount;
@@ -364,7 +467,7 @@ export default function CreatorHomeScreen() {
               <Text style={S.cardTitle} numberOfLines={2}>{item.title}</Text>
               {isOwner && <View style={S.creatorBadge}><Text style={S.creatorBadgeText}>CREATOR</Text></View>}
             </View>
-            <Text style={S.cardDesc} numberOfLines={2}>{item.description}</Text>
+            <Text style={S.cardDesc} numberOfLines={2}>{stripHtml(item.description)}</Text>
             {/* Creator name */}
             {(item.creatorName || item.ownerName) && (
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 6 }}>
@@ -375,9 +478,10 @@ export default function CreatorHomeScreen() {
               </View>
             )}
           </View>
-          <View style={[S.statusBadge, { backgroundColor: isCompleted ? COLORS.success + '30' : '#16A34A20' }]}>
+          <View style={[S.statusBadge, { alignSelf: 'flex-start', backgroundColor: isCompleted ? COLORS.success + '20' : COLORS.success + '15' }]}>
+            <View style={[S.statusDot, { backgroundColor: isCompleted ? COLORS.success : '#22C55E' }]} />
             <Text style={[S.statusBadgeText, { color: isCompleted ? COLORS.success : '#22C55E' }]}>
-              {isCompleted ? '✓ Completed' : 'Active'}
+              {isCompleted ? 'Completed' : 'Active'}
             </Text>
           </View>
         </View>
@@ -464,6 +568,7 @@ export default function CreatorHomeScreen() {
   const renderMyProjectCard = ({ item }: { item: Project }) => {
     const pid = (item as any)._id || item.id;
     const pendingCount = projectPendingRequests[pid] || 0;
+    const isCompleted = (item as any).isCompleted || item.status === 'completed' || item.status === 'Completed';
     return (
       <TouchableOpacity
         style={S.card}
@@ -479,7 +584,13 @@ export default function CreatorHomeScreen() {
                 <View style={S.pendingBadge}><Text style={S.pendingBadgeText}>{pendingCount}</Text></View>
               )}
             </View>
-            <Text style={S.cardDesc} numberOfLines={2}>{item.description}</Text>
+            <Text style={S.cardDesc} numberOfLines={2}>{stripHtml(item.description)}</Text>
+          </View>
+          <View style={[S.statusBadge, { alignSelf: 'flex-start', backgroundColor: isCompleted ? COLORS.success + '20' : COLORS.success + '15' }]}>
+            <View style={[S.statusDot, { backgroundColor: isCompleted ? COLORS.success : '#22C55E' }]} />
+            <Text style={[S.statusBadgeText, { color: isCompleted ? COLORS.success : '#22C55E' }]}>
+              {isCompleted ? 'Completed' : 'Active'}
+            </Text>
           </View>
         </View>
         {/* Tech stack */}
@@ -516,20 +627,30 @@ export default function CreatorHomeScreen() {
 
   // ── Idea card (with status + edit/delete) ─────────────────
   const renderIdeaCard = ({ item }: { item: any }) => {
-    const statusColor = item.status === 'approved' ? COLORS.success : item.status === 'rejected' ? COLORS.danger : COLORS.warning;
+    const statusColor = item.status === 'approved' ? COLORS.success
+      : item.status === 'completed' ? COLORS.success
+      : item.status === 'rejected' ? COLORS.danger
+      : item.status === 'in-progress' ? PRIMARY
+      : COLORS.warning;
+    const statusLabel = item.status === 'pending' ? 'Pending'
+      : item.status === 'approved' ? 'Approved'
+      : item.status === 'completed' ? 'Completed'
+      : item.status === 'in-progress' ? 'In Progress'
+      : item.status === 'rejected' ? 'Rejected' : item.status;
     return (
       <View style={[S.card, { borderLeftWidth: 4, borderLeftColor: PRIMARY }]}>
         <View style={S.cardTop}>
           <View style={{ flex: 1 }}>
             <Text style={S.cardTitle} numberOfLines={2}>{item.title}</Text>
-            <Text style={S.cardDesc} numberOfLines={2}>{item.description}</Text>
+            <Text style={S.cardDesc} numberOfLines={2}>{stripHtml(item.description)}</Text>
             {item.category && <Text style={[S.metaText, { marginTop: 4, color: PRIMARY }]}>{item.category}</Text>}
             <Text style={[S.metaText, { marginTop: 4 }]}>Submitted {shortDate(item.submittedAt || item.createdAt)}</Text>
           </View>
           <View style={{ gap: 8, alignItems: 'flex-end' }}>
-            <View style={[S.statusBadge, { backgroundColor: statusColor + '20' }]}>
+            <View style={[S.statusBadge, { backgroundColor: statusColor + '15' }]}>
+              <View style={[S.statusDot, { backgroundColor: statusColor }]} />
               <Text style={[S.statusBadgeText, { color: statusColor }]}>
-                {item.status === 'pending' ? '⏳ Pending' : item.status === 'approved' ? '✅ Approved' : '❌ Rejected'}
+                {statusLabel}
               </Text>
             </View>
             <View style={{ flexDirection: 'row', gap: 12 }}>
@@ -882,7 +1003,8 @@ export default function CreatorHomeScreen() {
             </View>
             {detailProject && (
               <ScrollView>
-                <View style={[S.statusBadge, { alignSelf: 'flex-start', marginBottom: 12, backgroundColor: COLORS.success + '20' }]}>
+                <View style={[S.statusBadge, { alignSelf: 'flex-start', marginBottom: 12, backgroundColor: COLORS.success + '15' }]}>
+                  <View style={[S.statusDot, { backgroundColor: COLORS.success }]} />
                   <Text style={[S.statusBadgeText, { color: COLORS.success }]}>{detailProject.status}</Text>
                 </View>
 
@@ -896,7 +1018,7 @@ export default function CreatorHomeScreen() {
                 )}
 
                 <Text style={S.fieldLabel}>Description</Text>
-                <Text style={[S.cardDesc, { marginBottom: 16, marginTop: 4 }]}>{detailProject.description}</Text>
+                <Text style={[S.cardDesc, { marginBottom: 16, marginTop: 4 }]}>{stripHtml(detailProject.description)}</Text>
 
                 {detailProject.techStack && detailProject.techStack.length > 0 && (
                   <>
@@ -979,8 +1101,8 @@ const S = StyleSheet.create({
   inviteBadge:   { position: 'absolute', top: -3, right: -3, minWidth: 18, height: 18, borderRadius: 9, backgroundColor: COLORS.danger, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 4 },
   inviteBadgeText:{ fontSize: 9, fontWeight: '900', color: '#fff' },
 
-  tabBar:        { flexDirection: 'row', marginHorizontal: 16, marginBottom: 10, backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, padding: 3, borderWidth: 1, borderColor: COLORS.border },
-  tabItem:       { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, paddingVertical: 10, borderRadius: RADIUS.md },
+  tabBar:        { flexDirection: 'row', marginHorizontal: 12, marginBottom: 8, backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, padding: 3, borderWidth: 1, borderColor: COLORS.border },
+  tabItem:       { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, height: 32, borderRadius: RADIUS.md },
   tabItemActive: { backgroundColor: PRIMARY },
   tabLabel:      { fontSize: 11, fontWeight: '700', color: COLORS.textMuted },
   tabLabelActive:{ color: '#fff' },
@@ -995,10 +1117,10 @@ const S = StyleSheet.create({
   chipTextActive:{ color: '#fff' },
 
   filterRow:         { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, marginTop: 8, marginBottom: 6 },
-  smallChip:         { paddingHorizontal: 10, paddingVertical: 5, borderRadius: RADIUS.full, backgroundColor: COLORS.surface, borderWidth: 1, borderColor: COLORS.border },
-  smallChipActive:   { backgroundColor: PRIMARY + '20', borderColor: PRIMARY },
+  smallChip:         { paddingHorizontal: 10, paddingVertical: 5, borderRadius: RADIUS.md, backgroundColor: COLORS.surface, borderWidth: 1, borderColor: COLORS.border },
+  smallChipActive:   { backgroundColor: PRIMARY, borderColor: PRIMARY },
   smallChipText:     { fontSize: 11, color: COLORS.textMuted, fontWeight: '600' },
-  smallChipTextActive: { color: PRIMARY },
+  smallChipTextActive: { color: '#fff' },
   iconChip:          { width: 30, height: 30, borderRadius: RADIUS.full, backgroundColor: COLORS.surface, borderWidth: 1, borderColor: COLORS.border, alignItems: 'center', justifyContent: 'center' },
   iconChipActive:    { backgroundColor: PRIMARY + '20', borderColor: PRIMARY },
 
@@ -1010,7 +1132,8 @@ const S = StyleSheet.create({
   cardTitle: { fontSize: 15, fontWeight: '800', color: COLORS.textPrimary, lineHeight: 20 },
   cardDesc:  { fontSize: 13, color: COLORS.textMuted, lineHeight: 18, marginTop: 4 },
 
-  statusBadge:     { paddingHorizontal: 8, paddingVertical: 3, borderRadius: RADIUS.full },
+  statusBadge:     { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 8, paddingVertical: 4, borderRadius: RADIUS.md },
+  statusDot:       { width: 6, height: 6, borderRadius: 3 },
   statusBadgeText: { fontSize: 10, fontWeight: '700' },
 
   progressLabel: { fontSize: 11, color: COLORS.textMuted, fontWeight: '600' },
@@ -1060,10 +1183,10 @@ const S = StyleSheet.create({
   projTag:     { paddingHorizontal: 8, paddingVertical: 2, backgroundColor: PRIMARY, borderRadius: RADIUS.full },
   projTagText: { fontSize: 9, color: '#fff', fontWeight: '800' },
 
-  subTabRow:       { flexDirection: 'row', marginHorizontal: 16, marginBottom: 10, backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, padding: 3, borderWidth: 1, borderColor: COLORS.border },
-  subTab:          { flex: 1, paddingVertical: 10, alignItems: 'center', borderRadius: RADIUS.md },
+  subTabRow:       { flexDirection: 'row', marginHorizontal: 12, marginBottom: 8, backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, padding: 3, borderWidth: 1, borderColor: COLORS.border },
+  subTab:          { flex: 1, height: 32, alignItems: 'center', justifyContent: 'center', borderRadius: RADIUS.md },
   subTabActive:    { backgroundColor: PRIMARY },
-  subTabText:      { fontSize: 13, fontWeight: '700', color: COLORS.textMuted },
+  subTabText:      { fontSize: 11, fontWeight: '700', color: COLORS.textMuted },
   subTabTextActive:{ color: '#fff' },
 
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' },

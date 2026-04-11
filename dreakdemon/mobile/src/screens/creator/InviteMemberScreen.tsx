@@ -79,11 +79,11 @@ export default function InviteMemberScreen() {
     if (!selectedDev) return;
     setSending(true);
     try {
-      const result = await sendProjectInvite(projectId, selectedDev._id, message.trim() || undefined);
+      const result = await sendProjectInvite(projectId, selectedDev._id || selectedDev.id || '', message.trim() || undefined);
       setInviteLink(result.inviteLink || null);
       setStep('success');
     } catch (e: any) {
-      Alert.alert('Error', e?.response?.data?.message || e.message || 'Failed to send invite');
+      Alert.alert('Error', e?.response?.data?.error || e?.response?.data?.message || e.message || 'Failed to send invite');
     } finally {
       setSending(false);
     }
@@ -139,7 +139,7 @@ export default function InviteMemberScreen() {
       {/* Developer List */}
       <FlatList
         data={developers}
-        keyExtractor={item => item._id}
+        keyExtractor={item => item._id || item.id || ''}
         contentContainerStyle={{ padding: 16, gap: 10, paddingBottom: 40 }}
         renderItem={({ item }) => (
           <TouchableOpacity style={S.devCard} onPress={() => handleSelect(item)} activeOpacity={0.7}>

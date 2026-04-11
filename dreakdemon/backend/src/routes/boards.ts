@@ -615,6 +615,13 @@ router.patch('/tasks/:taskId/move', auth, async (req: AuthRequest, res: Response
     if (doneColumn && columnId === doneColumn.id && !task.completedAt) {
       task.completedAt = new Date();
       task.completedBy = new mongoose.Types.ObjectId(userId);
+      // Also mark as approved so it counts in completed-tasks query
+      if (!task.reviewStatus || task.reviewStatus !== 'approved') {
+        task.reviewStatus = 'approved';
+        task.reviewedBy = new mongoose.Types.ObjectId(userId);
+        task.reviewedAt = new Date();
+        task.reviewComment = task.reviewComment || 'Approved by owner (moved to Done)';
+      }
     }
 
     await task.save();

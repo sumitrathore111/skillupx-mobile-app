@@ -40,6 +40,11 @@ export async function fetchAllIdeas(): Promise<any[]> {
   return (data as any)?.ideas || [];
 }
 
+export async function fetchIdeaById(ideaId: string): Promise<any> {
+  const data = await apiRequest<any>('GET', `/ideas/${ideaId}`);
+  return data?.idea || data;
+}
+
 export async function fetchIdeas(params?: { search?: string }): Promise<Idea[]> {
   const query = params?.search ? `?search=${encodeURIComponent(params.search)}` : '';
   const data = await apiRequest<any>('GET', `/ideas${query}`);
@@ -126,8 +131,8 @@ export async function getInvitableDevelopers(
   const data = await apiRequest<any>('GET', `/project-invites/developers/${projectId}?${query.toString()}`);
   return {
     developers: data?.developers || data || [],
-    total: data?.total || 0,
-    page: data?.page || page,
+    total: data?.pagination?.total || data?.total || 0,
+    page: data?.pagination?.page || data?.page || page,
   };
 }
 
@@ -155,7 +160,9 @@ export async function respondToInvite(
   response: 'accepted' | 'declined',
 ): Promise<{ projectId?: string }> {
   const data = await apiRequest<any>('PUT', `/project-invites/${inviteId}/respond`, { response });
-  return data || {};
+  return {
+    projectId: data?.projectId || data?.invite?.projectId?.toString() || data?.invite?.projectId,
+  };
 }
 
 export async function fetchProjectMembers(projectId: string): Promise<any[]> {

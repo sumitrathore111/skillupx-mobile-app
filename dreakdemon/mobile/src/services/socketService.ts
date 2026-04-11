@@ -154,3 +154,123 @@ export function onUserOnline(callback: (userId: string) => void) {
 export function onUserOffline(callback: (userId: string) => void) {
   socket?.on('userOffline', callback);
 }
+
+// ============ PROJECT ROOM EVENTS ============
+export function joinProjectRoom(projectId: string) {
+  socket?.emit('join-project', projectId);
+}
+
+export function leaveProjectRoom(projectId: string) {
+  socket?.emit('leave-project', projectId);
+}
+
+// ── Board / Task events (emitted to project:{id} room)
+export function onTaskCreated(callback: (data: any) => void) {
+  socket?.on('task:created', callback);
+}
+export function offTaskCreated(callback?: (data: any) => void) {
+  socket?.off('task:created', callback);
+}
+
+export function onTaskUpdated(callback: (data: any) => void) {
+  socket?.on('task:updated', callback);
+}
+export function offTaskUpdated(callback?: (data: any) => void) {
+  socket?.off('task:updated', callback);
+}
+
+export function onTaskMoved(callback: (data: any) => void) {
+  socket?.on('task:moved', callback);
+}
+export function offTaskMoved(callback?: (data: any) => void) {
+  socket?.off('task:moved', callback);
+}
+
+export function onTaskDeleted(callback: (data: any) => void) {
+  socket?.on('task:deleted', callback);
+}
+export function offTaskDeleted(callback?: (data: any) => void) {
+  socket?.off('task:deleted', callback);
+}
+
+export function onTaskCommented(callback: (data: any) => void) {
+  socket?.on('task:commented', callback);
+}
+export function offTaskCommented(callback?: (data: any) => void) {
+  socket?.off('task:commented', callback);
+}
+
+// ── Project chat events (emitted to project:{id} room)
+export function onProjectMessage(callback: (data: any) => void) {
+  socket?.on('new-message', callback);
+}
+export function offProjectMessage(callback?: (data: any) => void) {
+  socket?.off('new-message', callback);
+}
+
+export function onProjectMessageEdited(callback: (data: any) => void) {
+  socket?.on('message-edited', callback);
+}
+export function offProjectMessageEdited(callback?: (data: any) => void) {
+  socket?.off('message-edited', callback);
+}
+
+export function onProjectMessageDeleted(callback: (data: any) => void) {
+  socket?.on('message-deleted', callback);
+}
+export function offProjectMessageDeleted(callback?: (data: any) => void) {
+  socket?.off('message-deleted', callback);
+}
+
+// ── Member events
+export function onMemberRemoved(callback: (data: any) => void) {
+  socket?.on('member-removed', callback);
+}
+export function offMemberRemoved(callback?: (data: any) => void) {
+  socket?.off('member-removed', callback);
+}
+
+// ── File events
+export function onFileUploaded(callback: (data: any) => void) {
+  socket?.on('file-uploaded', callback);
+}
+export function offFileUploaded(callback?: (data: any) => void) {
+  socket?.off('file-uploaded', callback);
+}
+
+export function onFileDeleted(callback: (data: any) => void) {
+  socket?.on('file-deleted', callback);
+}
+export function offFileDeleted(callback?: (data: any) => void) {
+  socket?.off('file-deleted', callback);
+}
+
+// ── Board structure events
+export function onBoardCreated(callback: (data: any) => void) {
+  socket?.on('board:created', callback);
+}
+export function offBoardCreated(callback?: (data: any) => void) {
+  socket?.off('board:created', callback);
+}
+
+export function onBoardUpdated(callback: (data: any) => void) {
+  socket?.on('board:updated', callback);
+}
+export function offBoardUpdated(callback?: (data: any) => void) {
+  socket?.off('board:updated', callback);
+}
+
+// ── GitHub events
+export function onGitHubPush(callback: (data: any) => void) {
+  socket?.on('github:push', callback);
+}
+export function offGitHubPush(callback?: (data: any) => void) {
+  socket?.off('github:push', callback);
+}
+
+export function onGitHubPR(callback: (data: any) => void) {
+  socket?.on('github:pull_request', callback);
+}
+export function offGitHubPR(callback?: (data: any) => void) {
+  socket?.off('github:pull_request', callback);
+}

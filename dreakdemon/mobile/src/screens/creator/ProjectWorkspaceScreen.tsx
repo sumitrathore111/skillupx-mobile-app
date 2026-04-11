@@ -1,68 +1,99 @@
-import { COLORS, RADIUS } from '@constants/theme';
+import { COLORS, RADIUS, SHADOWS } from '@constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import {
-  fetchProjectById,
-  fetchProjectJoinRequests,
-  respondToJoinRequest,
+    fetchIdeaById,
+    fetchProjectById,
+    fetchProjectJoinRequests,
+    respondToJoinRequest,
 } from '@services/creatorService';
 import {
-  completeSprint,
-  createBoardTask,
-  createIssue,
-  createSprint,
-  deleteBoardTask,
-  deleteMessage,
-  deleteProjectFile,
-  disconnectProjectFromGitHub,
-  editMessage,
-  getBoardTasks,
-  getGitHubActivity,
-  getGitHubCollaborators,
-  getGitHubStatus,
-  getLeaderboard,
-  getProjectActivity,
-  getProjectAnalytics,
-  getProjectFiles,
-  getProjectIssues,
-  getProjectMembers,
-  getProjectMessages,
-  getRepoBranches,
-  getRepoCommits,
-  getRepoContributors,
-  getRepoPulls,
-  getSprints,
-  inviteGitHubCollaborator,
-  moveBoardTask,
-  removeGitHubCollaborator,
-  removeMember,
-  sendProjectMessage,
-  startSprint,
-  updateIdeaStatus,
-  updateIssueStatus,
-  updateSprint,
-  uploadProjectFile,
+    completeSprint,
+    createBoardTask,
+    createSprint,
+    deleteBoardTask,
+    deleteMessage,
+    deleteProjectFile,
+    disconnectProjectFromGitHub,
+    editMessage,
+    getBoardTasks,
+    getGitHubActivity,
+    getGitHubCollaborators,
+    getGitHubStatus,
+    getProjectActivity,
+    getProjectAnalytics,
+    getProjectFiles,
+    getProjectMembers,
+    getProjectMessages,
+    getRepoBranches,
+    getRepoCommits,
+    getRepoContributors,
+    getRepoPulls,
+    getSprints,
+    inviteGitHubCollaborator,
+    moveBoardTask,
+    removeGitHubCollaborator,
+    removeMember,
+    sendProjectMessage,
+    startSprint,
+    updateIdeaStatus,
+    updateProject,
+    updateSprint,
+    uploadProjectFile,
 } from '@services/projectsService';
+import {
+    joinProjectRoom,
+    leaveProjectRoom,
+    offFileDeleted,
+    offFileUploaded,
+    offGitHubPR,
+    offGitHubPush,
+    offMemberRemoved,
+    offProjectMessage,
+    offProjectMessageDeleted,
+    offProjectMessageEdited,
+    offTaskCreated,
+    offTaskDeleted,
+    offTaskMoved,
+    offTaskUpdated,
+    onFileDeleted,
+    onFileUploaded,
+    onGitHubPR,
+    onGitHubPush,
+    onMemberRemoved,
+    onProjectMessage,
+    onProjectMessageDeleted,
+    onProjectMessageEdited,
+    onTaskCreated,
+    onTaskDeleted,
+    onTaskMoved,
+    onTaskUpdated,
+} from '@services/socketService';
 import { useAuthStore } from '@store/authStore';
 import * as DocumentPicker from 'expo-document-picker';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
-  ActivityIndicator,
-  Alert,
-  FlatList,
-  Linking,
-  Modal,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Alert,
+    FlatList,
+    Linking,
+    Modal,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+const GLASS = 'rgba(255,255,255,0.05)';
+const GLASS_BORDER = 'rgba(255,255,255,0.08)';
+const PRIMARY = COLORS.primary;
+
 // ───────────────────────────── Types ─────────────────────────────
-type Tab = 'board' | 'sprints' | 'github' | 'members' | 'files' | 'chat' | 'activity' | 'analytics' | 'issues';
+type Tab = 'board' | 'sprints' | 'github' | 'members' | 'files' | 'chat' | 'activity' | 'analytics';
 
 interface JoinRequestItem {
   id: string;
@@ -153,7 +184,6 @@ export default function ProjectWorkspaceScreen() {
   const [fileViewMode, setFileViewMode] = useState<'list' | 'grid'>('list');
 
   // ── Analytics state
-  const [leaderboard, setLeaderboard] = useState<any[]>([]);
   const [analyticsData, setAnalyticsData] = useState<any>(null);
   const [analyticsView, setAnalyticsView] = useState<'tasks' | 'github'>('tasks');
 
@@ -176,11 +206,6 @@ export default function ProjectWorkspaceScreen() {
   // ── Activity state
   const [activities, setActivities] = useState<any[]>([]);
 
-  // ── Issues state
-  const [issues, setIssues] = useState<any[]>([]);
-  const [showAddIssue, setShowAddIssue] = useState(false);
-  const [newIssue, setNewIssue] = useState({ title: '', description: '' });
-
   // ── Tabs config (memoized so badge updates)
   const TABS = useMemo(() => {
     const tabs: { key: Tab; label: string; icon: keyof typeof Ionicons.glyphMap; badge?: number; connected?: boolean }[] = [
@@ -191,21 +216,34 @@ export default function ProjectWorkspaceScreen() {
       { key: 'files', label: 'Files', icon: 'folder' },
       { key: 'chat', label: 'Chat', icon: 'chatbubbles' },
       { key: 'activity', label: 'Activity', icon: 'pulse' },
-      { key: 'issues', label: 'Issues', icon: 'alert-circle', badge: issues.filter((i: any) => i.status === 'open').length },
       { key: 'analytics', label: 'Stats', icon: 'bar-chart' },
     ];
     return tabs;
-  }, [githubConnected, isCreator, joinRequests, issues]);
+  }, [githubConnected, isCreator, joinRequests]);
 
   // ───────────────────── Data loaders ─────────────────────
   const loadProject = useCallback(async () => {
     try {
       const data = await fetchProjectById(projectId);
       setProject(data);
-      const currentId = user?.id || (user as any)?._id;
-      const ownerId = data?.owner || data?.creatorId || (data as any)?.createdBy || (data as any)?.userId;
-      setIsCreator(!!(currentId && ownerId && String(ownerId) === String(currentId)));
-      setIsProjectCompleted(data?.isCompleted || data?.status === 'completed');
+      const currentId = String(user?.id || (user as any)?._id || '');
+      const rawOwner = data?.owner as any;
+      const ownerId = String(
+        (rawOwner && typeof rawOwner === 'object' ? (rawOwner._id || rawOwner.id) : rawOwner)
+        || data?.creatorId || (data as any)?.createdBy || (data as any)?.userId || ''
+      );
+      setIsCreator(!!(currentId && ownerId && ownerId === currentId));
+      let completed = (data as any)?.isCompleted || data?.status === 'completed';
+      // Also check linked idea status (website marks idea.status = 'completed')
+      const linkedIdeaId = (data as any)?.ideaId;
+      if (!completed && linkedIdeaId) {
+        try {
+          const ideaIdStr = typeof linkedIdeaId === 'object' ? (linkedIdeaId._id || linkedIdeaId.id || linkedIdeaId) : linkedIdeaId;
+          const idea = await fetchIdeaById(String(ideaIdStr));
+          if (idea?.status === 'completed') completed = true;
+        } catch { /* ignore */ }
+      }
+      setIsProjectCompleted(completed);
     } catch (e) { console.error('loadProject', e); }
   }, [projectId, user]);
 
@@ -269,11 +307,7 @@ export default function ProjectWorkspaceScreen() {
 
   const loadAnalytics = useCallback(async () => {
     try {
-      const [lb, analytics] = await Promise.all([
-        getLeaderboard(),
-        getProjectAnalytics(projectId).catch(() => null),
-      ]);
-      setLeaderboard(lb || []);
+      const analytics = await getProjectAnalytics(projectId).catch(() => null);
       setAnalyticsData(analytics);
     } catch (e) { console.error(e); }
     finally { setLoading(false); }
@@ -326,13 +360,6 @@ export default function ProjectWorkspaceScreen() {
     finally { setLoading(false); }
   }, [projectId, githubConnected]);
 
-  const loadIssues = useCallback(async () => {
-    try {
-      const data = await getProjectIssues(projectId);
-      setIssues(data || []);
-    } catch (e) { console.error('loadIssues', e); }
-  }, [projectId]);
-
   // ── Initial load
   useEffect(() => {
     loadProject();
@@ -353,9 +380,88 @@ export default function ProjectWorkspaceScreen() {
       case 'github': loadGitHubActivity(); break;
       case 'members': loadMembers().then(() => loadJoinRequests()).then(() => setLoading(false)); break;
       case 'activity': loadActivity(); break;
-      case 'issues': loadIssues().then(() => setLoading(false)); break;
     }
   }, [activeTab]);
+
+  // ── Socket: join project room & listen for real-time events
+  useEffect(() => {
+    if (!projectId) return;
+    joinProjectRoom(projectId);
+
+    // Board events
+    const handleTaskCreated = () => loadBoard();
+    const handleTaskUpdated = () => loadBoard();
+    const handleTaskMoved = () => loadBoard();
+    const handleTaskDeleted = () => loadBoard();
+
+    onTaskCreated(handleTaskCreated);
+    onTaskUpdated(handleTaskUpdated);
+    onTaskMoved(handleTaskMoved);
+    onTaskDeleted(handleTaskDeleted);
+
+    // Chat events
+    const handleNewMessage = (data: any) => {
+      setMessages(prev => {
+        if (prev.some((m: any) => (m._id || m.id) === data.id)) return prev;
+        return [...prev, {
+          _id: data.id,
+          content: data.text,
+          message: data.text,
+          senderId: data.senderId,
+          senderName: data.senderName,
+          createdAt: data.timestamp || new Date().toISOString(),
+        }];
+      });
+    };
+    const handleMessageEdited = () => loadChat();
+    const handleMessageDeleted = (data: any) => {
+      setMessages(prev => prev.filter((m: any) => (m._id || m.id) !== data.messageId));
+    };
+
+    onProjectMessage(handleNewMessage);
+    onProjectMessageEdited(handleMessageEdited);
+    onProjectMessageDeleted(handleMessageDeleted);
+
+    // Member events
+    const handleMemberRemoved = (data: any) => {
+      const currentId = user?.id || (user as any)?._id;
+      if (data.userId === currentId) {
+        Alert.alert('Removed', 'You have been removed from this project.', [
+          { text: 'OK', onPress: () => navigation.goBack() },
+        ]);
+      } else {
+        loadMembers();
+      }
+    };
+    onMemberRemoved(handleMemberRemoved);
+
+    // File events
+    const handleFileUploaded = () => loadFiles();
+    const handleFileDeleted = () => loadFiles();
+    onFileUploaded(handleFileUploaded);
+    onFileDeleted(handleFileDeleted);
+
+    // GitHub events
+    const handleGitHub = () => loadGitHubActivity();
+    onGitHubPush(handleGitHub);
+    onGitHubPR(handleGitHub);
+
+    return () => {
+      leaveProjectRoom(projectId);
+      offTaskCreated(handleTaskCreated);
+      offTaskUpdated(handleTaskUpdated);
+      offTaskMoved(handleTaskMoved);
+      offTaskDeleted(handleTaskDeleted);
+      offProjectMessage(handleNewMessage);
+      offProjectMessageEdited(handleMessageEdited);
+      offProjectMessageDeleted(handleMessageDeleted);
+      offMemberRemoved(handleMemberRemoved);
+      offFileUploaded(handleFileUploaded);
+      offFileDeleted(handleFileDeleted);
+      offGitHubPush(handleGitHub);
+      offGitHubPR(handleGitHub);
+    };
+  }, [projectId]);
 
   // ───────────────────── Handlers ─────────────────────
   const handleAddTask = async () => {
@@ -531,8 +637,6 @@ export default function ProjectWorkspaceScreen() {
   };
 
   const handleMarkCompleted = () => {
-    const ideaId = project?.ideaId || project?._id || projectId;
-    if (!ideaId) { Alert.alert('Error', 'Cannot mark as completed: Project not linked to an idea'); return; }
     Alert.alert(
       'Mark Completed',
       'Mark this project as completed? This will show a completed badge on the project.',
@@ -542,7 +646,11 @@ export default function ProjectWorkspaceScreen() {
           text: 'Complete', onPress: async () => {
             setMarkingCompleted(true);
             try {
-              await updateIdeaStatus(ideaId, 'completed');
+              await updateProject(projectId, { status: 'completed' });
+              const ideaId = project?.ideaId;
+              if (ideaId) {
+                try { await updateIdeaStatus(ideaId, 'completed'); } catch { /* ignore */ }
+              }
               setIsProjectCompleted(true);
               Alert.alert('Success', 'Project marked as completed!');
             } catch (e: any) { Alert.alert('Error', e.message || 'Failed to mark completed'); }
@@ -1137,11 +1245,12 @@ export default function ProjectWorkspaceScreen() {
     <View style={{ flex: 1 }}>
       <FlatList
         data={messages}
-        keyExtractor={(i, idx) => i._id || String(idx)}
+        keyExtractor={(i, idx) => i._id || i.id || String(idx)}
         contentContainerStyle={{ padding: 16, gap: 8, paddingBottom: 8 }}
         renderItem={({ item }) => {
           const isMe = item.senderId === user?.id || item.senderId === (user as any)?._id;
           const msgId = item._id || item.id;
+          const msgText = item.text || item.content || item.message || '';
           return (
             <View style={[styles.chatBubbleRow, isMe && { alignSelf: 'flex-end' }]}>
               <TouchableOpacity
@@ -1150,7 +1259,7 @@ export default function ProjectWorkspaceScreen() {
                 onLongPress={() => {
                   if (isMe) {
                     Alert.alert('Message', undefined, [
-                      { text: 'Edit', onPress: () => handleEditMessage(msgId, item.content || item.message || '') },
+                      { text: 'Edit', onPress: () => handleEditMessage(msgId, msgText) },
                       { text: 'Delete', style: 'destructive', onPress: () => handleDeleteMessage(msgId) },
                       { text: 'Cancel', style: 'cancel' },
                     ]);
@@ -1158,7 +1267,7 @@ export default function ProjectWorkspaceScreen() {
                 }}
               >
                 {!isMe && <Text style={styles.chatSender}>{item.senderName}</Text>}
-                <Text style={[styles.chatMsg, isMe && { color: '#fff' }]}>{item.content || item.message}</Text>
+                <Text style={[styles.chatMsg, isMe && { color: '#fff' }]}>{msgText}</Text>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, alignSelf: 'flex-end' }}>
                   {item.edited && <Text style={[styles.chatTime, isMe && { color: 'rgba(255,255,255,0.6)' }]}>edited</Text>}
                   <Text style={[styles.chatTime, isMe && { color: 'rgba(255,255,255,0.6)' }]}>
@@ -1234,7 +1343,7 @@ export default function ProjectWorkspaceScreen() {
             </TouchableOpacity>
           )}
         </View>
-        <TouchableOpacity onPress={() => setFileViewMode(v => v === 'list' ? 'grid' : 'list')} style={{ padding: 8, backgroundColor: COLORS.surface, borderRadius: RADIUS.md, borderWidth: 1, borderColor: COLORS.border }}>
+        <TouchableOpacity onPress={() => setFileViewMode(v => v === 'list' ? 'grid' : 'list')} style={{ padding: 8, backgroundColor: GLASS, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: GLASS_BORDER }}>
           <Ionicons name={fileViewMode === 'list' ? 'grid-outline' : 'list-outline'} size={18} color={COLORS.primary} />
         </TouchableOpacity>
       </View>
@@ -1278,9 +1387,9 @@ export default function ProjectWorkspaceScreen() {
           contentContainerStyle={{ padding: 16, gap: 10, paddingBottom: 80 }}
           columnWrapperStyle={{ gap: 10 }}
           renderItem={({ item }) => (
-            <TouchableOpacity style={{ flex: 1, backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, padding: 14, borderWidth: 1, borderColor: COLORS.border, alignItems: 'center', gap: 8 }}
+            <TouchableOpacity style={{ flex: 1, backgroundColor: GLASS, borderRadius: RADIUS.lg, padding: 12, borderWidth: 1, borderColor: GLASS_BORDER, alignItems: 'center', gap: 6 }}
               onPress={() => (item.url || item.fileUrl) && Linking.openURL(item.url || item.fileUrl)}>
-              <Ionicons name={getFileIcon(item)} size={32} color={COLORS.accent} />
+              <Ionicons name={getFileIcon(item)} size={24} color={COLORS.accent} />
               <Text style={[styles.fileName, { textAlign: 'center', fontSize: 12 }]} numberOfLines={2}>{item.name || item.filename}</Text>
               <Text style={styles.fileMeta}>{item.size ? `${(item.size / 1024).toFixed(1)} KB` : ''}</Text>
               <View style={{ flexDirection: 'row', gap: 8 }}>
@@ -1357,104 +1466,6 @@ export default function ProjectWorkspaceScreen() {
     );
   };
 
-  // ═══════════════════ RENDER: Issues Tab ═══════════════════
-  const renderIssues = () => {
-    const STATUS_COLORS: Record<string, string> = { open: COLORS.success, 'in-progress': COLORS.warning, resolved: COLORS.textMuted };
-    const STATUSES = ['open', 'in-progress', 'resolved'];
-
-    const handleCreateIssue = async () => {
-      if (!newIssue.title.trim()) return;
-      try {
-        await createIssue(projectId, { title: newIssue.title.trim(), description: newIssue.description.trim() });
-        setNewIssue({ title: '', description: '' });
-        setShowAddIssue(false);
-        loadIssues();
-      } catch (e: any) { Alert.alert('Error', e.message || 'Failed to create issue'); }
-    };
-
-    const handleStatusChange = async (issueId: string, newStatus: string) => {
-      try {
-        await updateIssueStatus(projectId, issueId, newStatus);
-        loadIssues();
-      } catch (e: any) { Alert.alert('Error', e.message || 'Failed to update'); }
-    };
-
-    return (
-      <View style={{ flex: 1 }}>
-        <FlatList
-          data={issues}
-          keyExtractor={(item: any) => item._id || item.id}
-          contentContainerStyle={{ padding: 16, gap: 10, paddingBottom: 100 }}
-          renderItem={({ item }: { item: any }) => (
-            <View style={[styles.taskCard, { borderLeftWidth: 3, borderLeftColor: STATUS_COLORS[item.status] || COLORS.textMuted }]}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                <Ionicons name="alert-circle" size={16} color={STATUS_COLORS[item.status] || COLORS.textMuted} />
-                <Text style={styles.taskTitle} numberOfLines={2}>{item.title}</Text>
-              </View>
-              {item.description ? <Text style={{ fontSize: 12, color: COLORS.textSecondary, marginBottom: 8 }} numberOfLines={2}>{item.description}</Text> : null}
-              <View style={{ flexDirection: 'row', gap: 6 }}>
-                {STATUSES.map(s => (
-                  <TouchableOpacity
-                    key={s}
-                    style={[styles.chip, item.status === s && { backgroundColor: STATUS_COLORS[s] }]}
-                    onPress={() => handleStatusChange(item._id || item.id, s)}
-                  >
-                    <Text style={[styles.chipText, item.status === s && { color: '#fff' }]}>{s.replace('-', ' ')}</Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-              {item.createdAt && <Text style={{ fontSize: 10, color: COLORS.textMuted, marginTop: 6 }}>{new Date(item.createdAt).toLocaleDateString()}</Text>}
-            </View>
-          )}
-          ListEmptyComponent={
-            <View style={styles.empty}>
-              <Ionicons name="alert-circle-outline" size={48} color={COLORS.textMuted} />
-              <Text style={styles.emptyText}>No issues yet</Text>
-              <Text style={styles.emptySubtext}>Create an issue to track bugs or tasks</Text>
-            </View>
-          }
-        />
-
-        {/* Create Issue FAB */}
-        <TouchableOpacity style={styles.fab} onPress={() => setShowAddIssue(true)}>
-          <Ionicons name="add" size={24} color="#fff" />
-        </TouchableOpacity>
-
-        {/* Add Issue Modal */}
-        <Modal visible={showAddIssue} transparent animationType="slide">
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Create Issue</Text>
-              <TextInput
-                style={styles.modalInput}
-                placeholder="Issue title *"
-                placeholderTextColor={COLORS.textMuted}
-                value={newIssue.title}
-                onChangeText={t => setNewIssue(prev => ({ ...prev, title: t }))}
-              />
-              <TextInput
-                style={[styles.modalInput, { height: 100, textAlignVertical: 'top' }]}
-                placeholder="Description (optional)"
-                placeholderTextColor={COLORS.textMuted}
-                value={newIssue.description}
-                onChangeText={t => setNewIssue(prev => ({ ...prev, description: t }))}
-                multiline
-              />
-              <View style={styles.modalActions}>
-                <TouchableOpacity style={styles.cancelBtn} onPress={() => setShowAddIssue(false)}>
-                  <Text style={styles.cancelBtnText}>Cancel</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={[styles.saveBtn, !newIssue.title.trim() && { opacity: 0.4 }]} onPress={handleCreateIssue} disabled={!newIssue.title.trim()}>
-                  <Text style={styles.saveBtnText}>Create</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        </Modal>
-      </View>
-    );
-  };
-
   // ═══════════════════ RENDER: Analytics Tab ═══════════════════
   const renderAnalytics = () => {
     // Use API data if available, fallback to local calculation
@@ -1500,7 +1511,7 @@ export default function ProjectWorkspaceScreen() {
                 { label: 'Efficiency', value: efficiency > 0 ? `${efficiency}%` : '—', icon: 'speedometer' as const, color: COLORS.primary },
               ].map(s => (
                 <View key={s.label} style={styles.statCard}>
-                  <Ionicons name={s.icon} size={20} color={s.color} />
+                  <Ionicons name={s.icon} size={16} color={s.color} />
                   <Text style={styles.statValue}>{s.value}</Text>
                   <Text style={styles.statLabel}>{s.label}</Text>
                 </View>
@@ -1549,8 +1560,8 @@ export default function ProjectWorkspaceScreen() {
                       <Text style={{ fontSize: 12, color: COLORS.textPrimary }}>{col}</Text>
                       <Text style={{ fontSize: 12, fontWeight: '700', color: COLORS.textSecondary }}>{count} ({pct}%)</Text>
                     </View>
-                    <View style={{ height: 4, backgroundColor: COLORS.background, borderRadius: 2, overflow: 'hidden' }}>
-                      <View style={{ height: '100%', backgroundColor: COLORS.primary, borderRadius: 2, width: `${pct}%` }} />
+                    <View style={{ height: 6, backgroundColor: COLORS.border, borderRadius: 3, overflow: 'hidden' }}>
+                      <View style={{ height: '100%', backgroundColor: PRIMARY, borderRadius: 3, width: `${pct}%` }} />
                     </View>
                   </View>
                 );
@@ -1594,15 +1605,15 @@ export default function ProjectWorkspaceScreen() {
             )}
 
             {/* Team Stats */}
-            {(teamStats?.memberStats?.length > 0 || leaderboard.length > 0) && (
+            {teamStats?.memberStats?.length > 0 && (
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Team Stats</Text>
-                {(teamStats?.memberStats || leaderboard).map((member: any, idx: number) => (
+                {teamStats.memberStats.map((member: any, idx: number) => (
                   <View key={member._id || member.userId || idx} style={styles.leaderRow}>
                     <Text style={styles.leaderRank}>#{idx + 1}</Text>
                     <View style={styles.leaderAvatar}><Text style={styles.memberInitial}>{getInitials(member.name || 'M')}</Text></View>
                     <Text style={styles.leaderName}>{member.name || 'Member'}</Text>
-                    <Text style={styles.leaderScore}>{member.tasksCompleted || member.totalScore || member.score || 0}</Text>
+                    <Text style={styles.leaderScore}>{member.tasksCompleted || member.score || 0}</Text>
                   </View>
                 ))}
               </View>
@@ -1620,7 +1631,7 @@ export default function ProjectWorkspaceScreen() {
                 { label: 'Contributors', value: githubContributors.length, icon: 'people' as const, color: '#6366F1' },
               ].map(s => (
                 <View key={s.label} style={styles.statCard}>
-                  <Ionicons name={s.icon} size={20} color={s.color} />
+                  <Ionicons name={s.icon} size={16} color={s.color} />
                   <Text style={styles.statValue}>{s.value}</Text>
                   <Text style={styles.statLabel}>{s.label}</Text>
                 </View>
@@ -1652,7 +1663,11 @@ export default function ProjectWorkspaceScreen() {
     <SafeAreaView style={styles.container}>
       {/* ── Header ── */}
       <View style={styles.header}>
+        <LinearGradient colors={['rgba(0,173,181,0.08)', 'transparent']} style={styles.headerGradient} />
         <View style={styles.headerTop}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginRight: 8 }}>
+            <Ionicons name="arrow-back" size={22} color={COLORS.textPrimary} />
+          </TouchableOpacity>
           <Text style={styles.headerTitle} numberOfLines={1}>{projectTitle || project?.title || 'Project Workspace'}</Text>
           {isCreator && !isProjectCompleted && (
             <TouchableOpacity style={styles.completeBtn} onPress={handleMarkCompleted} disabled={markingCompleted}>
@@ -1698,7 +1713,7 @@ export default function ProjectWorkspaceScreen() {
             style={[styles.tab, activeTab === tab.key && styles.tabActive]}
             onPress={() => setActiveTab(tab.key)}
           >
-            <Ionicons name={tab.icon} size={14} color={activeTab === tab.key ? COLORS.primary : COLORS.textMuted} />
+            <Ionicons name={tab.icon} size={12} color={activeTab === tab.key ? '#fff' : COLORS.textMuted} />
             <Text style={[styles.tabText, activeTab === tab.key && styles.tabTextActive]}>{tab.label}</Text>
             {tab.badge && tab.badge > 0 ? (
               <View style={styles.tabBadge}><Text style={styles.tabBadgeText}>{tab.badge}</Text></View>
@@ -1720,7 +1735,6 @@ export default function ProjectWorkspaceScreen() {
           {activeTab === 'chat' && renderChat()}
           {activeTab === 'files' && renderFiles()}
           {activeTab === 'activity' && renderActivity()}
-          {activeTab === 'issues' && renderIssues()}
           {activeTab === 'analytics' && renderAnalytics()}
         </>
       )}
@@ -1747,6 +1761,7 @@ export default function ProjectWorkspaceScreen() {
         <View style={styles.modalOverlay}>
           <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end' }}>
           <View style={styles.modalContent}>
+            <View style={styles.modalHandle} />
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Add Task</Text>
               <TouchableOpacity onPress={() => setShowAddTask(false)}><Ionicons name="close" size={24} color={COLORS.textPrimary} /></TouchableOpacity>
@@ -1816,6 +1831,7 @@ export default function ProjectWorkspaceScreen() {
       <Modal visible={showAddSprint} transparent animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
+            <View style={styles.modalHandle} />
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>New Sprint</Text>
               <TouchableOpacity onPress={() => setShowAddSprint(false)}><Ionicons name="close" size={24} color={COLORS.textPrimary} /></TouchableOpacity>
@@ -1833,6 +1849,7 @@ export default function ProjectWorkspaceScreen() {
       <Modal visible={!!editingSprint} transparent animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
+            <View style={styles.modalHandle} />
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Edit Sprint</Text>
               <TouchableOpacity onPress={() => setEditingSprint(null)}><Ionicons name="close" size={24} color={COLORS.textPrimary} /></TouchableOpacity>
@@ -1865,179 +1882,181 @@ const styles = StyleSheet.create({
   emptyText: { fontSize: 13, color: COLORS.textMuted },
   emptyMini: { alignItems: 'center', paddingVertical: 20 },
 
-  // ── Header
-  header: { paddingHorizontal: 16, paddingTop: 12, paddingBottom: 8, borderBottomWidth: 1, borderBottomColor: COLORS.border, gap: 8 },
+  // ── Header (matches CreatorHome)
+  header: { paddingHorizontal: 16, paddingTop: 12, paddingBottom: 14, gap: 8, overflow: 'hidden' },
+  headerGradient: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 },
   headerTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10 },
-  headerTitle: { flex: 1, fontSize: 18, fontWeight: '800', color: COLORS.textPrimary },
+  headerTitle: { flex: 1, fontSize: 20, fontWeight: '900', color: COLORS.textPrimary, letterSpacing: -0.3 },
   headerMeta: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  completeBtn: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 10, paddingVertical: 6, backgroundColor: COLORS.success, borderRadius: RADIUS.md },
+  completeBtn: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 12, paddingVertical: 7, backgroundColor: COLORS.success, borderRadius: RADIUS.lg, ...SHADOWS.sm },
   completeBtnText: { fontSize: 12, fontWeight: '700', color: '#fff' },
-  completedBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 10, paddingVertical: 6, backgroundColor: COLORS.success + '20', borderRadius: RADIUS.md },
+  completedBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 10, paddingVertical: 6, backgroundColor: COLORS.success + '20', borderRadius: RADIUS.lg },
   completedBadgeText: { fontSize: 12, fontWeight: '700', color: COLORS.success },
-  githubBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 8, paddingVertical: 4, backgroundColor: COLORS.primary + '15', borderRadius: RADIUS.full },
-  githubBadgeText: { fontSize: 11, fontWeight: '600', color: COLORS.primary },
+  githubBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 8, paddingVertical: 4, backgroundColor: PRIMARY + '15', borderRadius: RADIUS.full },
+  githubBadgeText: { fontSize: 11, fontWeight: '600', color: PRIMARY },
   memberAvatars: { flexDirection: 'row', alignItems: 'center' },
-  miniAvatar: { width: 24, height: 24, borderRadius: 12, backgroundColor: COLORS.primary, justifyContent: 'center', alignItems: 'center', borderWidth: 1.5, borderColor: COLORS.background },
+  miniAvatar: { width: 24, height: 24, borderRadius: 12, backgroundColor: PRIMARY, justifyContent: 'center', alignItems: 'center', borderWidth: 1.5, borderColor: COLORS.background },
   miniAvatarText: { fontSize: 9, fontWeight: '700', color: '#fff' },
 
-  // ── Tabs
-  tabsRow: { flexDirection: 'row', gap: 4, paddingHorizontal: 16, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: COLORS.border },
-  tab: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 12, paddingVertical: 8, borderRadius: RADIUS.full, backgroundColor: COLORS.surface },
-  tabActive: { backgroundColor: COLORS.primary + '20' },
-  tabText: { fontSize: 12, fontWeight: '600', color: COLORS.textMuted },
-  tabTextActive: { color: COLORS.primary },
-  tabBadge: { minWidth: 16, height: 16, borderRadius: 8, backgroundColor: COLORS.danger, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 4 },
-  tabBadgeText: { fontSize: 9, fontWeight: '800', color: '#fff' },
-  tabConnectedDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: COLORS.success },
+  // ── Tabs (matches CreatorHome tab bar pattern)
+  tabsRow: { flexDirection: 'row', gap: 6, paddingHorizontal: 12, paddingVertical: 8 },
+  tab: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, height: 32, paddingHorizontal: 12, borderRadius: RADIUS.md, backgroundColor: GLASS, borderWidth: 1, borderColor: GLASS_BORDER },
+  tabActive: { backgroundColor: PRIMARY, borderColor: PRIMARY },
+  tabText: { fontSize: 11, fontWeight: '700', color: COLORS.textMuted },
+  tabTextActive: { color: '#fff' },
+  tabBadge: { minWidth: 14, height: 14, borderRadius: 7, backgroundColor: COLORS.danger, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 3 },
+  tabBadgeText: { fontSize: 8, fontWeight: '900', color: '#fff' },
+  tabConnectedDot: { width: 5, height: 5, borderRadius: 2.5, backgroundColor: COLORS.success },
 
   // ── Board
-  boardSearchRow: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: COLORS.surface, borderRadius: RADIUS.md, paddingHorizontal: 12, paddingVertical: 8, borderWidth: 1, borderColor: COLORS.border },
-  boardSearchInput: { flex: 1, fontSize: 14, color: COLORS.textPrimary, padding: 0 },
-  column: { backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, padding: 12, borderWidth: 1, borderColor: COLORS.border, gap: 8 },
+  boardSearchRow: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: COLORS.surface, borderRadius: RADIUS.md, paddingHorizontal: 12, borderWidth: 1, borderColor: COLORS.border },
+  boardSearchInput: { flex: 1, height: 42, fontSize: 14, color: COLORS.textPrimary, padding: 0 },
+  column: { backgroundColor: GLASS, borderRadius: RADIUS.xl, padding: 14, borderWidth: 1, borderColor: GLASS_BORDER, gap: 10, ...SHADOWS.sm },
   colHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 },
-  colTitle: { fontSize: 14, fontWeight: '700', color: COLORS.textPrimary },
-  countBadge: { backgroundColor: COLORS.primary + '20', paddingHorizontal: 8, paddingVertical: 2, borderRadius: RADIUS.full },
-  countText: { fontSize: 11, fontWeight: '700', color: COLORS.primary },
-  taskCard: { backgroundColor: COLORS.background, borderRadius: RADIUS.md, padding: 10, borderWidth: 1, borderColor: COLORS.border, gap: 6 },
+  colTitle: { fontSize: 15, fontWeight: '800', color: COLORS.textPrimary },
+  countBadge: { backgroundColor: PRIMARY + '20', paddingHorizontal: 8, paddingVertical: 3, borderRadius: RADIUS.full },
+  countText: { fontSize: 11, fontWeight: '700', color: PRIMARY },
+  taskCard: { backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, padding: 14, borderWidth: 1, borderColor: COLORS.border, gap: 8, ...SHADOWS.sm },
   taskTop: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   priorityDot: { width: 8, height: 8, borderRadius: 4 },
-  taskTitle: { flex: 1, fontSize: 13, fontWeight: '600', color: COLORS.textPrimary },
-  taskDesc: { fontSize: 11, color: COLORS.textMuted, lineHeight: 16 },
+  taskTitle: { flex: 1, fontSize: 14, fontWeight: '700', color: COLORS.textPrimary },
+  taskDesc: { fontSize: 12, color: COLORS.textMuted, lineHeight: 18 },
   assigneeRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  assigneeAvatar: { width: 18, height: 18, borderRadius: 9, backgroundColor: COLORS.primary + '30', justifyContent: 'center', alignItems: 'center' },
-  assigneeInitial: { fontSize: 8, fontWeight: '700', color: COLORS.primary },
-  assigneeText: { fontSize: 10, color: COLORS.textMuted },
-  labelsRow: { flexDirection: 'row', gap: 4, flexWrap: 'wrap' },
-  labelChip: { paddingHorizontal: 6, paddingVertical: 2, backgroundColor: COLORS.primary + '15', borderRadius: RADIUS.sm },
-  labelText: { fontSize: 9, color: COLORS.primary, fontWeight: '600' },
-  taskActions: { flexDirection: 'row', gap: 6, alignItems: 'center', flexWrap: 'wrap' },
-  moveBtn: { paddingHorizontal: 6, paddingVertical: 3, backgroundColor: COLORS.primary + '15', borderRadius: RADIUS.sm },
-  moveBtnText: { fontSize: 9, color: COLORS.primary, fontWeight: '600' },
+  assigneeAvatar: { width: 20, height: 20, borderRadius: 10, backgroundColor: PRIMARY + '30', justifyContent: 'center', alignItems: 'center' },
+  assigneeInitial: { fontSize: 9, fontWeight: '700', color: PRIMARY },
+  assigneeText: { fontSize: 11, color: COLORS.textMuted },
+  labelsRow: { flexDirection: 'row', gap: 6, flexWrap: 'wrap' },
+  labelChip: { paddingHorizontal: 8, paddingVertical: 3, backgroundColor: PRIMARY + '15', borderRadius: RADIUS.full },
+  labelText: { fontSize: 10, color: PRIMARY, fontWeight: '600' },
+  taskActions: { flexDirection: 'row', gap: 8, alignItems: 'center', flexWrap: 'wrap', borderTopWidth: 1, borderTopColor: COLORS.border, paddingTop: 8, marginTop: 2 },
+  moveBtn: { paddingHorizontal: 8, paddingVertical: 4, backgroundColor: PRIMARY + '15', borderRadius: RADIUS.sm },
+  moveBtnText: { fontSize: 10, color: PRIMARY, fontWeight: '600' },
 
   // ── Sprints
-  sprintSummary: { flexDirection: 'row', backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, padding: 14, borderWidth: 1, borderColor: COLORS.border, justifyContent: 'space-around' },
+  sprintSummary: { flexDirection: 'row', backgroundColor: GLASS, borderRadius: RADIUS.xl, padding: 16, borderWidth: 1, borderColor: GLASS_BORDER, justifyContent: 'space-around', ...SHADOWS.sm },
   sprintSummaryItem: { alignItems: 'center', gap: 4 },
   sprintSummaryValue: { fontSize: 18, fontWeight: '800', color: COLORS.textPrimary },
   sprintSummaryLabel: { fontSize: 10, color: COLORS.textMuted, fontWeight: '600' },
-  sprintProgressBar: { height: 6, backgroundColor: COLORS.background, borderRadius: 3, overflow: 'hidden' },
+  sprintProgressBar: { height: 6, backgroundColor: COLORS.border, borderRadius: 3, overflow: 'hidden' },
   sprintProgressFill: { height: '100%', backgroundColor: COLORS.success, borderRadius: 3 },
-  sprintCard: { backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, padding: 14, borderWidth: 1, borderColor: COLORS.border, gap: 8 },
+  sprintCard: { backgroundColor: GLASS, borderRadius: RADIUS.xl, padding: 16, borderWidth: 1, borderColor: GLASS_BORDER, gap: 10, ...SHADOWS.sm },
   sprintHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  sprintName: { fontSize: 15, fontWeight: '700', color: COLORS.textPrimary },
+  sprintName: { fontSize: 15, fontWeight: '800', color: COLORS.textPrimary },
   statusChip: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: RADIUS.full },
   statusChipText: { fontSize: 10, fontWeight: '700', textTransform: 'uppercase' },
   sprintGoal: { fontSize: 13, color: COLORS.textSecondary, lineHeight: 18 },
   sprintStats: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   sprintStatText: { fontSize: 11, color: COLORS.textMuted },
   sprintDate: { fontSize: 11, color: COLORS.textMuted },
-  sprintActionBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 10, backgroundColor: COLORS.primary, borderRadius: RADIUS.md, marginTop: 4 },
+  sprintActionBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 12, backgroundColor: PRIMARY, borderRadius: RADIUS.lg, marginTop: 4 },
   sprintActionText: { fontSize: 13, fontWeight: '700', color: '#fff' },
 
   // ── GitHub
-  connectGithubBtn: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#24292e', paddingHorizontal: 20, paddingVertical: 12, borderRadius: RADIUS.md, marginTop: 16 },
+  connectGithubBtn: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#24292e', paddingHorizontal: 20, paddingVertical: 14, borderRadius: RADIUS.lg, marginTop: 16, ...SHADOWS.sm },
   connectGithubText: { fontSize: 14, fontWeight: '700', color: '#fff' },
-  githubFeaturesList: { marginTop: 20, gap: 10, alignSelf: 'stretch', paddingHorizontal: 40 },
+  githubFeaturesList: { marginTop: 20, gap: 12, alignSelf: 'stretch', paddingHorizontal: 40 },
   githubFeatureRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   githubFeatureText: { fontSize: 13, color: COLORS.textSecondary },
-  githubRepoCard: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, padding: 16, borderWidth: 1, borderColor: COLORS.border },
-  githubRepoName: { fontSize: 15, fontWeight: '700', color: COLORS.textPrimary },
+  githubRepoCard: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: GLASS, borderRadius: RADIUS.xl, padding: 16, borderWidth: 1, borderColor: GLASS_BORDER, ...SHADOWS.sm },
+  githubRepoName: { fontSize: 15, fontWeight: '800', color: COLORS.textPrimary },
   githubRepoLink: { fontSize: 11, color: COLORS.textMuted, marginTop: 2 },
   connectedDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: COLORS.success },
-  disconnectGithubBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 10, backgroundColor: COLORS.danger + '15', borderRadius: RADIUS.md, borderWidth: 1, borderColor: COLORS.danger + '30' },
+  disconnectGithubBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 12, backgroundColor: COLORS.danger + '15', borderRadius: RADIUS.lg, borderWidth: 1, borderColor: COLORS.danger + '30' },
   disconnectGithubText: { fontSize: 13, fontWeight: '600', color: COLORS.danger },
-  githubItemCard: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: COLORS.surface, borderRadius: RADIUS.md, padding: 12, borderWidth: 1, borderColor: COLORS.border },
-  githubItemTitle: { fontSize: 13, fontWeight: '600', color: COLORS.textPrimary },
+  githubItemCard: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: GLASS, borderRadius: RADIUS.lg, padding: 14, borderWidth: 1, borderColor: GLASS_BORDER },
+  githubItemTitle: { fontSize: 13, fontWeight: '700', color: COLORS.textPrimary },
   githubItemMeta: { fontSize: 11, color: COLORS.textMuted, marginTop: 2 },
-  githubSha: { fontSize: 11, fontWeight: '600', color: COLORS.primary, fontFamily: 'monospace' },
+  githubSha: { fontSize: 11, fontWeight: '600', color: PRIMARY, fontFamily: 'monospace' },
 
   // ── Members
-  section: { backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, padding: 16, borderWidth: 1, borderColor: COLORS.border, gap: 12 },
+  section: { backgroundColor: GLASS, borderRadius: RADIUS.lg, padding: 12, borderWidth: 1, borderColor: GLASS_BORDER, gap: 10, ...SHADOWS.sm },
   sectionHeaderRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  sectionTitle: { fontSize: 15, fontWeight: '700', color: COLORS.textPrimary },
+  sectionTitle: { fontSize: 17, fontWeight: '800', color: COLORS.textPrimary },
   pendingBadge: { minWidth: 20, height: 20, borderRadius: 10, backgroundColor: COLORS.danger, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 6 },
   pendingBadgeText: { fontSize: 10, fontWeight: '800', color: '#fff' },
-  requestCard: { backgroundColor: COLORS.background, borderRadius: RADIUS.md, padding: 12, borderWidth: 1, borderColor: COLORS.warning + '40', gap: 8 },
+  requestCard: { backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, padding: 14, borderWidth: 1, borderColor: COLORS.warning + '40', gap: 10 },
   requestTop: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   requestDate: { fontSize: 10, color: COLORS.textMuted, marginTop: 2 },
-  requestMessage: { backgroundColor: COLORS.surfaceElevated, padding: 8, borderRadius: RADIUS.sm, borderLeftWidth: 3, borderLeftColor: COLORS.warning },
+  requestMessage: { backgroundColor: COLORS.surfaceElevated, padding: 10, borderRadius: RADIUS.md, borderLeftWidth: 3, borderLeftColor: COLORS.warning },
   requestMessageText: { fontSize: 12, color: COLORS.textSecondary, fontStyle: 'italic' },
   requestDetail: { fontSize: 11, color: COLORS.textMuted },
   requestActions: { flexDirection: 'row', gap: 8, marginTop: 4 },
-  approveBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, paddingVertical: 8, backgroundColor: COLORS.success, borderRadius: RADIUS.md },
+  approveBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, paddingVertical: 10, backgroundColor: COLORS.success, borderRadius: RADIUS.lg },
   approveBtnText: { fontSize: 13, fontWeight: '700', color: '#fff' },
-  rejectBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, paddingVertical: 8, backgroundColor: COLORS.danger, borderRadius: RADIUS.md },
+  rejectBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, paddingVertical: 10, backgroundColor: COLORS.danger, borderRadius: RADIUS.lg },
   rejectBtnText: { fontSize: 13, fontWeight: '700', color: '#fff' },
-  memberRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: COLORS.border },
-  memberAvatar: { width: 36, height: 36, borderRadius: 18, backgroundColor: COLORS.primary + '30', justifyContent: 'center', alignItems: 'center' },
-  memberInitial: { fontSize: 13, fontWeight: '700', color: COLORS.primary },
-  memberName: { fontSize: 14, fontWeight: '600', color: COLORS.textPrimary },
+  memberRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: COLORS.border },
+  memberAvatar: { width: 36, height: 36, borderRadius: 18, backgroundColor: PRIMARY + '30', justifyContent: 'center', alignItems: 'center' },
+  memberInitial: { fontSize: 13, fontWeight: '700', color: PRIMARY },
+  memberName: { fontSize: 14, fontWeight: '700', color: COLORS.textPrimary },
   memberEmail: { fontSize: 11, color: COLORS.textMuted },
   memberRole: { fontSize: 11, color: COLORS.textMuted, textTransform: 'capitalize' },
-  youBadge: { fontSize: 9, fontWeight: '700', color: COLORS.primary, backgroundColor: COLORS.primary + '20', paddingHorizontal: 6, paddingVertical: 1, borderRadius: RADIUS.full, overflow: 'hidden' },
+  youBadge: { fontSize: 9, fontWeight: '700', color: PRIMARY, backgroundColor: PRIMARY + '20', paddingHorizontal: 6, paddingVertical: 1, borderRadius: RADIUS.full, overflow: 'hidden' },
   removeMemberBtn: { padding: 6 },
-  inviteMemberBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: COLORS.primary, paddingVertical: 14, borderRadius: RADIUS.lg },
+  inviteMemberBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: PRIMARY, paddingVertical: 14, borderRadius: RADIUS.lg, ...SHADOWS.primary },
   inviteMemberText: { fontSize: 14, fontWeight: '700', color: '#fff' },
 
   // ── Chat
-  editBanner: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12, paddingVertical: 8, backgroundColor: COLORS.primary + '15', borderTopWidth: 1, borderTopColor: COLORS.primary + '30' },
-  editBannerText: { flex: 1, fontSize: 12, fontWeight: '600', color: COLORS.primary },
+  editBanner: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12, paddingVertical: 8, backgroundColor: PRIMARY + '15', borderTopWidth: 1, borderTopColor: PRIMARY + '30' },
+  editBannerText: { flex: 1, fontSize: 12, fontWeight: '600', color: PRIMARY },
   chatBubbleRow: { maxWidth: '80%', alignSelf: 'flex-start' },
   chatBubble: { padding: 10, borderRadius: RADIUS.lg },
   chatSender: { fontSize: 11, fontWeight: '700', color: COLORS.accent, marginBottom: 2 },
   chatMsg: { fontSize: 14, color: COLORS.textPrimary, lineHeight: 20 },
   chatTime: { fontSize: 10, color: COLORS.textMuted, marginTop: 4, alignSelf: 'flex-end' },
-  chatInputRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 8, padding: 12, borderTopWidth: 1, borderTopColor: COLORS.border, backgroundColor: COLORS.surface },
-  chatInput: { flex: 1, backgroundColor: COLORS.background, borderRadius: RADIUS.md, paddingHorizontal: 14, paddingVertical: 10, color: COLORS.textPrimary, fontSize: 14, maxHeight: 80, borderWidth: 1, borderColor: COLORS.border },
-  chatSendBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: COLORS.primary, justifyContent: 'center', alignItems: 'center' },
+  chatInputRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 8, padding: 10, borderTopWidth: 1, borderTopColor: COLORS.border, backgroundColor: COLORS.surface },
+  chatInput: { flex: 1, backgroundColor: COLORS.background, borderRadius: RADIUS.lg, paddingHorizontal: 12, paddingVertical: 8, color: COLORS.textPrimary, fontSize: 14, maxHeight: 80, borderWidth: 1, borderColor: COLORS.border },
+  chatSendBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: PRIMARY, justifyContent: 'center', alignItems: 'center', ...SHADOWS.primary },
 
   // ── Files
-  fileCard: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, padding: 14, borderWidth: 1, borderColor: COLORS.border },
-  fileName: { fontSize: 14, fontWeight: '600', color: COLORS.textPrimary },
+  fileCard: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: GLASS, borderRadius: RADIUS.lg, padding: 12, borderWidth: 1, borderColor: GLASS_BORDER, ...SHADOWS.sm },
+  fileName: { fontSize: 14, fontWeight: '700', color: COLORS.textPrimary },
   fileMeta: { fontSize: 11, color: COLORS.textMuted },
   fileDownloadBtn: { padding: 6, marginRight: 4 },
 
   // ── Activity
   activityGroup: { gap: 10 },
-  activityDateLabel: { fontSize: 13, fontWeight: '700', color: COLORS.textSecondary, paddingBottom: 4, borderBottomWidth: 1, borderBottomColor: COLORS.border },
-  activityRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, paddingVertical: 6 },
-  activityIcon: { width: 28, height: 28, borderRadius: 8, justifyContent: 'center', alignItems: 'center' },
+  activityDateLabel: { fontSize: 13, fontWeight: '700', color: COLORS.textSecondary, paddingBottom: 6, borderBottomWidth: 1, borderBottomColor: COLORS.border },
+  activityRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, paddingVertical: 8 },
+  activityIcon: { width: 30, height: 30, borderRadius: RADIUS.md, justifyContent: 'center', alignItems: 'center' },
   activityText: { fontSize: 13, color: COLORS.textPrimary, lineHeight: 18 },
   activityUser: { fontWeight: '700' },
   activityTime: { fontSize: 10, color: COLORS.textMuted, marginTop: 2 },
 
   // ── Analytics
-  statsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
-  statCard: { width: '47%', backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, padding: 14, alignItems: 'center', gap: 4, borderWidth: 1, borderColor: COLORS.border },
-  statValue: { fontSize: 22, fontWeight: '800', color: COLORS.textPrimary },
-  statLabel: { fontSize: 11, color: COLORS.textMuted },
-  progressSection: { backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, padding: 16, borderWidth: 1, borderColor: COLORS.border, gap: 10 },
-  progressBar: { height: 8, backgroundColor: COLORS.background, borderRadius: 4, overflow: 'hidden' },
-  progressFill: { height: '100%', backgroundColor: COLORS.success, borderRadius: 4 },
+  statsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  statCard: { width: '47%', backgroundColor: GLASS, borderRadius: RADIUS.lg, padding: 10, alignItems: 'center', gap: 4, borderWidth: 1, borderColor: GLASS_BORDER, ...SHADOWS.sm },
+  statValue: { fontSize: 18, fontWeight: '800', color: COLORS.textPrimary },
+  statLabel: { fontSize: 10, color: COLORS.textMuted, fontWeight: '600' },
+  progressSection: { backgroundColor: GLASS, borderRadius: RADIUS.lg, padding: 12, borderWidth: 1, borderColor: GLASS_BORDER, gap: 8, ...SHADOWS.sm },
+  progressBar: { height: 6, backgroundColor: COLORS.border, borderRadius: 3, overflow: 'hidden' },
+  progressFill: { height: '100%', backgroundColor: COLORS.success, borderRadius: 3 },
   progressText: { fontSize: 12, color: COLORS.textMuted },
-  priorityRow: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 4 },
+  priorityRow: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 6 },
   priorityDotLg: { width: 10, height: 10, borderRadius: 5 },
   priorityLabel: { flex: 1, fontSize: 13, color: COLORS.textPrimary },
   priorityCount: { fontSize: 13, fontWeight: '700', color: COLORS.textSecondary },
   leaderRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: COLORS.border },
-  leaderRank: { fontSize: 14, fontWeight: '800', color: COLORS.primary, width: 30 },
-  leaderAvatar: { width: 32, height: 32, borderRadius: 16, backgroundColor: COLORS.primary + '20', justifyContent: 'center', alignItems: 'center' },
-  leaderName: { flex: 1, fontSize: 14, fontWeight: '600', color: COLORS.textPrimary },
+  leaderRank: { fontSize: 14, fontWeight: '800', color: PRIMARY, width: 30 },
+  leaderAvatar: { width: 32, height: 32, borderRadius: 16, backgroundColor: PRIMARY + '20', justifyContent: 'center', alignItems: 'center' },
+  leaderName: { flex: 1, fontSize: 14, fontWeight: '700', color: COLORS.textPrimary },
   leaderScore: { fontSize: 12, fontWeight: '600', color: COLORS.accent },
 
   // ── FAB
-  fab: { position: 'absolute', bottom: 20, right: 20, width: 52, height: 52, borderRadius: 26, backgroundColor: COLORS.primary, justifyContent: 'center', alignItems: 'center', elevation: 5 },
+  fab: { position: 'absolute', bottom: 20, right: 20, width: 56, height: 56, borderRadius: 28, backgroundColor: PRIMARY, justifyContent: 'center', alignItems: 'center', ...SHADOWS.primary },
 
-  // ── Modal
+  // ── Modal (matches CreatorHome)
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' },
-  modalContent: { backgroundColor: COLORS.surface, borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 20, gap: 12, maxHeight: '85%' },
+  modalContent: { backgroundColor: COLORS.surface, borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 20, gap: 12, maxHeight: '90%' },
+  modalHandle: { width: 40, height: 4, backgroundColor: COLORS.border, borderRadius: 2, alignSelf: 'center', marginBottom: 16 },
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  modalTitle: { fontSize: 18, fontWeight: '800', color: COLORS.textPrimary },
-  modalInput: { backgroundColor: COLORS.background, borderRadius: RADIUS.md, paddingHorizontal: 14, paddingVertical: 12, color: COLORS.textPrimary, fontSize: 14, borderWidth: 1, borderColor: COLORS.border },
-  modalLabel: { fontSize: 12, fontWeight: '700', color: COLORS.textSecondary, marginTop: 4 },
+  modalTitle: { fontSize: 20, fontWeight: '900', color: COLORS.textPrimary },
+  modalInput: { backgroundColor: COLORS.surfaceElevated, borderRadius: RADIUS.md, borderWidth: 1.5, borderColor: COLORS.border, padding: 12, color: COLORS.textPrimary, fontSize: 13, minHeight: 48 },
+  modalLabel: { fontSize: 13, fontWeight: '700', color: COLORS.textPrimary, marginTop: 4 },
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
-  chip: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: RADIUS.full, backgroundColor: COLORS.background, borderWidth: 1, borderColor: COLORS.border },
-  chipActive: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
-  chipText: { fontSize: 11, fontWeight: '600', color: COLORS.textSecondary },
-  modalBtn: { backgroundColor: COLORS.primary, paddingVertical: 14, borderRadius: RADIUS.md, alignItems: 'center', marginTop: 8 },
-  modalBtnText: { fontSize: 14, fontWeight: '700', color: '#fff' },
+  chip: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: RADIUS.full, backgroundColor: COLORS.surface, borderWidth: 1, borderColor: COLORS.border },
+  chipActive: { backgroundColor: PRIMARY, borderColor: PRIMARY },
+  chipText: { fontSize: 11, fontWeight: '600', color: COLORS.textMuted },
+  modalBtn: { backgroundColor: PRIMARY, paddingVertical: 14, borderRadius: RADIUS.lg, alignItems: 'center', marginTop: 8, ...SHADOWS.primary },
+  modalBtnText: { fontSize: 15, fontWeight: '700', color: '#fff' },
 });

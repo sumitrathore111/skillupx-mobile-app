@@ -336,7 +336,8 @@ export interface ProjectInvite {
 }
 
 export interface InvitableDeveloper {
-  _id: string;
+  _id?: string;
+  id?: string;
   name: string;
   email: string;
   skills?: string[];

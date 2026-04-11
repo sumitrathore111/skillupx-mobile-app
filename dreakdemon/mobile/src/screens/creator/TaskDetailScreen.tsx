@@ -894,7 +894,7 @@ export default function TaskDetailScreen() {
             style={[S.tab, activeTab === tab.key && S.tabActive]}
             onPress={() => setActiveTab(tab.key)}
           >
-            <Ionicons name={tab.icon} size={14} color={activeTab === tab.key ? PRIMARY : COLORS.textMuted} />
+            <Ionicons name={tab.icon} size={12} color={activeTab === tab.key ? '#fff' : COLORS.textMuted} />
             <Text style={[S.tabText, activeTab === tab.key && S.tabTextActive]}>{tab.label}</Text>
             {tab.badge && tab.badge > 0 ? (
               <View style={S.tabBadge}><Text style={S.tabBadgeText}>{tab.badge}</Text></View>
@@ -926,18 +926,18 @@ const S = StyleSheet.create({
   priorityDotSm: { width: 8, height: 8, borderRadius: 4 },
 
   tabRow: {
-    flexDirection: 'row', paddingHorizontal: 16, paddingVertical: 8, gap: 6,
-    borderBottomWidth: 1, borderBottomColor: GLASS_BORDER,
+    flexDirection: 'row', paddingHorizontal: 12, paddingVertical: 8, gap: 6,
   },
   tab: {
     flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4,
-    paddingVertical: 8, borderRadius: RADIUS.md, backgroundColor: GLASS,
+    height: 32, borderRadius: RADIUS.md, backgroundColor: GLASS,
+    borderWidth: 1, borderColor: GLASS_BORDER,
   },
-  tabActive: { backgroundColor: PRIMARY + '20' },
-  tabText: { fontSize: 11, fontWeight: '600', color: COLORS.textMuted },
-  tabTextActive: { color: PRIMARY },
-  tabBadge: { minWidth: 16, height: 16, borderRadius: 8, backgroundColor: COLORS.danger, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 4 },
-  tabBadgeText: { fontSize: 8, fontWeight: '800', color: '#fff' },
+  tabActive: { backgroundColor: PRIMARY, borderColor: PRIMARY },
+  tabText: { fontSize: 11, fontWeight: '700', color: COLORS.textMuted },
+  tabTextActive: { color: '#fff' },
+  tabBadge: { minWidth: 14, height: 14, borderRadius: 7, backgroundColor: COLORS.danger, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 3 },
+  tabBadgeText: { fontSize: 8, fontWeight: '900', color: '#fff' },
 
   // Overview
   row: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
