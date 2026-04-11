@@ -13,7 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 const EMOJI_LIST = ['😀','😎','🤓','🧑‍💻','👨‍💻','👩‍💻','🦊','🐱','🐶','🐼','🦁','🐸','🐵','🦄','🐲','🔥','⚡','🚀','💎','🎯','🏆','⭐','🌟','💡','🎨','🎮','🎵','🌈','💜','💙','💚','💛','🧡','❤️','🖤','🤍','💀','👻','🤖','👾'];
 
 export default function ProfileScreen() {
-  const { user } = useAuthStore();
+  const { user, logoutUser } = useAuthStore();
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
@@ -384,6 +384,18 @@ export default function ProfileScreen() {
               ))}
             </View>
           )}
+
+          {/* Logout */}
+          <TouchableOpacity
+            style={styles.logoutBtn}
+            onPress={() => Alert.alert('Logout', 'Are you sure you want to logout?', [
+              { text: 'Cancel', style: 'cancel' },
+              { text: 'Logout', style: 'destructive', onPress: () => logoutUser() },
+            ])}
+          >
+            <Ionicons name="log-out-outline" size={18} color={COLORS.danger} />
+            <Text style={styles.logoutText}>Logout</Text>
+          </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -425,4 +437,6 @@ const styles = StyleSheet.create({
   statCard: { flex: 1, minWidth: '45%', backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, padding: 14, alignItems: 'center', gap: 4, borderWidth: 1, borderColor: COLORS.border },
   statValue: { fontSize: 20, fontWeight: '800', color: COLORS.textPrimary },
   statLabel: { fontSize: 11, color: COLORS.textMuted },
+  logoutBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 14, backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: COLORS.danger + '40', marginTop: 8 },
+  logoutText: { fontSize: 15, fontWeight: '700', color: COLORS.danger },
 });

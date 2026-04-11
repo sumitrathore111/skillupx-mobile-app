@@ -26,10 +26,10 @@ export interface UserProfile {
 
 export const getUserProfile = async (userId: string): Promise<UserProfile> => {
   const { data } = await api.get(`/users/${userId}`);
-  return data;
+  return data.user || data;
 };
 
 export const updateUserProfile = async (userId: string, updates: Partial<UserProfile>): Promise<UserProfile> => {
   const { data } = await api.put(`/users/${userId}`, updates);
-  return data;
+  return data.user || data;
 };

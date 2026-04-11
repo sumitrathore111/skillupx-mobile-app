@@ -6,13 +6,12 @@ import {
     deleteIdea,
     fetchAllIdeas,
     fetchMyCompletedTasks,
-    fetchMyIdeas,
     fetchMyInvites,
     fetchMyProjectsList,
     fetchProjectMembers,
     fetchProjects,
     fetchUserJoinRequests,
-    sendJoinRequest,
+    sendJoinRequest
 } from '@services/creatorService';
 import { useAuthStore } from '@store/authStore';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -184,18 +183,18 @@ export default function CreatorHomeScreen() {
   const loadMyProjects = useCallback(async () => {
     setMyProjectsLoading(true);
     try {
-      if (myProjectsView === 'projects') {
-        // Match website: build "My Projects" from user's approved/completed ideas
-        const allIdeas = await fetchAllIdeas();
-        const uid = String(user?.id || (user as any)?._id || '');
-        const userApprovedIdeas = allIdeas.filter((idea: any) => {
-          const ideaUserId = String(
-            idea.userId || idea.submittedBy?._id || idea.submittedBy?.id || idea.submittedBy || ''
-          );
-          return ideaUserId === uid && (idea.status === 'approved' || idea.status === 'completed');
-        });
+      // Both tabs show user's submitted ideas
+      const allIdeas = await fetchAllIdeas();
+      const uid = String(user?.id || (user as any)?._id || '');
+      const userIdeas = allIdeas.filter((idea: any) => {
+        const ideaUserId = String(
+          idea.userId || idea.submittedBy?._id || idea.submittedBy?.id || idea.submittedBy || ''
+        );
+        return ideaUserId === uid;
+      });
 
-        // Also fetch actual project data to enrich with real members/progress/techStack
+      if (myProjectsView === 'projects') {
+        // Enrich ideas with real project data where available
         let realProjects: Project[] = [];
         try { realProjects = await fetchMyProjectsList(); } catch { /* ignore */ }
         const projectMap = new Map<string, any>();
@@ -210,7 +209,7 @@ export default function CreatorHomeScreen() {
           }
         }
 
-        const mergedProjects: Project[] = userApprovedIdeas.map((idea: any) => {
+        const mergedProjects: Project[] = userIdeas.map((idea: any) => {
           const ideaId = String(idea._id || idea.id);
           const linkedProjectId = idea.projectId
             ? String(idea.projectId._id || idea.projectId.id || idea.projectId)
@@ -227,31 +226,22 @@ export default function CreatorHomeScreen() {
             creatorId: uid,
             creatorName: idea.submittedByName || idea.userName || user?.name || '',
             ownerName: idea.submittedByName || idea.userName || user?.name || '',
-            status: idea.status === 'completed' ? 'completed' : (real?.status || 'active'),
+            status: idea.status === 'completed' ? 'completed' : (real?.status || idea.status || 'pending'),
             isCompleted: idea.status === 'completed',
+            ideaStatus: idea.status,
             progress: real?.progress || 0,
             members: real?.members || [],
-            memberCount: real ? (Array.isArray(real.members) ? real.members.length : (real.memberCount || 1)) : 1,
+            memberCount: real ? (Array.isArray(real.members) ? real.members.length : (real.memberCount || 1)) : 0,
             techStack: real?.techStack || [],
-            tags: real?.tags || [idea.category],
+            tags: real?.tags || (idea.category ? [idea.category] : []),
             ideaId: ideaId,
             createdAt: idea.submittedAt || idea.createdAt || new Date().toISOString(),
           } as any;
         });
 
-        // Also include projects where user is member but not idea owner
-        const mergedIds = new Set(mergedProjects.map(p => String((p as any)._id || p.id)));
-        for (const p of realProjects) {
-          const pid = String((p as any)._id || p.id);
-          if (!mergedIds.has(pid)) {
-            mergedProjects.push(p);
-          }
-        }
-
         setMyProjects(mergedProjects);
       } else {
-        const data = await fetchMyIdeas();
-        setMyIdeas(data);
+        setMyIdeas(userIdeas);
       }
     } catch (e) { console.error(e); }
     finally { setMyProjectsLoading(false); }
@@ -568,28 +558,48 @@ export default function CreatorHomeScreen() {
   const renderMyProjectCard = ({ item }: { item: Project }) => {
     const pid = (item as any)._id || item.id;
     const pendingCount = projectPendingRequests[pid] || 0;
-    const isCompleted = (item as any).isCompleted || item.status === 'completed' || item.status === 'Completed';
+    const ideaStatus = (item as any).ideaStatus || item.status;
+    const isCompleted = ideaStatus === 'completed';
+    const isApproved = ideaStatus === 'approved';
+    const hasProject = isApproved || isCompleted || item.progress > 0;
+    const statusColor = isCompleted ? COLORS.success
+      : isApproved ? COLORS.success
+      : ideaStatus === 'in-progress' ? PRIMARY
+      : ideaStatus === 'rejected' ? COLORS.danger
+      : COLORS.warning;
+    const statusLabel = isCompleted ? 'Completed'
+      : isApproved ? 'Approved'
+      : ideaStatus === 'in-progress' ? 'In Progress'
+      : ideaStatus === 'rejected' ? 'Rejected'
+      : 'Pending';
+
+    const onPress = () => {
+      if (hasProject) {
+        navigation.navigate('ProjectWorkspace', { projectId: pid, projectTitle: item.title });
+      }
+    };
+
     return (
       <TouchableOpacity
         style={S.card}
-        onPress={() => navigation.navigate('ProjectWorkspace', { projectId: pid, projectTitle: item.title })}
-        activeOpacity={0.85}
+        onPress={onPress}
+        activeOpacity={hasProject ? 0.85 : 1}
       >
         <View style={S.cardTop}>
           <View style={{ flex: 1 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
               <Text style={S.cardTitle} numberOfLines={2}>{item.title}</Text>
-              <View style={S.creatorBadge}><Text style={S.creatorBadgeText}>CREATOR</Text></View>
               {pendingCount > 0 && (
                 <View style={S.pendingBadge}><Text style={S.pendingBadgeText}>{pendingCount}</Text></View>
               )}
             </View>
             <Text style={S.cardDesc} numberOfLines={2}>{stripHtml(item.description)}</Text>
+            {item.category && <Text style={[S.metaText, { marginTop: 6, color: PRIMARY }]}>{item.category}</Text>}
           </View>
-          <View style={[S.statusBadge, { alignSelf: 'flex-start', backgroundColor: isCompleted ? COLORS.success + '20' : COLORS.success + '15' }]}>
-            <View style={[S.statusDot, { backgroundColor: isCompleted ? COLORS.success : '#22C55E' }]} />
-            <Text style={[S.statusBadgeText, { color: isCompleted ? COLORS.success : '#22C55E' }]}>
-              {isCompleted ? 'Completed' : 'Active'}
+          <View style={[S.statusBadge, { alignSelf: 'flex-start', backgroundColor: statusColor + '20' }]}>
+            <View style={[S.statusDot, { backgroundColor: statusColor }]} />
+            <Text style={[S.statusBadgeText, { color: statusColor }]}>
+              {statusLabel}
             </Text>
           </View>
         </View>
@@ -603,23 +613,31 @@ export default function CreatorHomeScreen() {
             </View>
           </ScrollView>
         )}
-        <View style={{ marginBottom: 10 }}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 5 }}>
-            <Text style={S.progressLabel}>Progress</Text>
-            <Text style={[S.progressLabel, { color: PRIMARY, fontWeight: '700' }]}>{item.progress || 0}%</Text>
+        {hasProject && (
+          <View style={{ marginBottom: 10 }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 5 }}>
+              <Text style={S.progressLabel}>Progress</Text>
+              <Text style={[S.progressLabel, { color: PRIMARY, fontWeight: '700' }]}>{item.progress || 0}%</Text>
+            </View>
+            <View style={S.progressBg}>
+              <View style={[S.progressFill, { width: `${Math.min(item.progress || 0, 100)}%` as any }]} />
+            </View>
           </View>
-          <View style={S.progressBg}>
-            <View style={[S.progressFill, { width: `${Math.min(item.progress || 0, 100)}%` as any }]} />
-          </View>
-        </View>
+        )}
         <View style={S.cardFooter}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
             <Ionicons name="people-outline" size={13} color={COLORS.textMuted} />
             <Text style={S.metaText}>{getMemberCount(item)} members</Text>
           </View>
-          <View style={[S.actionBtn, { backgroundColor: PRIMARY }]}>
-            <Text style={S.actionBtnText}>Manage →</Text>
-          </View>
+          {hasProject ? (
+            <View style={[S.actionBtn, { backgroundColor: PRIMARY }]}>
+              <Text style={S.actionBtnText}>Manage →</Text>
+            </View>
+          ) : (
+            <View style={[S.actionBtn, { backgroundColor: statusColor + '30' }]}>
+              <Text style={[S.actionBtnText, { color: statusColor }]}>{statusLabel}</Text>
+            </View>
+          )}
         </View>
       </TouchableOpacity>
     );
@@ -749,7 +767,7 @@ export default function CreatorHomeScreen() {
           </View>
 
           {/* Category chips */}
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={S.chipRow} style={{ maxHeight: 44 }}>
+          <View style={S.chipGrid}>
             {CATEGORIES.map(cat => {
               const active = categoryFilter === cat;
               return (
@@ -758,7 +776,7 @@ export default function CreatorHomeScreen() {
                 </TouchableOpacity>
               );
             })}
-          </ScrollView>
+          </View>
 
           {/* Status + sort row */}
           <View style={S.filterRow}>
@@ -768,13 +786,6 @@ export default function CreatorHomeScreen() {
                   <Text style={[S.smallChipText, statusFilter === s && S.smallChipTextActive]}>
                     {s === 'all' ? 'All' : s.charAt(0).toUpperCase() + s.slice(1)}
                   </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-            <View style={{ flexDirection: 'row', gap: 6 }}>
-              {[{ k: 'recent' as SortMode, l: '🕐' }, { k: 'trending' as SortMode, l: '🔥' }, { k: 'popular' as SortMode, l: '⭐' }].map(s => (
-                <TouchableOpacity key={s.k} style={[S.iconChip, sortMode === s.k && S.iconChipActive]} onPress={() => setSortMode(s.k)}>
-                  <Text style={{ fontSize: 14 }}>{s.l}</Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -789,6 +800,7 @@ export default function CreatorHomeScreen() {
             <View style={S.centered}><ActivityIndicator size="large" color={PRIMARY} /></View>
           ) : (
             <FlatList
+              style={{ flex: 1 }}
               data={filteredProjects}
               renderItem={renderProjectCard}
               keyExtractor={i => String((i as any)._id || i.id)}
@@ -1111,9 +1123,10 @@ const S = StyleSheet.create({
   searchInput:  { flex: 1, height: 42, color: COLORS.textPrimary, fontSize: 14 },
 
   chipRow:      { paddingHorizontal: 16, gap: 6, paddingBottom: 2 },
-  chip:         { paddingHorizontal: 12, paddingVertical: 6, borderRadius: RADIUS.full, backgroundColor: COLORS.surface, borderWidth: 1, borderColor: COLORS.border },
+  chipGrid:     { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 16, gap: 6, marginBottom: 4 },
+  chip:         { paddingHorizontal: 10, paddingVertical: 5, borderRadius: RADIUS.sm, backgroundColor: COLORS.surface, borderWidth: 1, borderColor: COLORS.border },
   chipActive:   { backgroundColor: PRIMARY, borderColor: PRIMARY },
-  chipText:     { fontSize: 11, color: COLORS.textMuted, fontWeight: '600' },
+  chipText:     { fontSize: 10, color: COLORS.textMuted, fontWeight: '600' },
   chipTextActive:{ color: '#fff' },
 
   filterRow:         { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, marginTop: 8, marginBottom: 6 },
