@@ -22,6 +22,7 @@ import {
     ActivityIndicator,
     Alert,
     FlatList,
+    Image,
     KeyboardAvoidingView,
     Modal,
     Platform,
@@ -36,12 +37,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 type RouteParams = { groupId: string; groupName: string };
 
-const EMOJIS = ['😎', '🚀', '💻', '🔥', '⚡', '🎯', '🧠', '💡', '🎨', '🛠️', '✨', '🌟', '👾', '🤖', '🦊'];
-
-function getEmoji(name: string): string {
-  let h = 0;
-  for (let i = 0; i < name.length; i++) h = name.charCodeAt(i) + ((h << 5) - h);
-  return EMOJIS[Math.abs(h) % EMOJIS.length];
+function getDiceBearUri(seed: string): string {
+  return `https://api.dicebear.com/9.x/adventurer/png?seed=${encodeURIComponent(seed)}&size=96`;
 }
 
 export default function GroupChatScreen() {
@@ -403,7 +400,7 @@ export default function GroupChatScreen() {
   const renderMessage = useCallback(
     ({ item }: { item: any }) => {
       const isOwn = item.senderId === user?.id || item.sender?._id === user?.id;
-      const name = item.senderName || item.sender?.name || '';
+      const name = item.senderName || item.sender?.name || item.name || '';
       return (
         <TouchableOpacity
           onLongPress={() => handleMsgLongPress(item)}
@@ -412,7 +409,7 @@ export default function GroupChatScreen() {
         >
           {!isOwn && (
             <View style={st.msgAvatar}>
-              <Text style={{ fontSize: 14 }}>{getEmoji(name)}</Text>
+              <Image source={{ uri: getDiceBearUri(name) }} style={{ width: 26, height: 26, borderRadius: 13 }} />
             </View>
           )}
           <View style={{ maxWidth: '80%', gap: 2 }}>
@@ -432,7 +429,7 @@ export default function GroupChatScreen() {
               )}
             </View>
             <Text style={[st.time, isOwn && { textAlign: 'right' }]}>
-              {item.createdAt ? formatTime(item.createdAt) : ''}
+              {(item.createdAt || item.timestamp) ? formatTime(item.createdAt || item.timestamp) : ''}
             </Text>
           </View>
         </TouchableOpacity>
@@ -529,9 +526,7 @@ export default function GroupChatScreen() {
             {pendingRequests.map((req: any) => (
               <View key={req.userId} style={st.pendingItem}>
                 <View style={st.pendingAvatar}>
-                  <Text style={st.pendingAvatarLetter}>
-                    {getEmoji(req.userName || '?')}
-                  </Text>
+                  <Image source={{ uri: getDiceBearUri(req.userName || '?') }} style={{ width: 32, height: 32, borderRadius: 16 }} />
                 </View>
                 <Text style={st.pendingName} numberOfLines={1}>
                   {req.userName}
@@ -605,6 +600,7 @@ export default function GroupChatScreen() {
           style={{ flex: 1 }}
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
           keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+          enabled={Platform.OS === 'ios'}
         >
           {loadingMessages ? (
             <View style={st.centered}>
@@ -767,9 +763,7 @@ export default function GroupChatScreen() {
                 return (
                   <View key={memberId || i} style={st.memberRow}>
                     <View style={st.memberAvatar}>
-                      <Text style={st.memberAvatarLetter}>
-                        {getEmoji(memberName)}
-                      </Text>
+                      <Image source={{ uri: getDiceBearUri(memberName) }} style={{ width: 36, height: 36, borderRadius: 18 }} />
                     </View>
                     <View style={{ flex: 1 }}>
                       <Text style={st.memberName}>{memberName}</Text>

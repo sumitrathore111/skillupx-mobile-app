@@ -4,6 +4,7 @@ import Chat from '../models/Chat';
 import ChatMessage from '../models/ChatMessage';
 import User from '../models/User';
 import emailNotifications from '../services/emailService';
+import { sendPushToUser } from '../services/pushService';
 
 const router = Router();
 
@@ -224,6 +225,25 @@ router.post('/:chatId/messages', authenticate, async (req: AuthRequest, res: Res
       }
     } catch (emailError) {
       console.error('Failed to send chat message email notification:', emailError);
+    }
+
+    // Send push notification to the other participant (async, don't wait)
+    try {
+      const chatForPush = await Chat.findById(req.params.chatId);
+      if (chatForPush) {
+        const sendingUserId = senderId || req.user?.id;
+        const otherParticipantId = chatForPush.participantIds.find((id: string) => id !== sendingUserId);
+        if (otherParticipantId) {
+          sendPushToUser(
+            otherParticipantId,
+            senderName || req.user?.name || 'New Message',
+            message.length > 100 ? message.slice(0, 100) + '…' : message,
+            { type: 'chat', chatId: req.params.chatId, senderId: sendingUserId },
+          ).catch(() => {});
+        }
+      }
+    } catch (pushError) {
+      console.error('Failed to send push notification:', pushError);
     }
 
     res.status(201).json(messagePayload);

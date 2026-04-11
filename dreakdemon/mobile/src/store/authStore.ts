@@ -1,5 +1,6 @@
 import type { User } from '@/types/index';
 import { fetchCurrentUser, getStoredToken, getStoredUser, loginWithEmail, logout, registerUser } from '@services/authService';
+import { removePushTokenFromServer } from '@services/pushService';
 import { disconnectSocket, initializeSocket } from '@services/socketService';
 import { create } from 'zustand';
 
@@ -80,6 +81,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   },
 
   logoutUser: async () => {
+    try { await removePushTokenFromServer(); } catch { /* ignore */ }
     // Clear state immediately so navigation switches to login
     set({ user: null, token: null, isAuthenticated: false, error: null });
     // Clean up in background

@@ -1,12 +1,12 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-  Award,
-  Code2,
-  FolderOpen,
-  MessageSquare,
-  Trophy,
-  UserPlus,
-  X
+    Award,
+    Code2,
+    FolderOpen,
+    MessageSquare,
+    Trophy,
+    UserPlus,
+    X
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -137,13 +137,14 @@ export default function UniversalUserCard({
           className="w-full h-full object-cover"
         />
       );
-    } else if (avatar) {
-      return <span className="text-3xl">{avatar}</span>;
     }
+    const seed = userData?.name?.replace(/\s+/g, '') || 'User';
     return (
-      <span className="text-white font-bold text-2xl">
-        {userData?.name?.charAt(0)?.toUpperCase() || 'U'}
-      </span>
+      <img
+        src={`https://api.dicebear.com/9.x/adventurer/svg?seed=${seed}`}
+        alt={userData?.name || 'User'}
+        className="w-full h-full object-cover"
+      />
     );
   };
 

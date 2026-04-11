@@ -1000,7 +1000,7 @@ rl.on('close', () => {
           {/* Left - Me */}
           <div className="flex items-center gap-3">
             <img
-              src={me?.odProfilePic || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.id}`}
+              src={me?.odProfilePic || `https://api.dicebear.com/9.x/adventurer/svg?seed=${user?.id}`}
               alt="You"
               className="w-10 h-10 rounded-full border-2 border-cyan-400"
             />
@@ -1035,7 +1035,7 @@ rl.on('close', () => {
               <p className="text-xs text-gray-400">Rating: {opponent?.rating || 1000}</p>
             </div>
             <img
-              src={opponent?.odProfilePic || `https://api.dicebear.com/7.x/avataaars/svg?seed=${opponent?.odId}`}
+              src={opponent?.odProfilePic || `https://api.dicebear.com/9.x/adventurer/svg?seed=${opponent?.odId}`}
               alt="Opponent"
               className="w-10 h-10 rounded-full border-2 border-red-400"
             />

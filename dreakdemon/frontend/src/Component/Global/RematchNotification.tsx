@@ -113,7 +113,7 @@ const RematchNotification = () => {
           setIncomingRematch({
             battleId,
             challengerName: rematchRequest.fromName || challenger?.userName || 'Unknown',
-            challengerAvatar: challenger?.userAvatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${rematchRequest.from}`,
+            challengerAvatar: challenger?.userAvatar || `https://api.dicebear.com/9.x/adventurer/svg?seed=${rematchRequest.from}`,
             challengerRating: challenger?.rating || 1000,
             difficulty: battle.difficulty,
             entryFee: battle.entryFee,

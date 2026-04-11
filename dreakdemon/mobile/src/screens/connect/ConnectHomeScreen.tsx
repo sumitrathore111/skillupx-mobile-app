@@ -14,6 +14,7 @@ import {
     ActivityIndicator,
     Alert,
     FlatList,
+    Image,
     Modal,
     RefreshControl,
     ScrollView,
@@ -43,12 +44,8 @@ const SORT_OPTIONS = [
   { value: 'creator', label: 'Creator' },
 ];
 
-const EMOJIS = ['😎', '🚀', '💻', '🔥', '⚡', '🎯', '🧠', '💡', '🎨', '🛠️', '✨', '🌟', '👾', '🤖', '🦊'];
-
-function getEmoji(name: string): string {
-  let h = 0;
-  for (let i = 0; i < name.length; i++) h = name.charCodeAt(i) + ((h << 5) - h);
-  return EMOJIS[Math.abs(h) % EMOJIS.length];
+function getDiceBearUri(name: string): string {
+  return `https://api.dicebear.com/9.x/adventurer/png?seed=${encodeURIComponent(name)}&size=96`;
 }
 
 function nameColor(name: string): string {
@@ -277,14 +274,14 @@ export default function ConnectHomeScreen() {
   });
 
   // ─── RENDER: Developer Row (no card, clean row) ─────────────────
-  const renderDev = ({ item }: { item: DeveloperProfile }) => (
+  const renderDev = useCallback(({ item }: { item: DeveloperProfile }) => (
     <TouchableOpacity
       style={styles.devRow}
       onPress={() => navigation.navigate('DevProfile', { developerId: item.id || item.userId || item._id })}
       activeOpacity={0.6}
     >
       <View style={styles.devAvatar}>
-        <Text style={styles.devEmojiMain}>{getEmoji(item.name)}</Text>
+        <Image source={{ uri: getDiceBearUri(item.name) }} style={styles.devAvatarImg} />
         {item.isOnline && <View style={styles.onlineDot} />}
       </View>
       <View style={styles.devInfo}>
@@ -304,10 +301,10 @@ export default function ConnectHomeScreen() {
       </View>
       <Ionicons name="chevron-forward" size={16} color={COLORS.textMuted} />
     </TouchableOpacity>
-  );
+  ), [navigation]);
 
   // ─── RENDER: Conversation Row (Instagram DM style) ──────────────
-  const renderConversation = ({ item }: { item: Conversation }) => {
+  const renderConversation = useCallback(({ item }: { item: Conversation }) => {
     const pId = item.participant?.id || item.participant?.userId || item.participantId || '';
     const pName = item.participant?.name || item.participantName || 'Unknown';
     const isOnline = item.participant?.isOnline || false;
@@ -324,7 +321,7 @@ export default function ConnectHomeScreen() {
       >
         <View style={styles.dmAvatarWrap}>
           <View style={styles.dmAvatar}>
-            <Text style={styles.dmEmojiMain}>{getEmoji(pName)}</Text>
+            <Image source={{ uri: getDiceBearUri(pName) }} style={styles.dmAvatarImg} />
           </View>
           {isOnline && <View style={styles.dmOnlineDot} />}
         </View>
@@ -344,13 +341,13 @@ export default function ConnectHomeScreen() {
         )}
       </TouchableOpacity>
     );
-  };
+  }, [navigation]);
 
   // ─── RENDER: Connection Request Row ─────────────────────────────
-  const renderConnectionRequest = ({ item }: { item: ConnectionReqType }) => (
+  const renderConnectionRequest = useCallback(({ item }: { item: ConnectionReqType }) => (
     <View style={styles.requestRow}>
       <View style={styles.requestAvatar}>
-        <Text style={styles.requestEmojiMain}>{getEmoji(item.senderName)}</Text>
+        <Image source={{ uri: getDiceBearUri(item.senderName) }} style={styles.requestAvatarImg} />
       </View>
       <View style={{ flex: 1 }}>
         <Text style={styles.requestName}>{item.senderName}</Text>
@@ -363,10 +360,10 @@ export default function ConnectHomeScreen() {
         <Text style={styles.rejectBtnText}>Reject</Text>
       </TouchableOpacity>
     </View>
-  );
+  ), [handleAcceptRequest, handleRejectRequest]);
 
   // ─── RENDER: Group Row (clean, no card) ─────────────────────────
-  const renderGroup = ({ item }: { item: StudyGroup }) => {
+  const renderGroup = useCallback(({ item }: { item: StudyGroup }) => {
     const memberCount = Array.isArray(item.members) ? item.members.length : (item.members ?? 0);
     return (
       <TouchableOpacity
@@ -391,10 +388,10 @@ export default function ConnectHomeScreen() {
         <Ionicons name="chevron-forward" size={16} color={COLORS.textMuted} />
       </TouchableOpacity>
     );
-  };
+  }, [navigation]);
 
   // ─── RENDER: Review ─────────────────────────────────────────────
-  const renderReview = ({ item }: { item: any }) => {
+  const renderReview = useCallback(({ item }: { item: any }) => {
     const likes = localLikes[item.id] ?? item.likes ?? 0;
     const liked = !!likedByMe[item.id];
     const prosArr: string[] = Array.isArray(item.pros) ? item.pros : typeof item.pros === 'string' && item.pros ? item.pros.split('\n').filter(Boolean) : [];
@@ -403,7 +400,7 @@ export default function ConnectHomeScreen() {
       <View style={styles.reviewItem}>
         <View style={styles.reviewAuthorRow}>
           <View style={styles.reviewAvatar}>
-            <Text style={styles.reviewEmojiMain}>{getEmoji(item.authorName || item.userName || 'A')}</Text>
+            <Image source={{ uri: getDiceBearUri(item.authorName || item.userName || 'A') }} style={styles.reviewAvatarImg} />
           </View>
           <View style={{ flex: 1 }}>
             <Text style={styles.reviewAuthorName}>{item.authorName || item.userName || 'Anonymous'}</Text>
@@ -448,10 +445,10 @@ export default function ConnectHomeScreen() {
         </View>
       </View>
     );
-  };
+  }, [localLikes, likedByMe, handleLike, handleHelpful]);
 
   // ─── RENDER: Help Request ──────────────────────────────────────
-  const renderHelpRequest = ({ item }: { item: any }) => {
+  const renderHelpRequest = useCallback(({ item }: { item: any }) => {
     const isExpanded = !!expandedRequests[item.id];
     const tags: string[] = Array.isArray(item.tags) ? item.tags : [];
     const replies = item.replies || [];
@@ -459,7 +456,7 @@ export default function ConnectHomeScreen() {
       <View style={styles.helpItem}>
         <View style={styles.reviewAuthorRow}>
           <View style={styles.reviewAvatar}>
-            <Text style={styles.reviewEmojiMain}>{getEmoji(item.authorName || item.userName || 'A')}</Text>
+            <Image source={{ uri: getDiceBearUri(item.authorName || item.userName || 'A') }} style={styles.reviewAvatarImg} />
           </View>
           <View style={{ flex: 1 }}>
             <Text style={styles.reviewAuthorName}>{item.authorName || item.userName || 'Anonymous'}</Text>
@@ -479,7 +476,7 @@ export default function ConnectHomeScreen() {
             {replies.map((reply: any, i: number) => (
               <View key={i} style={styles.replyRow}>
                 <View style={styles.replyDot}>
-                  <Text style={{ fontSize: 12 }}>{getEmoji(reply.authorName || 'A')}</Text>
+                  <Image source={{ uri: getDiceBearUri(reply.authorName || 'A') }} style={{ width: 20, height: 20, borderRadius: 10 }} />
                 </View>
                 <View style={{ flex: 1 }}>
                   <Text style={{ fontSize: 11, fontWeight: '700', color: COLORS.textSecondary }}>{reply.authorName}</Text>
@@ -508,7 +505,7 @@ export default function ConnectHomeScreen() {
         </View>
       </View>
     );
-  };
+  }, [expandedRequests]);
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -622,6 +619,10 @@ export default function ConnectHomeScreen() {
               refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.primary} />}
               contentContainerStyle={{ paddingBottom: 32 }}
               ListEmptyComponent={<Text style={styles.emptyText}>No developers found</Text>}
+              removeClippedSubviews={true}
+              maxToRenderPerBatch={10}
+              windowSize={5}
+              initialNumToRender={10}
             />
           )}
           {activeTab === 'messages' && (
@@ -635,6 +636,10 @@ export default function ConnectHomeScreen() {
               keyExtractor={(i, idx) => i.id || i.chatId || i._id || String(idx)}
               refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.primary} />}
               contentContainerStyle={{ paddingBottom: 32 }}
+              removeClippedSubviews={true}
+              maxToRenderPerBatch={10}
+              windowSize={5}
+              initialNumToRender={10}
               ListHeaderComponent={
                 connectionRequests.length > 0 ? (
                   <View style={styles.requestsSection}>
@@ -669,6 +674,10 @@ export default function ConnectHomeScreen() {
               refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.primary} />}
               contentContainerStyle={{ paddingBottom: 32 }}
               ListEmptyComponent={<Text style={styles.emptyText}>No study groups found</Text>}
+              removeClippedSubviews={true}
+              maxToRenderPerBatch={10}
+              windowSize={5}
+              initialNumToRender={10}
             />
           )}
           {activeTab === 'reviews' && reviewSubTab === 'reviews' && (
@@ -676,6 +685,10 @@ export default function ConnectHomeScreen() {
               keyExtractor={(i, idx) => i.id || i._id || String(idx)}
               refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.primary} />}
               contentContainerStyle={{ padding: 16, gap: 16, paddingBottom: 32 }}
+              removeClippedSubviews={true}
+              maxToRenderPerBatch={10}
+              windowSize={5}
+              initialNumToRender={10}
               ListEmptyComponent={
                 <View style={styles.emptyCenter}>
                   <Ionicons name="star-outline" size={40} color={COLORS.textMuted} />
@@ -692,6 +705,10 @@ export default function ConnectHomeScreen() {
               keyExtractor={(i, idx) => i.id || i._id || String(idx)}
               refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.primary} />}
               contentContainerStyle={{ padding: 16, gap: 16, paddingBottom: 32 }}
+              removeClippedSubviews={true}
+              maxToRenderPerBatch={10}
+              windowSize={5}
+              initialNumToRender={10}
               ListEmptyComponent={
                 <View style={styles.emptyCenter}>
                   <Ionicons name="chatbubble-ellipses-outline" size={40} color={COLORS.textMuted} />
@@ -834,8 +851,8 @@ const styles = StyleSheet.create({
 
   // ─── Developer Row (NO card, plain row) ───
   devRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: COLORS.border, gap: 12 },
-  devAvatar: { width: 48, height: 48, borderRadius: 24, justifyContent: 'center', alignItems: 'center', position: 'relative', backgroundColor: COLORS.surface },
-  devEmojiMain: { fontSize: 24 },
+  devAvatar: { width: 48, height: 48, borderRadius: 24, justifyContent: 'center', alignItems: 'center', position: 'relative', backgroundColor: COLORS.surface, overflow: 'hidden' },
+  devAvatarImg: { width: 48, height: 48, borderRadius: 24 },
   onlineDot: { position: 'absolute', top: 1, right: 1, width: 10, height: 10, borderRadius: 5, backgroundColor: COLORS.success, borderWidth: 1.5, borderColor: COLORS.background },
   devInfo: { flex: 1 },
   devNameRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
@@ -849,8 +866,8 @@ const styles = StyleSheet.create({
   // ─── DM Row (Instagram style, NO card) ───
   dmRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, gap: 12 },
   dmAvatarWrap: { width: 52, height: 52, position: 'relative' },
-  dmAvatar: { width: 52, height: 52, borderRadius: 26, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.surface },
-  dmEmojiMain: { fontSize: 26 },
+  dmAvatar: { width: 52, height: 52, borderRadius: 26, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.surface, overflow: 'hidden' },
+  dmAvatarImg: { width: 52, height: 52, borderRadius: 26 },
   dmOnlineDot: { position: 'absolute', top: 1, right: 1, width: 12, height: 12, borderRadius: 6, backgroundColor: COLORS.success, borderWidth: 2, borderColor: COLORS.background },
   dmBody: { flex: 1 },
   dmTopRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 },
@@ -864,8 +881,8 @@ const styles = StyleSheet.create({
   requestsSection: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 12, borderBottomWidth: 1, borderBottomColor: COLORS.border },
   requestsHeader: { fontSize: 13, fontWeight: '700', color: COLORS.textSecondary, marginBottom: 8 },
   requestRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 10 },
-  requestAvatar: { width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.surface },
-  requestEmojiMain: { fontSize: 20 },
+  requestAvatar: { width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.surface, overflow: 'hidden' },
+  requestAvatarImg: { width: 40, height: 40, borderRadius: 20 },
   requestName: { fontSize: 13, fontWeight: '700', color: COLORS.primary },
   requestTime: { fontSize: 11, color: COLORS.textMuted },
   acceptBtn: { backgroundColor: COLORS.primary, paddingHorizontal: 14, paddingVertical: 6, borderRadius: RADIUS.md },
@@ -884,8 +901,8 @@ const styles = StyleSheet.create({
   // ─── Reviews (minimal styling) ───
   reviewItem: { gap: 6, paddingBottom: 16, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: COLORS.border },
   reviewAuthorRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  reviewAvatar: { width: 32, height: 32, borderRadius: 16, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.surface },
-  reviewEmojiMain: { fontSize: 18 },
+  reviewAvatar: { width: 32, height: 32, borderRadius: 16, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.surface, overflow: 'hidden' },
+  reviewAvatarImg: { width: 32, height: 32, borderRadius: 16 },
   reviewAuthorName: { fontSize: 12, fontWeight: '700', color: COLORS.primary },
   reviewDate: { fontSize: 11, color: COLORS.textMuted },
   categoryTag: { fontSize: 10, color: COLORS.accent, fontWeight: '600' },

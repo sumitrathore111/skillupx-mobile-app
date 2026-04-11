@@ -162,10 +162,11 @@ const formatRelativeTime = (timestamp: any): string => {
 
 // Helper function to get user avatar with proper fallback
 const getUserAvatar = (userprofile: any, userId: string | undefined): string => {
-  if (userprofile?.avatar && userprofile.avatar.trim() !== '') return userprofile.avatar;
-  if (userprofile?.avatrUrl && userprofile.avatrUrl.trim() !== '') return userprofile.avatrUrl;
-  if (userprofile?.profilePic && userprofile.profilePic.trim() !== '') return userprofile.profilePic;
-  return `https://api.dicebear.com/9.x/adventurer/svg?seed=${userId || 'default'}`;
+  if (userprofile?.avatar && userprofile.avatar.trim() !== '' && userprofile.avatar.startsWith('http')) return userprofile.avatar;
+  if (userprofile?.avatrUrl && userprofile.avatrUrl.trim() !== '' && userprofile.avatrUrl.startsWith('http')) return userprofile.avatrUrl;
+  if (userprofile?.profilePic && userprofile.profilePic.trim() !== '' && userprofile.profilePic.startsWith('http')) return userprofile.profilePic;
+  const seed = userprofile?.name?.replace(/\s+/g, '') || userId || 'default';
+  return `https://api.dicebear.com/9.x/adventurer/svg?seed=${seed}`;
 };
 
 // Helper function to render text with clickable links
@@ -438,7 +439,7 @@ export default function DeveloperConnect() {
             return [{
               participantId: otherParticipantId,
               participantName: payload.senderName || 'User',
-              participantAvatar: payload.senderAvatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${payload.senderName?.replace(/\s+/g, '') || 'User'}`,
+              participantAvatar: payload.senderAvatar || `https://api.dicebear.com/9.x/adventurer/svg?seed=${payload.senderName?.replace(/\s+/g, '') || 'User'}`,
               lastMessage: messageText,
               lastMessageAt: timestamp
             }, ...prev];
@@ -536,7 +537,7 @@ export default function DeveloperConnect() {
             techReviews: reviews,
             helpRequests: requests
           });
-        } catch (fallbackErr) {
+        } catch {
           setError('Failed to load developers: ' + (err instanceof Error ? err.message : String(err)));
         }
       } finally {
@@ -709,7 +710,7 @@ export default function DeveloperConnect() {
           }
           delete (socket as any)._chatMessageHandler;
         }
-      } catch (e) {
+      } catch {
         // ignore cleanup errors
       }
     };
@@ -749,7 +750,7 @@ export default function DeveloperConnect() {
         const formattedConversations = (chats || []).map((chat: any) => ({
           participantId: chat.participantId,
           participantName: chat.participantName,
-          participantAvatar: chat.participantAvatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${chat.participantName?.replace(/\s+/g, '')}`,
+          participantAvatar: chat.participantAvatar || `https://api.dicebear.com/9.x/adventurer/svg?seed=${chat.participantName?.replace(/\s+/g, '')}`,
           lastMessage: chat.lastMessage,
           lastMessageAt: chat.lastMessageAt,
           chatId: chat.id // Store chatId for caching
@@ -967,7 +968,7 @@ export default function DeveloperConnect() {
 
   const filteredDevelopers = useMemo(() => {
     const queryLower = debouncedSearch.toLowerCase();
-    let filtered = developers.filter(dev => {
+    const filtered = developers.filter(dev => {
       const devSkills = dev.skills || [];
       const devLookingFor = dev.lookingFor || '';
       const devInstitute = dev.institute || '';
@@ -1194,7 +1195,7 @@ export default function DeveloperConnect() {
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center gap-3 flex-1">
                 <img
-                  src={dev.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${dev.name}`}
+                  src={dev.avatar || `https://api.dicebear.com/9.x/adventurer/svg?seed=${dev.name}`}
                   alt={dev.name || 'Developer'}
                   className={`w-12 h-12 rounded-full ${dev.isCurrentUser ? 'ring-2 ring-purple-400' : ''}`}
                 />
@@ -1753,7 +1754,7 @@ export default function DeveloperConnect() {
                         >
                           {!isMe && (
                             <img
-                              src={msg.senderAvatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${msg.senderName?.replace(/\s+/g, '') || 'User'}`}
+                              src={msg.senderAvatar || `https://api.dicebear.com/9.x/adventurer/svg?seed=${msg.senderName?.replace(/\s+/g, '') || 'User'}`}
                               alt={msg.senderName || 'User'}
                               className="w-8 h-8 rounded-full flex-shrink-0 mr-2 shadow-md ring-2 ring-white dark:ring-gray-800"
                             />
@@ -1842,7 +1843,7 @@ export default function DeveloperConnect() {
 
                           {isMe && (
                             <img
-                              src={userprofile?.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.name?.replace(/\s+/g, '') || 'Me'}`}
+                              src={userprofile?.avatar || `https://api.dicebear.com/9.x/adventurer/svg?seed=${user?.name?.replace(/\s+/g, '') || 'Me'}`}
                               alt="Me"
                               className="w-8 h-8 rounded-full flex-shrink-0 ml-2 shadow-md ring-2 ring-white dark:ring-gray-800"
                             />
@@ -2126,7 +2127,7 @@ export default function DeveloperConnect() {
                         {groupMessages.map((msg: any, idx: number) => (
                           <div key={msg.id || idx} className="flex gap-2">
                             <img
-                              src={msg.avatar || msg.senderAvatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${msg.name || msg.senderName}`}
+                              src={msg.avatar || msg.senderAvatar || `https://api.dicebear.com/9.x/adventurer/svg?seed=${msg.name || msg.senderName}`}
                               alt={msg.name || msg.senderName}
                               className="w-8 h-8 rounded-full flex-shrink-0"
                             />

@@ -311,33 +311,30 @@ export default function DashboardLayout() {
                 isMinimized ? "justify-center" : "gap-3"
               }`}
             >
-              {/* Avatar/Emoji */}
+              {/* Avatar */}
               <div
                 className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center overflow-hidden"
                 style={{ backgroundColor: "#00ADB5" }}
               >
                 {(() => {
                   const avatar = userprofile?.avatar;
-                  if (avatar && avatar.trim() !== '') {
-                    // Check if it's a URL or emoji
-                    if (avatar.startsWith('http')) {
-                      return (
-                        <img
-                          src={avatar}
-                          alt="User Avatar"
-                          className="w-full h-full rounded-full object-cover"
-                        />
-                      );
-                    } else {
-                      // It's an emoji
-                      return <span className="text-2xl">{avatar}</span>;
-                    }
+                  if (avatar && avatar.trim() !== '' && avatar.startsWith('http')) {
+                    return (
+                      <img
+                        src={avatar}
+                        alt="User Avatar"
+                        className="w-full h-full rounded-full object-cover"
+                      />
+                    );
                   }
-                  // Fallback to first letter of name
+                  // Fallback to DiceBear avatar
+                  const seed = user?.name?.replace(/\s+/g, '') || 'User';
                   return (
-                    <span className="text-white font-bold text-lg">
-                      {user?.name?.charAt(0)?.toUpperCase() || "U"}
-                    </span>
+                    <img
+                      src={`https://api.dicebear.com/9.x/adventurer/svg?seed=${seed}`}
+                      alt="User Avatar"
+                      className="w-full h-full rounded-full object-cover"
+                    />
                   );
                 })()}
               </div>
@@ -441,21 +438,26 @@ export default function DashboardLayout() {
               className="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden"
               style={{ backgroundColor: "#00ADB5" }}
             >
-              {userprofile?.avatar && userprofile.avatar.trim() !== '' ? (
-                userprofile.avatar.startsWith('http') ? (
+              {(() => {
+                const avatar = userprofile?.avatar;
+                if (avatar && avatar.trim() !== '' && avatar.startsWith('http')) {
+                  return (
+                    <img
+                      src={avatar}
+                      alt="User Avatar"
+                      className="w-full h-full rounded-full object-cover"
+                    />
+                  );
+                }
+                const seed = user?.name?.replace(/\s+/g, '') || 'User';
+                return (
                   <img
-                    src={userprofile.avatar}
+                    src={`https://api.dicebear.com/9.x/adventurer/svg?seed=${seed}`}
                     alt="User Avatar"
                     className="w-full h-full rounded-full object-cover"
                   />
-                ) : (
-                  <span className="text-2xl">{userprofile.avatar}</span>
-                )
-              ) : (
-                <span className="text-white font-bold text-lg">
-                  {user?.name?.charAt(0)?.toUpperCase() || "U"}
-                </span>
-              )}
+                );
+              })()}
             </div>
           </div>
         </div>

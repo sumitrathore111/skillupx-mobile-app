@@ -30,13 +30,41 @@ import {
 } from "../../Component/Global/ui";
 import { useDataContext } from "../../Context/UserDataContext";
 
-// Emoji options for profile
-const PROFILE_EMOJIS = [
-  '😀', '😎', '🤓', '🧑‍💻', '👨‍💻', '👩‍💻', '🦊', '🐱', '🐶', '🦁',
-  '🐯', '🐻', '🐼', '🐨', '🐸', '🦄', '🐲', '🦋', '🌟', '⭐',
-  '🔥', '💎', '🎯', '🚀', '💡', '🎨', '🎭', '🎮', '🏆', '👑',
-  '🦸', '🧙', '🧛', '🧜', '🧚', '🦹', '🥷', '🧑‍🚀', '🧑‍🔬', '🧑‍🎨'
+// DiceBear avatar styles for profile
+const DICEBEAR_STYLES = [
+  { id: 'avataaars', label: 'Avataaars' },
+  { id: 'adventurer', label: 'Adventurer' },
+  { id: 'adventurer-neutral', label: 'Adventurer Neutral' },
+  { id: 'big-ears', label: 'Big Ears' },
+  { id: 'big-ears-neutral', label: 'Big Ears Neutral' },
+  { id: 'big-smile', label: 'Big Smile' },
+  { id: 'bottts', label: 'Bottts' },
+  { id: 'bottts-neutral', label: 'Bottts Neutral' },
+  { id: 'croodles', label: 'Croodles' },
+  { id: 'croodles-neutral', label: 'Croodles Neutral' },
+  { id: 'dylan', label: 'Dylan' },
+  { id: 'fun-emoji', label: 'Fun Emoji' },
+  { id: 'glass', label: 'Glass' },
+  { id: 'icons', label: 'Icons' },
+  { id: 'identicon', label: 'Identicon' },
+  { id: 'initials', label: 'Initials' },
+  { id: 'lorelei', label: 'Lorelei' },
+  { id: 'lorelei-neutral', label: 'Lorelei Neutral' },
+  { id: 'micah', label: 'Micah' },
+  { id: 'miniavs', label: 'Miniavs' },
+  { id: 'notionists', label: 'Notionists' },
+  { id: 'notionists-neutral', label: 'Notionists Neutral' },
+  { id: 'open-peeps', label: 'Open Peeps' },
+  { id: 'personas', label: 'Personas' },
+  { id: 'pixel-art', label: 'Pixel Art' },
+  { id: 'pixel-art-neutral', label: 'Pixel Art Neutral' },
+  { id: 'rings', label: 'Rings' },
+  { id: 'shapes', label: 'Shapes' },
+  { id: 'thumbs', label: 'Thumbs' },
 ];
+
+const getDiceBearUrl = (style: string, seed: string) =>
+  `https://api.dicebear.com/9.x/${style}/svg?seed=${encodeURIComponent(seed)}`;
 
 interface Education {
   degree: string;
@@ -83,7 +111,7 @@ interface ProfileData {
 export default function Profile() {
   const [isEditing, setIsEditing] = useState(false);
   const [newSkill, setNewSkill] = useState("");
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [showAvatarPicker, setShowAvatarPicker] = useState(false);
   const [profile, setProfile] = useState<ProfileData>({
     uid:'',
     name: "Your Name",
@@ -291,24 +319,19 @@ export default function Profile() {
               <CardTitle className="dark:text-white">Profile Summary</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 text-center">
-              {/* Profile Avatar/Emoji */}
+              {/* Profile Avatar */}
               <div className="relative inline-block">
                 <div
-                  className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-3 cursor-pointer transition-transform hover:scale-105 border-4 border-white dark:border-gray-700 shadow-lg"
+                  className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-3 cursor-pointer transition-transform hover:scale-105 border-4 border-white dark:border-gray-700 shadow-lg overflow-hidden"
                   style={{ backgroundColor: "#00ADB5" }}
-                  onClick={() => isEditing && setShowEmojiPicker(!showEmojiPicker)}
+                  onClick={() => isEditing && setShowAvatarPicker(!showAvatarPicker)}
                 >
-                  {profile?.avatar || profile?.profilePic ? (
-                    // Check if it's an emoji (single character or emoji) or URL
-                    (profile.avatar || profile.profilePic || '').startsWith('http') ? (
-                      <img
-                        src={profile.avatar || profile.profilePic}
-                        alt="Profile"
-                        className="w-full h-full rounded-full object-cover"
-                      />
-                    ) : (
-                      <span className="text-5xl">{profile.avatar || profile.profilePic}</span>
-                    )
+                  {(profile?.avatar || profile?.profilePic) ? (
+                    <img
+                      src={profile.avatar || profile.profilePic}
+                      alt="Profile"
+                      className="w-full h-full rounded-full object-cover"
+                    />
                   ) : (
                     <User className="w-10 h-10 text-white" />
                   )}
@@ -317,48 +340,59 @@ export default function Profile() {
                 {/* Edit indicator when editing */}
                 {isEditing && (
                   <button
-                    onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                    onClick={() => setShowAvatarPicker(!showAvatarPicker)}
                     className="absolute bottom-2 right-0 w-8 h-8 bg-blue-500 hover:bg-blue-600 rounded-full flex items-center justify-center shadow-lg transition-colors"
                   >
                     <Edit3 className="w-4 h-4 text-white" />
                   </button>
                 )}
 
-                {/* Emoji Picker Dropdown */}
-                {showEmojiPicker && isEditing && (
-                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 z-50 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 p-3 w-72">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Choose your emoji</span>
+                {/* DiceBear Avatar Picker Dropdown */}
+                {showAvatarPicker && isEditing && (
+                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 z-50 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 p-4 w-80">
+                    <div className="flex justify-between items-center mb-3">
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Choose your avatar style</span>
                       <button
-                        onClick={() => setShowEmojiPicker(false)}
+                        onClick={() => setShowAvatarPicker(false)}
                         className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
                       >
                         <X className="w-4 h-4 text-gray-500" />
                       </button>
                     </div>
-                    <div className="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
-                      {PROFILE_EMOJIS.map((emoji, index) => (
-                        <button
-                          key={index}
-                          onClick={() => {
-                            setProfile(prev => ({ ...prev, avatar: emoji, profilePic: emoji }));
-                            setShowEmojiPicker(false);
-                          }}
-                          className={`w-8 h-8 text-xl hover:bg-gray-100 dark:hover:bg-gray-700 rounded flex items-center justify-center transition-colors ${
-                            profile.avatar === emoji ? 'bg-blue-100 dark:bg-blue-900 ring-2 ring-blue-500' : ''
-                          }`}
-                        >
-                          {emoji}
-                        </button>
-                      ))}
+                    <div className="grid grid-cols-4 gap-2 max-h-64 overflow-y-auto pr-1">
+                      {DICEBEAR_STYLES.map((style) => {
+                        const url = getDiceBearUrl(style.id, profile.name || profile.uid || 'User');
+                        const isSelected = profile.avatar === url;
+                        return (
+                          <button
+                            key={style.id}
+                            onClick={() => {
+                              setProfile(prev => ({ ...prev, avatar: url, profilePic: url }));
+                              setShowAvatarPicker(false);
+                            }}
+                            className={`flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
+                              isSelected ? 'bg-blue-100 dark:bg-blue-900 ring-2 ring-blue-500' : ''
+                            }`}
+                            title={style.label}
+                          >
+                            <img
+                              src={url}
+                              alt={style.label}
+                              className="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-700"
+                              loading="lazy"
+                            />
+                            <span className="text-[10px] text-gray-500 dark:text-gray-400 truncate w-full text-center">{style.label}</span>
+                          </button>
+                        );
+                      })}
                     </div>
                     {/* Clear option */}
                     <button
                       onClick={() => {
                         setProfile(prev => ({ ...prev, avatar: '', profilePic: '' }));
-                        setShowEmojiPicker(false);
+                        setShowAvatarPicker(false);
                       }}
-                      className="w-full mt-2 py-1.5 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
+                      className="w-full mt-3 py-1.5 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
                     >
                       Remove Avatar
                     </button>
