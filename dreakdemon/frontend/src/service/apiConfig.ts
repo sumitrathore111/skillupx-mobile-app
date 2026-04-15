@@ -3,7 +3,7 @@
 
 const getBaseUrl = (): string => {
   const envUrl = import.meta.env.VITE_API_URL;
-  const defaultUrl = 'https://nextstepbackend-qhxw.onrender.com'; // Default to local backend if not set
+  const defaultUrl = 'http://localhost:5000'; // Default to local backend if not set
 
   if (!envUrl) return defaultUrl;
 

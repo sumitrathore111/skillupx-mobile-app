@@ -1,15 +1,3 @@
 {
-    "git.ignoreLimitWarning": true,
-    "java.jdt.ls.java.home": "C:\\Users\\sumit\\AppData\\Roaming\\Code\\User\\globalStorage\\pleiades.java-extension-pack-jdk\\java\\21",
-    "java.import.gradle.enabled": false,
-    "java.autobuild.enabled": false,
-    "java.import.exclusions": [
-        "**/android/**",
-        "**/build.gradle",
-        "**/settings.gradle"
-    ],
-    "files.associations": {
-        "build.gradle": "plaintext",
-        "settings.gradle": "plaintext"
-    }
+    "git.ignoreLimitWarning": true
 }

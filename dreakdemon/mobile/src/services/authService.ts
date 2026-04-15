@@ -103,22 +103,3 @@ export async function updateProfile(data: Partial<User>): Promise<User> {
   await setItem('auth_user', JSON.stringify(updated));
   return updated;
 }
-
-// Google Sign-In → your /api/auth/google
-interface GoogleAuthResponse {
-  token: string;
-  user: User;
-  isNewUser: boolean;
-}
-
-export async function loginWithGoogle(googleData: {
-  googleId: string;
-  email: string;
-  name: string;
-  avatar?: string;
-}): Promise<GoogleAuthResponse> {
-  const data = await apiRequest<GoogleAuthResponse>('POST', '/auth/google', googleData);
-  await setItem('auth_token', data.token);
-  await setItem('auth_user', JSON.stringify(data.user));
-  return data;
-}

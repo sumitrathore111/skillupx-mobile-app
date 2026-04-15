@@ -6,6 +6,7 @@ import type { RootStackParamList } from './types';
 
 // Auth screens
 import LoginScreen from '@screens/auth/LoginScreen';
+import RegisterScreen from '@screens/auth/RegisterScreen';
 
 // Main app (with bottom tabs)
 import BottomTabNavigator from './BottomTabNavigator';
@@ -29,7 +30,10 @@ export default function RootNavigator() {
       {isAuthenticated ? (
         <Stack.Screen name="Main" component={BottomTabNavigator} />
       ) : (
-        <Stack.Screen name="Auth" component={LoginScreen} />
+        <>
+          <Stack.Screen name="Auth" component={LoginScreen} />
+          <Stack.Screen name="Register" component={RegisterScreen} />
+        </>
       )}
     </Stack.Navigator>
   );

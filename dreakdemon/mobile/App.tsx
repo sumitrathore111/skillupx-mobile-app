@@ -1,6 +1,6 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import Constants, { ExecutionEnvironment } from 'expo-constants';
+import * as Notifications from 'expo-notifications';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useRef } from 'react';
 import 'react-native-gesture-handler';
@@ -10,8 +10,6 @@ import './global.css';
 import RootNavigator from './src/navigation/RootNavigator';
 import { registerForPushNotifications, savePushTokenToServer } from './src/services/pushService';
 import { useAuthStore } from './src/store/authStore';
-
-const isExpoGo = Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -26,39 +24,34 @@ function AppContent() {
 
   useEffect(() => { initialize(); }, []);
 
-  // Register for push notifications when user is authenticated (skip in Expo Go)
+  // Register for push notifications when user is authenticated
   useEffect(() => {
-    if (!isAuthenticated || isExpoGo) return;
+    if (!isAuthenticated) return;
     registerForPushNotifications().then((token) => {
       if (token) savePushTokenToServer(token);
-    }).catch(() => {});
+    });
   }, [isAuthenticated]);
 
-  // Handle notification taps (skip in Expo Go)
+  // Handle notification taps (navigate to relevant screen)
   useEffect(() => {
-    if (isExpoGo) return;
-    let subscription: any;
-    try {
-      const Notifications = require('expo-notifications');
-      subscription = Notifications.addNotificationResponseReceivedListener((response: any) => {
-        const data = response.notification.request.content.data;
-        if (!navigationRef.current) return;
+    const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
+      const data = response.notification.request.content.data;
+      if (!navigationRef.current) return;
 
-        if (data?.type === 'chat' && data?.chatId) {
-          navigationRef.current.navigate('Connect', {
-            screen: 'Chat',
-            params: { participantId: data.senderId, participantName: '' },
-          });
-        } else if (data?.type === 'groupChat' && data?.groupId) {
-          navigationRef.current.navigate('Connect', {
-            screen: 'GroupChat',
-            params: { groupId: data.groupId, groupName: data.groupName || '' },
-          });
-        }
-      });
-    } catch {}
+      if (data?.type === 'chat' && data?.chatId) {
+        navigationRef.current.navigate('Connect', {
+          screen: 'Chat',
+          params: { participantId: data.senderId, participantName: '' },
+        });
+      } else if (data?.type === 'groupChat' && data?.groupId) {
+        navigationRef.current.navigate('Connect', {
+          screen: 'GroupChat',
+          params: { groupId: data.groupId, groupName: data.groupName || '' },
+        });
+      }
+    });
 
-    return () => subscription?.remove();
+    return () => subscription.remove();
   }, []);
 
   return (

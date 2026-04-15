@@ -295,7 +295,7 @@ export default function RoadmapDetailPage() {
             {phases.map((phase, phaseIndex) => {
               const phaseInfo = PHASE_LABELS[phase.key];
               const isExpanded = expandedPhases.includes(phase.key);
-              const phaseCompleted = phase.topics.filter((t: Topic) => completedTopicIds.has(t._id)).length;
+              const phaseCompleted = phase.topics.filter(t => completedTopicIds.has(t._id)).length;
               const phaseTotal = phase.topics.length;
               const phaseProgress = phaseTotal > 0 ? Math.round((phaseCompleted / phaseTotal) * 100) : 0;
 
@@ -364,7 +364,7 @@ export default function RoadmapDetailPage() {
                         className="border-t border-gray-100 dark:border-gray-700"
                       >
                         <div className="divide-y divide-gray-100 dark:divide-gray-700">
-                          {phase.topics.map((topic: Topic) => {
+                          {phase.topics.map((topic) => {
                             const isCompleted = completedTopicIds.has(topic._id);
                             const isLoading = completingTopic === topic._id;
 

@@ -1,9 +1,8 @@
 {
   "expo": {
-    "name": "SkillUpX",
+    "name": "DreakDemon",
     "slug": "dreakdemon",
     "version": "1.0.0",
-    "scheme": "skillupx",
     "orientation": "portrait",
     "updates": {
       "enabled": false
@@ -28,7 +27,7 @@
         "backgroundColor": "#0A0A0F"
       },
       "package": "com.dreakdemon.app",
-      "versionCode": 5,
+      "versionCode": 1,
       "softwareKeyboardLayoutMode": "adjustResize",
       "permissions": [
         "NOTIFICATIONS",
@@ -46,18 +45,11 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#0A0A0F",
-          "image": "./assets/splash.png",
-          "imageWidth": 200
+          "backgroundColor": "#0A0A0F"
         }
       ],
-      "expo-asset",
-      "expo-web-browser"
+      "expo-asset"
     ],
-    "extra": {
-      "eas": {
-        "projectId": "99319aac-110f-4e61-ad2e-461c0a1f5d10"
-      }
-    }
+    "extra": {}
   }
 }

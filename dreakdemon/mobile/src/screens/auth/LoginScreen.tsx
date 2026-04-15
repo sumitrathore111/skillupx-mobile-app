@@ -1,25 +1,21 @@
 import SkillUpXLogo from '@components/SkillUpXLogo';
 import { COLORS, RADIUS } from '@constants/theme';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import { useAuthStore } from '@store/authStore';
-import Constants from 'expo-constants';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
-  ActivityIndicator,
-  Alert,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    ActivityIndicator, Alert, Animated,
+    KeyboardAvoidingView, Platform, ScrollView,
+    StyleSheet,
+    Text, TextInput, TouchableOpacity,
+    View
 } from 'react-native';
-
-const STATUSBAR_HEIGHT = Constants.statusBarHeight || 24;
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function LoginScreen() {
+  const navigation = useNavigation<any>();
   const { login, isLoading, error, clearError } = useAuthStore();
 
   const [email, setEmail] = useState('');
@@ -28,8 +24,26 @@ export default function LoginScreen() {
   const [emailFocused, setEmailFocused] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
 
-  const emailInputRef = useRef<TextInput>(null);
-  const passwordInputRef = useRef<TextInput>(null);
+  // Animations
+  const headerOpacity = useRef(new Animated.Value(0)).current;
+  const headerTranslate = useRef(new Animated.Value(-20)).current;
+  const formOpacity = useRef(new Animated.Value(0)).current;
+  const formTranslate = useRef(new Animated.Value(30)).current;
+  const footerOpacity = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.stagger(150, [
+      Animated.parallel([
+        Animated.timing(headerOpacity, { toValue: 1, duration: 600, useNativeDriver: true }),
+        Animated.timing(headerTranslate, { toValue: 0, duration: 600, useNativeDriver: true }),
+      ]),
+      Animated.parallel([
+        Animated.timing(formOpacity, { toValue: 1, duration: 500, useNativeDriver: true }),
+        Animated.timing(formTranslate, { toValue: 0, duration: 500, useNativeDriver: true }),
+      ]),
+      Animated.timing(footerOpacity, { toValue: 1, duration: 400, useNativeDriver: true }),
+    ]).start();
+  }, []);
 
   const handleLogin = async () => {
     if (!email.trim() || !password.trim()) {
@@ -45,29 +59,31 @@ export default function LoginScreen() {
   };
 
   return (
-    <View style={styles.root}>
-      <ScrollView
-        contentContainerStyle={styles.scroll}
-        keyboardShouldPersistTaps="always"
-        showsVerticalScrollIndicator={false}
-        bounces={false}
-        overScrollMode="never"
+    <SafeAreaView style={styles.safeArea}>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        {/* Top Branding */}
-        <View style={styles.brandSection}>
-          <View style={styles.logoRow}>
-            <SkillUpXLogo size={56} />
-            <View>
-              <Text style={styles.brandName}>
-                Skill<Text style={styles.brandAccent}>UpX</Text>
-              </Text>
-              <Text style={styles.brandSub}>Code · Connect · Create</Text>
+        <ScrollView
+          contentContainerStyle={styles.scroll}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          {/* ─── Top Branding ─── */}
+          <Animated.View style={[styles.brandSection, { opacity: headerOpacity, transform: [{ translateY: headerTranslate }] }]}>
+            <View style={styles.logoRow}>
+              <SkillUpXLogo size={56} />
+              <View style={styles.logoTextGroup}>
+                <Text style={styles.brandName}>
+                  Skill<Text style={styles.brandAccent}>UpX</Text>
+                </Text>
+                <Text style={styles.brandSub}>Code · Connect · Create</Text>
+              </View>
             </View>
-          </View>
-        </View>
+          </Animated.View>
 
-        {/* Form Card */}
-        <View style={styles.card}>
+          {/* ─── Form Card ─── */}
+          <Animated.View style={[styles.card, { opacity: formOpacity, transform: [{ translateY: formTranslate }] }]}>
             <Text style={styles.heading}>Sign In</Text>
             <Text style={styles.subheading}>Welcome back! Please enter your details.</Text>
 
@@ -81,10 +97,7 @@ export default function LoginScreen() {
             {/* Email */}
             <View style={styles.fieldGroup}>
               <Text style={styles.fieldLabel}>Email address</Text>
-              <Pressable
-                style={[styles.fieldRow, emailFocused && styles.fieldRowFocused]}
-                onPress={() => emailInputRef.current?.focus()}
-              >
+              <View style={[styles.fieldRow, emailFocused && styles.fieldRowFocused]}>
                 <Ionicons
                   name="mail-outline"
                   size={18}
@@ -92,7 +105,6 @@ export default function LoginScreen() {
                   style={styles.fieldIcon}
                 />
                 <TextInput
-                  ref={emailInputRef}
                   style={styles.fieldInput}
                   placeholder="you@example.com"
                   placeholderTextColor={COLORS.textDisabled}
@@ -103,22 +115,15 @@ export default function LoginScreen() {
                   keyboardType="email-address"
                   autoCapitalize="none"
                   autoComplete="email"
-                  autoCorrect={false}
                   returnKeyType="next"
-                  blurOnSubmit={false}
-                  onSubmitEditing={() => passwordInputRef.current?.focus()}
-                  editable={true}
                 />
-              </Pressable>
+              </View>
             </View>
 
             {/* Password */}
             <View style={styles.fieldGroup}>
               <Text style={styles.fieldLabel}>Password</Text>
-              <Pressable
-                style={[styles.fieldRow, passwordFocused && styles.fieldRowFocused]}
-                onPress={() => passwordInputRef.current?.focus()}
-              >
+              <View style={[styles.fieldRow, passwordFocused && styles.fieldRowFocused]}>
                 <Ionicons
                   name="lock-closed-outline"
                   size={18}
@@ -126,7 +131,6 @@ export default function LoginScreen() {
                   style={styles.fieldIcon}
                 />
                 <TextInput
-                  ref={passwordInputRef}
                   style={styles.fieldInput}
                   placeholder="••••••••"
                   placeholderTextColor={COLORS.textDisabled}
@@ -136,10 +140,8 @@ export default function LoginScreen() {
                   onBlur={() => setPasswordFocused(false)}
                   secureTextEntry={!showPassword}
                   autoComplete="password"
-                  autoCorrect={false}
                   returnKeyType="go"
                   onSubmitEditing={handleLogin}
-                  editable={true}
                 />
                 <TouchableOpacity
                   onPress={() => setShowPassword(p => !p)}
@@ -151,7 +153,7 @@ export default function LoginScreen() {
                     color={COLORS.textMuted}
                   />
                 </TouchableOpacity>
-              </Pressable>
+              </View>
             </View>
 
             {/* Sign In Button */}
@@ -178,41 +180,57 @@ export default function LoginScreen() {
               </LinearGradient>
             </TouchableOpacity>
 
-          </View>
+            {/* Divider */}
+            <View style={styles.divider}>
+              <View style={styles.dividerLine} />
+              <Text style={styles.dividerLabel}>OR</Text>
+              <View style={styles.dividerLine} />
+            </View>
 
-        {/* Feature Pills */}
-        <View style={styles.pills}>
-          <View style={styles.pill}>
-            <Ionicons name="shield-checkmark" size={14} color={COLORS.primary} />
-            <Text style={styles.pillText}>Secure & Fast</Text>
-          </View>
-          <View style={styles.pillDot} />
-          <View style={styles.pill}>
-            <Ionicons name="globe-outline" size={14} color={COLORS.primary} />
-            <Text style={styles.pillText}>Access Anywhere</Text>
-          </View>
-        </View>
-      </ScrollView>
-    </View>
+            {/* Register */}
+            <TouchableOpacity
+              style={styles.registerBtn}
+              onPress={() => navigation.navigate('Register')}
+              activeOpacity={0.8}
+            >
+              <Ionicons name="person-add-outline" size={16} color={COLORS.primary} />
+              <Text style={styles.registerText}>Create New Account</Text>
+            </TouchableOpacity>
+          </Animated.View>
+
+          {/* ─── Feature Pills ─── */}
+          <Animated.View style={[styles.pills, { opacity: footerOpacity }]}>
+            <View style={styles.pill}>
+              <Ionicons name="shield-checkmark" size={14} color={COLORS.primary} />
+              <Text style={styles.pillText}>Secure & Fast</Text>
+            </View>
+            <View style={styles.pillDot} />
+            <View style={styles.pill}>
+              <Ionicons name="globe-outline" size={14} color={COLORS.primary} />
+              <Text style={styles.pillText}>Access Anywhere</Text>
+            </View>
+          </Animated.View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 /* ─────────────── Styles ─────────────── */
 const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-    paddingTop: STATUSBAR_HEIGHT,
-  },
+  safeArea: { flex: 1, backgroundColor: COLORS.background },
+  container: { flex: 1 },
   scroll: {
-    paddingHorizontal: 24,
-    paddingTop: 40,
-    paddingBottom: 40,
+    flexGrow: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 32,
   },
 
   /* Brand */
   brandSection: { alignItems: 'center', marginBottom: 32 },
   logoRow: { flexDirection: 'row', alignItems: 'center', gap: 14 },
+  logoTextGroup: {},
   brandName: { fontSize: 28, fontWeight: '800', color: COLORS.textPrimary, letterSpacing: 1 },
   brandAccent: { color: COLORS.primary },
   brandSub: { fontSize: 12, color: COLORS.textMuted, marginTop: 2, letterSpacing: 1.5 },
@@ -250,9 +268,14 @@ const styles = StyleSheet.create({
   },
   fieldRowFocused: {
     borderColor: COLORS.primary,
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 3,
   },
   fieldIcon: { marginRight: 10 },
-  fieldInput: { flex: 1, color: COLORS.textPrimary, fontSize: 15, paddingVertical: 0, height: 48 },
+  fieldInput: { flex: 1, color: COLORS.textPrimary, fontSize: 15 },
 
   /* Sign In */
   signInBtn: {
@@ -264,6 +287,25 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   signInText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+
+  /* Divider */
+  divider: { flexDirection: 'row', alignItems: 'center', marginVertical: 20 },
+  dividerLine: { flex: 1, height: StyleSheet.hairlineWidth, backgroundColor: COLORS.border },
+  dividerLabel: {
+    color: COLORS.textMuted,
+    fontSize: 11,
+    fontWeight: '600',
+    letterSpacing: 1.5,
+    paddingHorizontal: 14,
+  },
+
+  /* Register */
+  registerBtn: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
+    borderWidth: 1.5, borderColor: COLORS.primary,
+    borderRadius: RADIUS.md, height: 50,
+  },
+  registerText: { color: COLORS.primary, fontSize: 15, fontWeight: '700' },
 
   /* Pills */
   pills: {
