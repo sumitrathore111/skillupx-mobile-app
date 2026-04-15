@@ -155,6 +155,7 @@ export interface Roadmap {
 export interface RoadmapDetail {
   roadmap: Roadmap;
   topicsByPhase: {
+    foundation: Topic[];
     beginner: Topic[];
     intermediate: Topic[];
     advanced: Topic[];
