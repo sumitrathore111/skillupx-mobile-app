@@ -1,0 +1,51 @@
+###########################################
+# robots.txt for https://skillupx.online/
+# This file tells search engines how to crawl your site
+###########################################
+
+# Allow all crawlers access to public pages
+User-agent: *
+
+# Block private/authenticated dashboard routes
+Disallow: /dashboard/
+Disallow: /dashboard/*
+
+# Block auth pages (not useful for search indexing)
+Disallow: /login
+Disallow: /signup
+
+# Block invite join links (private, user-specific)
+Disallow: /project/join/
+
+# Block API routes if exposed
+Disallow: /api/
+
+# Allow public pages explicitly
+Allow: /
+Allow: /about
+Allow: /contact
+Allow: /TechUpdate
+Allow: /documentation
+Allow: /blog
+Allow: /codearena
+Allow: /roadmaps
+Allow: /creator-corner
+Allow: /developer-connect
+Allow: /privacy-policy
+Allow: /terms-and-conditions
+
+# Allow important resources for rendering
+Allow: /assets/
+Allow: /manifest.json
+
+# Googlebot specific (Googlebot does not support Crawl-delay)
+User-agent: Googlebot
+Allow: /
+
+# Bingbot specific
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 2
+
+# Sitemap location
+Sitemap: https://skillupx.online/sitemap.xml

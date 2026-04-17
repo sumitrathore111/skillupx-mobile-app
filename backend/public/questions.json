@@ -1,0 +1,2740 @@
+{
+  "problems": [
+    {
+      "id": "A001",
+      "title": "Maximum Subarray Sum",
+      "difficulty": "Medium",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Given an integer array nums, find the contiguous subarray (containing at least one number) which has the largest sum and return its sum.",
+      "inputFormat": "First line contains integer n (1 <= n <= 100000). Second line contains n integers (-10000 <= a_i <= 10000).",
+      "outputFormat": "Print a single integer - the maximum sum of contiguous subarray.",
+      "constraints": ["1 <= n <= 100000", "-10000 <= nums[i] <= 10000"],
+      "tags": ["array", "dynamic-programming", "kadane"],
+      "testCases": [
+        {"input": "9\n-2 1 -3 4 -1 2 1 -5 4", "output": "6", "explanation": "Subarray [4,-1,2,1] has sum = 6"},
+        {"input": "1\n5", "output": "5", "explanation": "Single element"},
+        {"input": "5\n-1 -2 -3 -4 -5", "output": "-1", "explanation": "All negative"}
+      ]
+    },
+    {
+      "id": "A002",
+      "title": "Rotate Array",
+      "difficulty": "Easy",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Given an array, rotate the array to the right by k steps, where k is non-negative.",
+      "inputFormat": "First line contains n and k (1 <= n <= 100000, 0 <= k <= 1000000000). Second line contains n integers.",
+      "outputFormat": "Print n integers - the rotated array.",
+      "constraints": ["1 <= n <= 100000", "0 <= k <= 1000000000"],
+      "tags": ["array", "math"],
+      "testCases": [
+        {"input": "7 3\n1 2 3 4 5 6 7", "output": "5 6 7 1 2 3 4", "explanation": "Rotate right by 3"},
+        {"input": "3 2\n-1 -100 3", "output": "-100 3 -1", "explanation": "Rotate right by 2"}
+      ]
+    },
+    {
+      "id": "A003",
+      "title": "Find Missing Number",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Given an array nums containing n distinct numbers in the range [0, n], return the only number in the range that is missing from the array.",
+      "inputFormat": "First line contains integer n (1 <= n <= 10000). Second line contains n integers.",
+      "outputFormat": "Print a single integer - the missing number.",
+      "constraints": ["1 <= n <= 10000", "0 <= nums[i] <= n", "All numbers distinct"],
+      "tags": ["array", "math", "bit-manipulation"],
+      "testCases": [
+        {"input": "3\n3 0 1", "output": "2", "explanation": "Missing 2"},
+        {"input": "2\n0 1", "output": "2", "explanation": "Range [0,2]"}
+      ]
+    },
+    {
+      "id": "A004",
+      "title": "Product of Array Except Self",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Return an array where answer[i] is equal to the product of all elements except nums[i]. Must be O(n) without division.",
+      "inputFormat": "First line contains n (2 <= n <= 100000). Second line contains n integers.",
+      "outputFormat": "Print n integers - the product array.",
+      "constraints": ["2 <= n <= 100000", "-30 <= nums[i] <= 30"],
+      "tags": ["array", "prefix-sum"],
+      "testCases": [
+        {"input": "4\n1 2 3 4", "output": "24 12 8 6", "explanation": "Products except self"},
+        {"input": "5\n-1 1 0 -3 3", "output": "0 0 9 0 0", "explanation": "With zero"}
+      ]
+    },
+    {
+      "id": "A005",
+      "title": "Container With Most Water",
+      "difficulty": "Medium",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Find two lines that together with the x-axis form a container with maximum water.",
+      "inputFormat": "First line contains n (2 <= n <= 100000). Second line contains n integers (heights).",
+      "outputFormat": "Print maximum water area.",
+      "constraints": ["2 <= n <= 100000", "0 <= height[i] <= 10000"],
+      "tags": ["array", "two-pointers", "greedy"],
+      "testCases": [
+        {"input": "9\n1 8 6 2 5 4 8 3 7", "output": "49", "explanation": "min(8,7) * 7 = 49"},
+        {"input": "2\n1 1", "output": "1", "explanation": "Two lines"}
+      ]
+    },
+    {
+      "id": "A006",
+      "title": "Find All Duplicates",
+      "difficulty": "Medium",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Find all integers that appear twice in array where all integers are in range [1, n]. O(n) time, O(1) space.",
+      "inputFormat": "First line contains n (1 <= n <= 100000). Second line contains n integers.",
+      "outputFormat": "Print duplicates space-separated or empty line.",
+      "constraints": ["1 <= n <= 100000", "1 <= nums[i] <= n"],
+      "tags": ["array", "hash-table"],
+      "testCases": [
+        {"input": "8\n4 3 2 7 8 2 3 1", "output": "2 3", "explanation": "2 and 3 twice"},
+        {"input": "1\n1", "output": "", "explanation": "No duplicates"}
+      ]
+    },
+    {
+      "id": "A007",
+      "title": "Two Sum",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Given an array and a target, return indices of two numbers that add up to target.",
+      "inputFormat": "First line contains n and target (2 <= n <= 10000). Second line contains n integers.",
+      "outputFormat": "Print two indices (0-indexed) space-separated.",
+      "constraints": ["2 <= n <= 10000", "Exactly one solution exists"],
+      "tags": ["array", "hash-table"],
+      "testCases": [
+        {"input": "4 9\n2 7 11 15", "output": "0 1", "explanation": "nums[0] + nums[1] = 9"},
+        {"input": "3 6\n3 2 4", "output": "1 2", "explanation": "nums[1] + nums[2] = 6"}
+      ]
+    },
+    {
+      "id": "A008",
+      "title": "Three Sum",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Find all unique triplets in array that sum to zero.",
+      "inputFormat": "First line contains n (3 <= n <= 3000). Second line contains n integers.",
+      "outputFormat": "Print each triplet on new line, sorted. Print triplets in sorted order.",
+      "constraints": ["3 <= n <= 3000", "-100000 <= nums[i] <= 100000"],
+      "tags": ["array", "two-pointers", "sorting"],
+      "testCases": [
+        {"input": "6\n-1 0 1 2 -1 -4", "output": "-1 -1 2\n-1 0 1", "explanation": "Two triplets"},
+        {"input": "3\n0 0 0", "output": "0 0 0", "explanation": "All zeros"}
+      ]
+    },
+    {
+      "id": "A009",
+      "title": "Merge Intervals",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Given array of intervals, merge all overlapping intervals.",
+      "inputFormat": "First line contains n (1 <= n <= 10000). Next n lines contain two integers - start and end.",
+      "outputFormat": "Print merged intervals, one per line.",
+      "constraints": ["1 <= n <= 10000", "0 <= start <= end <= 10000"],
+      "tags": ["array", "sorting"],
+      "testCases": [
+        {"input": "4\n1 3\n2 6\n8 10\n15 18", "output": "1 6\n8 10\n15 18", "explanation": "Merge [1,3] and [2,6]"},
+        {"input": "2\n1 4\n4 5", "output": "1 5", "explanation": "Overlapping at 4"}
+      ]
+    },
+    {
+      "id": "A010",
+      "title": "Move Zeroes",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Move all zeroes to end while maintaining relative order of non-zero elements.",
+      "inputFormat": "First line contains n (1 <= n <= 10000). Second line contains n integers.",
+      "outputFormat": "Print n integers - modified array.",
+      "constraints": ["1 <= n <= 10000", "Must modify in-place"],
+      "tags": ["array", "two-pointers"],
+      "testCases": [
+        {"input": "5\n0 1 0 3 12", "output": "1 3 12 0 0", "explanation": "Zeroes moved to end"},
+        {"input": "1\n0", "output": "0", "explanation": "Single zero"}
+      ]
+    },
+    {
+      "id": "A011",
+      "title": "Best Time to Buy and Sell Stock",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Find maximum profit from one transaction. You can buy on one day and sell on a future day.",
+      "inputFormat": "First line contains n (1 <= n <= 100000). Second line contains n integers (prices).",
+      "outputFormat": "Print maximum profit. Print 0 if no profit possible.",
+      "constraints": ["1 <= n <= 100000", "0 <= prices[i] <= 10000"],
+      "tags": ["array", "dynamic-programming"],
+      "testCases": [
+        {"input": "6\n7 1 5 3 6 4", "output": "5", "explanation": "Buy at 1, sell at 6"},
+        {"input": "5\n7 6 4 3 1", "output": "0", "explanation": "No profit"}
+      ]
+    },
+    {
+      "id": "A012",
+      "title": "Search in Rotated Sorted Array",
+      "difficulty": "Medium",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Search for target in rotated sorted array in O(log n) time.",
+      "inputFormat": "First line contains n and target (1 <= n <= 5000). Second line contains n distinct integers.",
+      "outputFormat": "Print index of target or -1 if not found.",
+      "constraints": ["1 <= n <= 5000", "All values distinct", "O(log n) required"],
+      "tags": ["array", "binary-search"],
+      "testCases": [
+        {"input": "7 0\n4 5 6 7 0 1 2", "output": "4", "explanation": "Target at index 4"},
+        {"input": "7 3\n4 5 6 7 0 1 2", "output": "-1", "explanation": "Not found"}
+      ]
+    },
+    {
+      "id": "A013",
+      "title": "Maximum Product Subarray",
+      "difficulty": "Medium",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Find contiguous subarray with largest product.",
+      "inputFormat": "First line contains n (1 <= n <= 20000). Second line contains n integers.",
+      "outputFormat": "Print maximum product.",
+      "constraints": ["1 <= n <= 20000", "-10 <= nums[i] <= 10"],
+      "tags": ["array", "dynamic-programming"],
+      "testCases": [
+        {"input": "4\n2 3 -2 4", "output": "6", "explanation": "Subarray [2,3] has product 6"},
+        {"input": "3\n-2 0 -1", "output": "0", "explanation": "Result is 0"}
+      ]
+    },
+    {
+      "id": "A014",
+      "title": "Find Minimum in Rotated Sorted Array",
+      "difficulty": "Medium",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Find minimum element in rotated sorted array in O(log n).",
+      "inputFormat": "First line contains n (1 <= n <= 5000). Second line contains n unique integers.",
+      "outputFormat": "Print minimum element.",
+      "constraints": ["1 <= n <= 5000", "All elements unique"],
+      "tags": ["array", "binary-search"],
+      "testCases": [
+        {"input": "5\n3 4 5 1 2", "output": "1", "explanation": "Minimum is 1"},
+        {"input": "7\n4 5 6 7 0 1 2", "output": "0", "explanation": "Minimum is 0"}
+      ]
+    },
+    {
+      "id": "A015",
+      "title": "Contains Duplicate",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Return true if any value appears at least twice in the array.",
+      "inputFormat": "First line contains n (1 <= n <= 100000). Second line contains n integers.",
+      "outputFormat": "Print YES or NO.",
+      "constraints": ["1 <= n <= 100000"],
+      "tags": ["array", "hash-table"],
+      "testCases": [
+        {"input": "4\n1 2 3 1", "output": "YES", "explanation": "1 appears twice"},
+        {"input": "4\n1 2 3 4", "output": "NO", "explanation": "All distinct"}
+      ]
+    },
+    {
+      "id": "A016",
+      "title": "Majority Element",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Find element that appears more than n/2 times. Always exists.",
+      "inputFormat": "First line contains n (1 <= n <= 50000). Second line contains n integers.",
+      "outputFormat": "Print the majority element.",
+      "constraints": ["1 <= n <= 50000", "Majority element always exists"],
+      "tags": ["array", "divide-and-conquer", "boyer-moore"],
+      "testCases": [
+        {"input": "7\n3 2 3 3 4 3 3", "output": "3", "explanation": "3 appears 5 times"},
+        {"input": "3\n2 2 1", "output": "2", "explanation": "2 appears twice"}
+      ]
+    },
+    {
+      "id": "A017",
+      "title": "Sort Colors",
+      "difficulty": "Medium",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Sort array with only 0s, 1s, and 2s in-place.",
+      "inputFormat": "First line contains n (1 <= n <= 300). Second line contains n integers (0, 1, or 2).",
+      "outputFormat": "Print sorted array.",
+      "constraints": ["1 <= n <= 300", "nums[i] is 0, 1, or 2", "Must be in-place"],
+      "tags": ["array", "two-pointers", "sorting"],
+      "testCases": [
+        {"input": "6\n2 0 2 1 1 0", "output": "0 0 1 1 2 2", "explanation": "Sorted"},
+        {"input": "3\n2 0 1", "output": "0 1 2", "explanation": "Sorted"}
+      ]
+    },
+    {
+      "id": "A018",
+      "title": "4Sum",
+      "difficulty": "Medium",
+      "timeLimit": "3s",
+      "memoryLimit": "256MB",
+      "description": "Find all unique quadruplets that sum to target.",
+      "inputFormat": "First line contains n and target (4 <= n <= 200). Second line contains n integers.",
+      "outputFormat": "Print each quadruplet on new line in sorted order.",
+      "constraints": ["4 <= n <= 200", "-1000000000 <= nums[i] <= 1000000000"],
+      "tags": ["array", "two-pointers", "sorting"],
+      "testCases": [
+        {"input": "6 0\n1 0 -1 0 -2 2", "output": "-2 -1 1 2\n-2 0 0 2\n-1 0 0 1", "explanation": "Three quadruplets"},
+        {"input": "5 8\n2 2 2 2 2", "output": "2 2 2 2", "explanation": "All same"}
+      ]
+    },
+    {
+      "id": "A019",
+      "title": "Jump Game",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Determine if you can reach the last index. Each element represents max jump length.",
+      "inputFormat": "First line contains n (1 <= n <= 10000). Second line contains n integers.",
+      "outputFormat": "Print YES or NO.",
+      "constraints": ["1 <= n <= 10000", "0 <= nums[i] <= 100000"],
+      "tags": ["array", "greedy", "dynamic-programming"],
+      "testCases": [
+        {"input": "5\n2 3 1 1 4", "output": "YES", "explanation": "Jump 1 step then 3 steps"},
+        {"input": "5\n3 2 1 0 4", "output": "NO", "explanation": "Stuck at index 3"}
+      ]
+    },
+    {
+      "id": "A020",
+      "title": "Subarray Sum Equals K",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Find total number of continuous subarrays whose sum equals k.",
+      "inputFormat": "First line contains n and k (1 <= n <= 20000). Second line contains n integers.",
+      "outputFormat": "Print count of subarrays.",
+      "constraints": ["1 <= n <= 20000", "-1000 <= nums[i] <= 1000"],
+      "tags": ["array", "hash-table", "prefix-sum"],
+      "testCases": [
+        {"input": "7 3\n1 1 1 2 1 1 1", "output": "4", "explanation": "Four subarrays sum to 3"},
+        {"input": "4 2\n1 2 3 4", "output": "1", "explanation": "Only [2] sums to 2"}
+      ]
+    },
+    {
+      "id": "A021",
+      "title": "Spiral Matrix",
+      "difficulty": "Medium",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Return all elements of matrix in spiral order.",
+      "inputFormat": "First line contains m and n (1 <= m,n <= 100). Next m lines contain n integers.",
+      "outputFormat": "Print elements in spiral order space-separated.",
+      "constraints": ["1 <= m, n <= 100"],
+      "tags": ["array", "matrix", "simulation"],
+      "testCases": [
+        {"input": "3 3\n1 2 3\n4 5 6\n7 8 9", "output": "1 2 3 6 9 8 7 4 5", "explanation": "Spiral traversal"},
+        {"input": "3 4\n1 2 3 4\n5 6 7 8\n9 10 11 12", "output": "1 2 3 4 8 12 11 10 9 5 6 7", "explanation": "Spiral"}
+      ]
+    },
+    {
+      "id": "A022",
+      "title": "Rotate Image",
+      "difficulty": "Medium",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Rotate n x n matrix by 90 degrees clockwise in-place.",
+      "inputFormat": "First line contains n (1 <= n <= 20). Next n lines contain n integers.",
+      "outputFormat": "Print rotated matrix, n integers per line.",
+      "constraints": ["1 <= n <= 20", "Must rotate in-place"],
+      "tags": ["array", "matrix"],
+      "testCases": [
+        {"input": "3\n1 2 3\n4 5 6\n7 8 9", "output": "7 4 1\n8 5 2\n9 6 3", "explanation": "90° clockwise"},
+        {"input": "2\n1 2\n3 4", "output": "3 1\n4 2", "explanation": "Rotated"}
+      ]
+    },
+    {
+      "id": "A023",
+      "title": "Set Matrix Zeroes",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "If element is 0, set its entire row and column to 0. Do it in-place.",
+      "inputFormat": "First line contains m and n (1 <= m,n <= 200). Next m lines contain n integers.",
+      "outputFormat": "Print modified matrix.",
+      "constraints": ["1 <= m, n <= 200", "In-place with O(1) space"],
+      "tags": ["array", "matrix"],
+      "testCases": [
+        {"input": "3 3\n1 1 1\n1 0 1\n1 1 1", "output": "1 0 1\n0 0 0\n1 0 1", "explanation": "Row 1 and col 1 zeroed"},
+        {"input": "3 4\n0 1 2 0\n3 4 5 2\n1 3 1 5", "output": "0 0 0 0\n0 4 5 0\n0 3 1 0", "explanation": "Zeroes propagated"}
+      ]
+    },
+    {
+      "id": "A024",
+      "title": "Next Permutation",
+      "difficulty": "Medium",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Rearrange numbers into next lexicographically greater permutation. If not possible, return lowest order.",
+      "inputFormat": "First line contains n (1 <= n <= 100). Second line contains n integers.",
+      "outputFormat": "Print next permutation.",
+      "constraints": ["1 <= n <= 100", "Must be in-place"],
+      "tags": ["array", "two-pointers"],
+      "testCases": [
+        {"input": "3\n1 2 3", "output": "1 3 2", "explanation": "Next permutation"},
+        {"input": "3\n3 2 1", "output": "1 2 3", "explanation": "Wrap around"}
+      ]
+    },
+    {
+      "id": "A025",
+      "title": "First Missing Positive",
+      "difficulty": "Hard",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Find smallest missing positive integer. Must be O(n) time and O(1) space.",
+      "inputFormat": "First line contains n (1 <= n <= 10000). Second line contains n integers.",
+      "outputFormat": "Print smallest missing positive.",
+      "constraints": ["1 <= n <= 10000", "O(n) time, O(1) space"],
+      "tags": ["array", "hash-table"],
+      "testCases": [
+        {"input": "3\n1 2 0", "output": "3", "explanation": "Missing 3"},
+        {"input": "4\n3 4 -1 1", "output": "2", "explanation": "Missing 2"}
+      ]
+    },
+    {
+      "id": "A026",
+      "title": "Trapping Rain Water",
+      "difficulty": "Hard",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Compute how much water can be trapped after raining given elevation map.",
+      "inputFormat": "First line contains n (1 <= n <= 20000). Second line contains n integers (heights).",
+      "outputFormat": "Print total water trapped.",
+      "constraints": ["1 <= n <= 20000", "0 <= height[i] <= 100000"],
+      "tags": ["array", "two-pointers", "stack"],
+      "testCases": [
+        {"input": "12\n0 1 0 2 1 0 1 3 2 1 2 1", "output": "6", "explanation": "6 units trapped"},
+        {"input": "6\n4 2 0 3 2 5", "output": "9", "explanation": "9 units"}
+      ]
+    },
+    {
+      "id": "A027",
+      "title": "Longest Consecutive Sequence",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Find length of longest consecutive elements sequence. Must be O(n).",
+      "inputFormat": "First line contains n (0 <= n <= 100000). Second line contains n integers.",
+      "outputFormat": "Print length of longest sequence.",
+      "constraints": ["0 <= n <= 100000", "Must be O(n)"],
+      "tags": ["array", "hash-table", "union-find"],
+      "testCases": [
+        {"input": "6\n100 4 200 1 3 2", "output": "4", "explanation": "Sequence [1,2,3,4]"},
+        {"input": "9\n0 3 7 2 5 8 4 6 0 1", "output": "9", "explanation": "Sequence [0-8]"}
+      ]
+    },
+    {
+      "id": "A028",
+      "title": "Sliding Window Maximum",
+      "difficulty": "Hard",
+      "timeLimit": "3s",
+      "memoryLimit": "256MB",
+      "description": "Find maximum in each sliding window of size k.",
+      "inputFormat": "First line contains n and k (1 <= k <= n <= 100000). Second line contains n integers.",
+      "outputFormat": "Print n-k+1 integers - max in each window.",
+      "constraints": ["1 <= k <= n <= 100000"],
+      "tags": ["array", "queue", "sliding-window", "heap"],
+      "testCases": [
+        {"input": "8 3\n1 3 -1 -3 5 3 6 7", "output": "3 3 5 5 6 7", "explanation": "Max in each window of 3"},
+        {"input": "1 1\n1", "output": "1", "explanation": "Single element"}
+      ]
+    },
+    {
+      "id": "A029",
+      "title": "Find Peak Element",
+      "difficulty": "Medium",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Find a peak element (greater than neighbors). Array may contain multiple peaks.",
+      "inputFormat": "First line contains n (1 <= n <= 1000). Second line contains n integers.",
+      "outputFormat": "Print index of any peak element.",
+      "constraints": ["1 <= n <= 1000", "nums[i] != nums[i+1]"],
+      "tags": ["array", "binary-search"],
+      "testCases": [
+        {"input": "5\n1 2 3 1 5", "output": "2", "explanation": "Index 2 is peak (3)"},
+        {"input": "4\n1 2 1 3", "output": "1", "explanation": "Index 1 is peak"}
+      ]
+    },
+    {
+      "id": "A030",
+      "title": "Kth Largest Element",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Find the kth largest element in unsorted array.",
+      "inputFormat": "First line contains n and k (1 <= k <= n <= 100000). Second line contains n integers.",
+      "outputFormat": "Print kth largest element.",
+      "constraints": ["1 <= k <= n <= 100000"],
+      "tags": ["array", "divide-and-conquer", "heap", "quickselect"],
+      "testCases": [
+        {"input": "6 2\n3 2 1 5 6 4", "output": "5", "explanation": "2nd largest is 5"},
+        {"input": "9 4\n3 2 3 1 2 4 5 5 6", "output": "4", "explanation": "4th largest is 4"}
+      ]
+    },
+    {
+      "id": "A031",
+      "title": "Find First and Last Position",
+      "difficulty": "Medium",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Find starting and ending position of target in sorted array. O(log n) required.",
+      "inputFormat": "First line contains n and target (0 <= n <= 100000). Second line contains n sorted integers.",
+      "outputFormat": "Print start and end indices or -1 -1.",
+      "constraints": ["0 <= n <= 100000", "Array sorted", "O(log n)"],
+      "tags": ["array", "binary-search"],
+      "testCases": [
+        {"input": "8 8\n5 7 7 8 8 10 10 10", "output": "3 4", "explanation": "8 at indices 3-4"},
+        {"input": "6 6\n5 7 7 8 8 10", "output": "-1 -1", "explanation": "6 not found"}
+      ]
+    },
+    {
+      "id": "A032",
+      "title": "Merge Sorted Array",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Merge two sorted arrays into first array which has enough space.",
+      "inputFormat": "First line contains m and n. Second line contains m+n integers (first m are valid). Third line contains n integers.",
+      "outputFormat": "Print merged sorted array.",
+      "constraints": ["0 <= m, n <= 200", "Must merge in-place"],
+      "tags": ["array", "two-pointers", "sorting"],
+      "testCases": [
+        {"input": "3 3\n1 2 3 0 0 0\n2 5 6", "output": "1 2 2 3 5 6", "explanation": "Merged"},
+        {"input": "1 0\n1", "output": "1", "explanation": "Nothing to merge"}
+      ]
+    },
+    {
+      "id": "A033",
+      "title": "Pascal's Triangle",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Generate first numRows of Pascal's triangle.",
+      "inputFormat": "Single integer numRows (1 <= numRows <= 30).",
+      "outputFormat": "Print each row on new line, space-separated.",
+      "constraints": ["1 <= numRows <= 30"],
+      "tags": ["array", "dynamic-programming"],
+      "testCases": [
+        {"input": "5", "output": "1\n1 1\n1 2 1\n1 3 3 1\n1 4 6 4 1", "explanation": "First 5 rows"},
+        {"input": "1", "output": "1", "explanation": "Single row"}
+      ]
+    },
+    {
+      "id": "A034",
+      "title": "Insert Interval",
+      "difficulty": "Medium",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Insert new interval into sorted non-overlapping intervals and merge if necessary.",
+      "inputFormat": "First line contains n (0 <= n <= 10000). Next n lines contain intervals. Last line contains new interval.",
+      "outputFormat": "Print merged intervals.",
+      "constraints": ["0 <= n <= 10000", "Intervals initially non-overlapping"],
+      "tags": ["array", "sorting"],
+      "testCases": [
+        {"input": "3\n1 3\n6 9\n10 12\n2 5", "output": "1 5\n6 9\n10 12", "explanation": "Merged [1,3] with [2,5]"},
+        {"input": "5\n1 2\n3 5\n6 7\n8 10\n12 16\n4 8", "output": "1 2\n3 10\n12 16", "explanation": "Multiple merges"}
+      ]
+    },
+    {
+      "id": "A035",
+      "title": "Plus One",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Add one to number represented as array of digits.",
+      "inputFormat": "First line contains n (1 <= n <= 100). Second line contains n digits.",
+      "outputFormat": "Print resulting array.",
+      "constraints": ["1 <= n <= 100", "No leading zeros except 0 itself"],
+      "tags": ["array", "math"],
+      "testCases": [
+        {"input": "3\n1 2 3", "output": "1 2 4", "explanation": "123 + 1 = 124"},
+        {"input": "3\n9 9 9", "output": "1 0 0 0", "explanation": "999 + 1 = 1000"}
+      ]
+    },
+    {
+      "id": "A036",
+      "title": "Remove Duplicates from Sorted Array",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Remove duplicates in-place from sorted array, return new length.",
+      "inputFormat": "First line contains n (0 <= n <= 30000). Second line contains n sorted integers.",
+      "outputFormat": "Print length k, then first k elements.",
+      "constraints": ["0 <= n <= 30000", "Array sorted", "In-place O(1) space"],
+      "tags": ["array", "two-pointers"],
+      "testCases": [
+        {"input": "10\n0 0 1 1 1 2 2 3 3 4", "output": "5\n0 1 2 3 4", "explanation": "5 unique elements"},
+        {"input": "2\n1 1", "output": "1\n1", "explanation": "One unique"}
+      ]
+    },
+    {
+      "id": "A037",
+      "title": "Valid Mountain Array",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Check if array is valid mountain (strictly increasing then strictly decreasing).",
+      "inputFormat": "First line contains n (1 <= n <= 10000). Second line contains n integers.",
+      "outputFormat": "Print YES or NO.",
+      "constraints": ["1 <= n <= 10000"],
+      "tags": ["array"],
+      "testCases": [
+        {"input": "4\n0 3 2 1", "output": "YES", "explanation": "Valid mountain"},
+        {"input": "3\n0 1 2", "output": "NO", "explanation": "Only increasing"}
+      ]
+    },
+    {
+      "id": "A038",
+      "title": "Find All Numbers Disappeared",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Find all numbers in [1,n] that don't appear in array. O(n) time, O(1) space.",
+      "inputFormat": "First line contains n (1 <= n <= 100000). Second line contains n integers.",
+      "outputFormat": "Print disappeared numbers space-separated.",
+      "constraints": ["1 <= n <= 100000", "1 <= nums[i] <= n"],
+      "tags": ["array", "hash-table"],
+      "testCases": [
+        {"input": "8\n4 3 2 7 8 2 3 1", "output": "5 6", "explanation": "5 and 6 missing"},
+        {"input": "2\n1 1", "output": "2", "explanation": "2 missing"}
+      ]
+    },
+    {
+      "id": "A039",
+      "title": "Third Maximum Number",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Return third distinct maximum. If doesn't exist, return maximum.",
+      "inputFormat": "First line contains n (1 <= n <= 10000). Second line contains n integers.",
+      "outputFormat": "Print third maximum or maximum.",
+      "constraints": ["1 <= n <= 10000"],
+      "tags": ["array", "sorting"],
+      "testCases": [
+        {"input": "5\n3 2 1 5 4", "output": "3", "explanation": "Third max is 3"},
+        {"input": "2\n1 2", "output": "2", "explanation": "Only 2 distinct"}
+      ]
+    },
+    {
+      "id": "A040",
+      "title": "Find Pivot Index",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Find leftmost pivot index where left sum equals right sum.",
+      "inputFormat": "First line contains n (1 <= n <= 10000). Second line contains n integers.",
+      "outputFormat": "Print pivot index or -1.",
+      "constraints": ["1 <= n <= 10000"],
+      "tags": ["array", "prefix-sum"],
+      "testCases": [
+        {"input": "6\n1 7 3 6 5 6", "output": "3", "explanation": "Left sum = right sum at index 3"},
+        {"input": "3\n1 2 3", "output": "-1", "explanation": "No pivot"}
+      ]
+    },
+    {
+      "id": "A041",
+      "title": "Longest Subarray of 1s After Deleting One",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Find length of longest subarray of 1s after deleting exactly one element.",
+      "inputFormat": "First line contains n (1 <= n <= 100000). Second line contains n binary integers.",
+      "outputFormat": "Print maximum length.",
+      "constraints": ["1 <= n <= 100000", "nums[i] is 0 or 1"],
+      "tags": ["array", "sliding-window"],
+      "testCases": [
+        {"input": "9\n1 1 0 1 1 1 0 1 1", "output": "5", "explanation": "Delete 0 at index 2"},
+        {"input": "6\n0 1 1 1 0 1", "output": "4", "explanation": "Delete first 0"}
+      ]
+    },
+    {
+      "id": "A042",
+      "title": "Max Consecutive Ones III",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Find max consecutive 1s if you can flip at most k 0s.",
+      "inputFormat": "First line contains n and k (1 <= n <= 100000, 0 <= k <= n). Second line contains n binary integers.",
+      "outputFormat": "Print maximum consecutive 1s.",
+      "constraints": ["1 <= n <= 100000"],
+      "tags": ["array", "sliding-window"],
+      "testCases": [
+        {"input": "11 2\n1 1 1 0 0 0 1 1 1 1 0", "output": "6", "explanation": "Flip two 0s"},
+        {"input": "19 3\n0 0 1 1 0 0 1 1 1 0 1 1 0 0 0 1 1 1 1", "output": "10", "explanation": "Flip three 0s"}
+      ]
+    },
+    {
+      "id": "A043",
+      "title": "Minimum Size Subarray Sum",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Find minimal length of subarray with sum >= target.",
+      "inputFormat": "First line contains target and n (1 <= n <= 100000). Second line contains n positive integers.",
+      "outputFormat": "Print minimal length or 0 if impossible.",
+      "constraints": ["1 <= target <= 1000000000", "1 <= n <= 100000"],
+      "tags": ["array", "sliding-window", "binary-search"],
+      "testCases": [
+        {"input": "7 6\n2 3 1 2 4 3", "output": "2", "explanation": "Subarray [4,3]"},
+        {"input": "4 4\n1 4 4 1", "output": "1", "explanation": "Single element 4"}
+      ]
+    },
+    {
+      "id": "A044",
+      "title": "Longest Turbulent Subarray",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Find length of longest turbulent subarray (alternating comparisons).",
+      "inputFormat": "First line contains n (1 <= n <= 40000). Second line contains n integers.",
+      "outputFormat": "Print maximum length.",
+      "constraints": ["1 <= n <= 40000"],
+      "tags": ["array", "sliding-window"],
+      "testCases": [
+        {"input": "9\n9 4 2 10 7 8 8 1 9", "output": "5", "explanation": "Subarray [4,2,10,7,8]"},
+        {"input": "4\n4 8 12 16", "output": "2", "explanation": "Only pairs turbulent"}
+      ]
+    },
+    {
+      "id": "A045",
+      "title": "Maximum Sum Circular Subarray",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Find maximum sum of circular subarray.",
+      "inputFormat": "First line contains n (1 <= n <= 30000). Second line contains n integers.",
+      "outputFormat": "Print maximum circular subarray sum.",
+      "constraints": ["1 <= n <= 30000", "-30000 <= nums[i] <= 30000"],
+      "tags": ["array", "dynamic-programming"],
+      "testCases": [
+        {"input": "5\n1 -2 3 -2 5", "output": "7", "explanation": "Circular [5,1,3] = 7"},
+        {"input": "3\n5 -3 5", "output": "10", "explanation": "Circular [5,5] = 10"}
+      ]
+    },
+    {
+      "id": "A046",
+      "title": "Maximum Absolute Sum",
+      "difficulty": "Medium",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Find maximum absolute value of sum of any subarray.",
+      "inputFormat": "First line contains n (1 <= n <= 100000). Second line contains n integers.",
+      "outputFormat": "Print maximum absolute sum.",
+      "constraints": ["1 <= n <= 100000"],
+      "tags": ["array", "dynamic-programming"],
+      "testCases": [
+        {"input": "4\n1 -3 2 3", "output": "5", "explanation": "|2+3| = 5"},
+        {"input": "5\n2 -5 1 -4 3", "output": "8", "explanation": "|-5+1-4| = 8"}
+      ]
+    },
+    {
+      "id": "A047",
+      "title": "Shortest Subarray with Sum at Least K",
+      "difficulty": "Hard",
+      "timeLimit": "3s",
+      "memoryLimit": "256MB",
+      "description": "Find length of shortest non-empty subarray with sum at least k.",
+      "inputFormat": "First line contains n and k (1 <= n <= 50000). Second line contains n integers.",
+      "outputFormat": "Print shortest length or -1.",
+      "constraints": ["1 <= n <= 50000"],
+      "tags": ["array", "sliding-window", "heap", "queue"],
+      "testCases": [
+        {"input": "5 7\n1 2 3 4 5", "output": "2", "explanation": "[4,5] or [3,4]"},
+        {"input": "3 81\n2 -1 2", "output": "-1", "explanation": "Impossible"}
+      ]
+    },
+    {
+      "id": "A048",
+      "title": "Number of Subarrays with Bounded Maximum",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Count subarrays where maximum is in range [left, right].",
+      "inputFormat": "First line contains n, left, right (1 <= n <= 50000). Second line contains n integers.",
+      "outputFormat": "Print count of valid subarrays.",
+      "constraints": ["1 <= n <= 50000", "0 <= left <= right <= 1000000"],
+      "tags": ["array", "two-pointers"],
+      "testCases": [
+        {"input": "7 2 3\n2 1 4 3 2 1 2", "output": "13", "explanation": "13 valid subarrays"},
+        {"input": "3 0 0\n1 2 3", "output": "0", "explanation": "No valid subarrays"}
+      ]
+    },
+    {
+      "id": "A049",
+      "title": "Monotonic Array",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Check if array is monotonic (all increasing or all decreasing).",
+      "inputFormat": "First line contains n (1 <= n <= 50000). Second line contains n integers.",
+      "outputFormat": "Print YES or NO.",
+      "constraints": ["1 <= n <= 50000"],
+      "tags": ["array"],
+      "testCases": [
+        {"input": "4\n1 2 2 3", "output": "YES", "explanation": "Non-decreasing"},
+        {"input": "4\n1 3 2 4", "output": "NO", "explanation": "Not monotonic"}
+      ]
+    },
+    {
+      "id": "A050",
+      "title": "Advantage Shuffle",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Permute nums1 to maximize number of positions where nums1[i] > nums2[i].",
+      "inputFormat": "First line contains n (1 <= n <= 10000). Next two lines contain n integers each.",
+      "outputFormat": "Print permuted nums1.",
+      "constraints": ["1 <= n <= 10000"],
+      "tags": ["array", "greedy", "sorting"],
+      "testCases": [
+        {"input": "4\n2 7 11 15\n1 10 4 11", "output": "2 11 7 15", "explanation": "Maximize advantages"},
+        {"input": "5\n12 24 8 32 40\n13 25 32 11 5", "output": "24 32 8 12 40", "explanation": "Greedy matching"}
+      ]
+    },
+    {
+      "id": "A051",
+      "title": "Array Partition",
+      "difficulty": "Easy",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Partition 2n integers into n pairs to maximize sum of min of each pair.",
+      "inputFormat": "First line contains n (1 <= n <= 10000). Second line contains 2n integers.",
+      "outputFormat": "Print maximum sum.",
+      "constraints": ["1 <= n <= 10000"],
+      "tags": ["array", "greedy", "sorting"],
+      "testCases": [
+        {"input": "2\n1 4 3 2", "output": "4", "explanation": "Pairs (1,2) and (3,4)"},
+        {"input": "3\n6 2 6 5 1 2", "output": "9", "explanation": "Sum of minimums"}
+      ]
+    },
+    {
+      "id": "A052",
+      "title": "Maximum Gap",
+      "difficulty": "Hard",
+      "timeLimit": "3s",
+      "memoryLimit": "256MB",
+      "description": "Find maximum difference between successive elements in sorted form. Must be linear time.",
+      "inputFormat": "First line contains n (1 <= n <= 100000). Second line contains n integers.",
+      "outputFormat": "Print maximum gap.",
+      "constraints": ["1 <= n <= 100000", "Must be O(n) time"],
+      "tags": ["array", "sorting", "bucket-sort"],
+      "testCases": [
+        {"input": "4\n3 6 9 1", "output": "3", "explanation": "Sorted: 1,3,6,9. Max gap is 3"},
+        {"input": "7\n10 5 2 7 1 9 8", "output": "2", "explanation": "Max consecutive gap"}
+      ]
+    },
+    {
+      "id": "A053",
+      "title": "Wiggle Sort",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Reorder array so nums[0] <= nums[1] >= nums[2] <= nums[3]...",
+      "inputFormat": "First line contains n (1 <= n <= 100000). Second line contains n integers.",
+      "outputFormat": "Print any valid wiggle sorted array.",
+      "constraints": ["1 <= n <= 100000"],
+      "tags": ["array", "greedy", "sorting"],
+      "testCases": [
+        {"input": "6\n3 5 2 1 6 4", "output": "3 5 1 6 2 4", "explanation": "Valid wiggle"},
+        {"input": "4\n1 2 3 4", "output": "1 3 2 4", "explanation": "Wiggle pattern"}
+      ]
+    },
+    {
+      "id": "A054",
+      "title": "Wiggle Sort II",
+      "difficulty": "Medium",
+      "timeLimit": "3s",
+      "memoryLimit": "256MB",
+      "description": "Reorder so nums[0] < nums[1] > nums[2] < nums[3]... (strict inequalities).",
+      "inputFormat": "First line contains n (1 <= n <= 50000). Second line contains n integers.",
+      "outputFormat": "Print wiggle sorted array.",
+      "constraints": ["1 <= n <= 50000", "May assume valid arrangement exists"],
+      "tags": ["array", "sorting", "divide-and-conquer"],
+      "testCases": [
+        {"input": "6\n1 5 1 1 6 4", "output": "1 6 1 5 1 4", "explanation": "Strict wiggle"},
+        {"input": "5\n1 3 2 2 3", "output": "2 3 1 3 2", "explanation": "Valid arrangement"}
+      ]
+    },
+    {
+      "id": "A055",
+      "title": "Partition Array Into Three Parts",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Check if array can be partitioned into three non-empty parts with equal sum.",
+      "inputFormat": "First line contains n (3 <= n <= 50000). Second line contains n integers.",
+      "outputFormat": "Print YES or NO.",
+      "constraints": ["3 <= n <= 50000"],
+      "tags": ["array", "greedy"],
+      "testCases": [
+        {"input": "9\n0 2 1 -6 6 -7 9 1 2", "output": "YES", "explanation": "Three parts sum to 0"},
+        {"input": "6\n0 2 1 -6 6 7", "output": "NO", "explanation": "Cannot partition"}
+      ]
+    },
+    {
+      "id": "A056",
+      "title": "Check If N and Its Double Exist",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Check if there exist two indices where arr[i] = 2 * arr[j].",
+      "inputFormat": "First line contains n (2 <= n <= 500). Second line contains n integers.",
+      "outputFormat": "Print YES or NO.",
+      "constraints": ["2 <= n <= 500"],
+      "tags": ["array", "hash-table"],
+      "testCases": [
+        {"input": "5\n10 2 5 3 7", "output": "YES", "explanation": "10 = 2 * 5"},
+        {"input": "3\n3 1 7", "output": "NO", "explanation": "No such pair"}
+      ]
+    },
+    {
+      "id": "A057",
+      "title": "Replace Elements with Greatest on Right",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Replace every element with greatest element on right side. Last becomes -1.",
+      "inputFormat": "First line contains n (1 <= n <= 10000). Second line contains n integers.",
+      "outputFormat": "Print modified array.",
+      "constraints": ["1 <= n <= 10000"],
+      "tags": ["array"],
+      "testCases": [
+        {"input": "5\n17 18 5 4 6", "output": "18 6 6 6 -1", "explanation": "Greatest on right"},
+        {"input": "1\n400", "output": "-1", "explanation": "Single element"}
+      ]
+    },
+    {
+      "id": "A058",
+      "title": "Height Checker",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Count students not standing in correct position (expected is sorted array).",
+      "inputFormat": "First line contains n (1 <= n <= 100). Second line contains n integers (heights).",
+      "outputFormat": "Print count of misplaced students.",
+      "constraints": ["1 <= n <= 100", "1 <= heights[i] <= 100"],
+      "tags": ["array", "sorting"],
+      "testCases": [
+        {"input": "5\n1 1 4 2 1", "output": "3", "explanation": "3 students misplaced"},
+        {"input": "5\n5 1 2 3 4", "output": "5", "explanation": "All misplaced"}
+      ]
+    },
+    {
+      "id": "A059",
+      "title": "Relative Sort Array",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Sort arr1 so relative order matches arr2, then remaining in ascending order.",
+      "inputFormat": "First line contains n and m. Second line contains n integers (arr1). Third line contains m integers (arr2).",
+      "outputFormat": "Print sorted arr1.",
+      "constraints": ["1 <= n <= 1000", "All arr2 elements appear in arr1"],
+      "tags": ["array", "sorting", "hash-table"],
+      "testCases": [
+        {"input": "11 4\n2 3 1 3 2 4 6 7 9 2 19\n2 1 4 3", "output": "2 2 2 1 4 3 3 6 7 9 19", "explanation": "Follow arr2 order"},
+        {"input": "4 3\n2 21 43 38\n2 38 43", "output": "2 38 43 21", "explanation": "21 at end"}
+      ]
+    },
+    {
+      "id": "A060",
+      "title": "Sum of Even Numbers After Queries",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "After each query (add val to arr[index]), return sum of even numbers.",
+      "inputFormat": "First line contains n and q (1 <= n,q <= 10000). Second line contains n integers. Next q lines contain val and index.",
+      "outputFormat": "Print q integers - sum after each query.",
+      "constraints": ["1 <= n, q <= 10000"],
+      "tags": ["array", "simulation"],
+      "testCases": [
+        {"input": "4 4\n1 2 3 4\n1 0\n-3 1\n-4 0\n2 3", "output": "8 6 2 4", "explanation": "Even sums after queries"},
+        {"input": "3 2\n1 3 5\n2 0\n4 2", "output": "0 10", "explanation": "Even sums"}
+      ]
+    },
+    {
+      "id": "A061",
+      "title": "Queries on Number of Points Inside Circle",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Count points inside each circle query.",
+      "inputFormat": "First line contains n and q. Next n lines contain x,y coordinates. Next q lines contain cx,cy,radius.",
+      "outputFormat": "Print q integers - count for each query.",
+      "constraints": ["1 <= n, q <= 500"],
+      "tags": ["array", "math", "geometry"],
+      "testCases": [
+        {"input": "3 2\n1 3\n3 3\n5 3\n2 3 1\n4 3 1", "output": "2 2", "explanation": "Points in circles"},
+        {"input": "2 3\n1 1\n2 2\n0 0 1\n1 1 1\n2 2 1", "output": "1 2 1", "explanation": "Circle queries"}
+      ]
+    },
+    {
+      "id": "A062",
+      "title": "Count Good Triplets",
+      "difficulty": "Easy",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Count triplets where |arr[i]-arr[j]|<=a, |arr[j]-arr[k]|<=b, |arr[i]-arr[k]|<=c.",
+      "inputFormat": "First line contains n,a,b,c (3 <= n <= 100). Second line contains n integers.",
+      "outputFormat": "Print count of good triplets.",
+      "constraints": ["3 <= n <= 100", "0 <= a,b,c <= 1000"],
+      "tags": ["array", "enumeration"],
+      "testCases": [
+        {"input": "6 1 2 3\n3 0 1 1 9 7\n1 2 3", "output": "4", "explanation": "4 valid triplets"},
+        {"input": "4 0 0 1\n1 1 2 2\n0 0 1", "output": "0", "explanation": "No valid triplets"}
+      ]
+    },
+    {
+      "id": "A063",
+      "title": "Find Lucky Integer",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Find largest lucky integer (value equals frequency). Return -1 if none.",
+      "inputFormat": "First line contains n (1 <= n <= 500). Second line contains n integers.",
+      "outputFormat": "Print largest lucky integer or -1.",
+      "constraints": ["1 <= n <= 500", "1 <= arr[i] <= 500"],
+      "tags": ["array", "hash-table"],
+      "testCases": [
+        {"input": "5\n2 2 3 4 4", "output": "2", "explanation": "2 appears 2 times"},
+        {"input": "7\n1 2 2 3 3 3 4", "output": "3", "explanation": "3 appears 3 times"}
+      ]
+    },
+    {
+      "id": "A064",
+      "title": "Count Negative Numbers in Sorted Matrix",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Count negative numbers in m x n matrix sorted descending row-wise and column-wise.",
+      "inputFormat": "First line contains m and n. Next m lines contain n integers each.",
+      "outputFormat": "Print count of negative numbers.",
+      "constraints": ["1 <= m, n <= 100"],
+      "tags": ["array", "binary-search", "matrix"],
+      "testCases": [
+        {"input": "4 4\n4 3 2 -1\n3 2 1 -1\n1 1 -1 -2\n-1 -1 -2 -3", "output": "8", "explanation": "8 negatives"},
+        {"input": "2 2\n3 2\n1 0", "output": "0", "explanation": "No negatives"}
+      ]
+    },
+    {
+      "id": "A065",
+      "title": "Matrix Diagonal Sum",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Return sum of matrix diagonals. Count middle element once if n is odd.",
+      "inputFormat": "First line contains n. Next n lines contain n integers.",
+      "outputFormat": "Print diagonal sum.",
+      "constraints": ["1 <= n <= 100"],
+      "tags": ["array", "matrix"],
+      "testCases": [
+        {"input": "3\n1 2 3\n4 5 6\n7 8 9", "output": "25", "explanation": "1+5+9+3+7 = 25"},
+        {"input": "4\n1 1 1 1\n1 1 1 1\n1 1 1 1\n1 1 1 1", "output": "8", "explanation": "Sum is 8"}
+      ]
+    },
+    {
+      "id": "A066",
+      "title": "Lucky Numbers in Matrix",
+      "difficulty": "Easy",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Find lucky numbers (minimum in row and maximum in column).",
+      "inputFormat": "First line contains m and n. Next m lines contain n integers.",
+      "outputFormat": "Print lucky numbers space-separated or empty line.",
+      "constraints": ["1 <= m, n <= 50"],
+      "tags": ["array", "matrix"],
+      "testCases": [
+        {"input": "3 3\n3 7 8\n9 11 13\n15 16 17", "output": "15", "explanation": "15 is lucky"},
+        {"input": "3 4\n1 10 4 2\n9 3 8 7\n15 16 17 12", "output": "12", "explanation": "12 is lucky"}
+      ]
+    },
+    {
+      "id": "A067",
+      "title": "Reshape the Matrix",
+      "difficulty": "Easy",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Reshape m x n matrix to r x c. Return original if impossible.",
+      "inputFormat": "First line contains m,n,r,c. Next m lines contain n integers.",
+      "outputFormat": "Print reshaped matrix or original.",
+      "constraints": ["1 <= m, n <= 100"],
+      "tags": ["array", "matrix", "simulation"],
+      "testCases": [
+        {"input": "2 2 1 4\n1 2\n3 4", "output": "1 2 3 4", "explanation": "Reshaped to 1x4"},
+        {"input": "2 2 2 4\n1 2\n3 4", "output": "1 2\n3 4", "explanation": "Impossible, return original"}
+      ]
+    },
+    {
+      "id": "A068",
+      "title": "Toeplitz Matrix",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Check if matrix is Toeplitz (every diagonal same values).",
+      "inputFormat": "First line contains m and n. Next m lines contain n integers.",
+      "outputFormat": "Print YES or NO.",
+      "constraints": ["1 <= m, n <= 20"],
+      "tags": ["array", "matrix"],
+      "testCases": [
+        {"input": "3 4\n1 2 3 4\n5 1 2 3\n9 5 1 2", "output": "YES", "explanation": "Is Toeplitz"},
+        {"input": "2 2\n1 2\n2 2", "output": "NO", "explanation": "Not Toeplitz"}
+      ]
+    },
+    {
+      "id": "A069",
+      "title": "Flipping an Image",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Flip image horizontally then invert (0->1, 1->0).",
+      "inputFormat": "First line contains n. Next n lines contain n binary integers.",
+      "outputFormat": "Print modified image.",
+      "constraints": ["1 <= n <= 20"],
+      "tags": ["array", "matrix"],
+      "testCases": [
+        {"input": "3\n1 1 0\n1 0 1\n0 0 0", "output": "1 0 0\n0 1 0\n1 1 1", "explanation": "Flipped and inverted"},
+        {"input": "1\n1", "output": "0", "explanation": "Single element"}
+      ]
+    },
+    {
+      "id": "A070",
+      "title": "Transpose Matrix",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Return transpose of matrix.",
+      "inputFormat": "First line contains m and n. Next m lines contain n integers.",
+      "outputFormat": "Print transposed matrix (n x m).",
+      "constraints": ["1 <= m, n <= 1000"],
+      "tags": ["array", "matrix"],
+      "testCases": [
+        {"input": "2 3\n1 2 3\n4 5 6", "output": "1 4\n2 5\n3 6", "explanation": "Transposed"},
+        {"input": "1 1\n1", "output": "1", "explanation": "Single element"}
+      ]
+    },
+    {
+      "id": "A071",
+      "title": "Valid Sudoku",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Determine if 9x9 Sudoku board is valid.",
+      "inputFormat": "9 lines with 9 characters each. '.' for empty, 1-9 for filled.",
+      "outputFormat": "Print YES or NO.",
+      "constraints": ["Board is 9x9", "Only digits 1-9 or '.'"],
+      "tags": ["array", "hash-table", "matrix"],
+      "testCases": [
+        {"input": "53..7....\n6..195...\n.98....6.\n8...6...3\n4..8.3..1\n7...2...6\n.6....28.\n...419..5\n....8..79", "output": "YES", "explanation": "Valid Sudoku"},
+        {"input": "53..7....\n6..195...\n.98....6.\n8...6...3\n4..8.3..1\n7...2...6\n.6....28.\n...419..5\n....8.179", "output": "NO", "explanation": "Invalid - duplicate 7"}
+      ]
+    },
+    {
+      "id": "A072",
+      "title": "Diagonal Traverse",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Return all elements in diagonal order.",
+      "inputFormat": "First line contains m and n. Next m lines contain n integers.",
+      "outputFormat": "Print elements in diagonal order.",
+      "constraints": ["1 <= m, n <= 10000"],
+      "tags": ["array", "matrix", "simulation"],
+      "testCases": [
+        {"input": "3 3\n1 2 3\n4 5 6\n7 8 9", "output": "1 2 4 7 5 3 6 8 9", "explanation": "Diagonal traversal"},
+        {"input": "2 2\n1 2\n3 4", "output": "1 2 3 4", "explanation": "Diagonal order"}
+      ]
+    },
+    {
+      "id": "A073",
+      "title": "Kth Smallest Element in Sorted Matrix",
+      "difficulty": "Medium",
+      "timeLimit": "3s",
+      "memoryLimit": "256MB",
+      "description": "Find kth smallest element in n x n matrix sorted row and column wise.",
+      "inputFormat": "First line contains n and k. Next n lines contain n integers.",
+      "outputFormat": "Print kth smallest element.",
+      "constraints": ["1 <= n <= 300", "1 <= k <= n*n"],
+      "tags": ["array", "matrix", "heap", "binary-search"],
+      "testCases": [
+        {"input": "3 8\n1 5 9\n10 11 13\n12 13 15", "output": "13", "explanation": "8th smallest is 13"},
+        {"input": "2 3\n1 2\n1 3", "output": "2", "explanation": "3rd smallest"}
+      ]
+    },
+    {
+      "id": "A074",
+      "title": "Search a 2D Matrix",
+      "difficulty": "Medium",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Search target in matrix sorted left-to-right and top-to-bottom. O(log(m*n)) required.",
+      "inputFormat": "First line contains m,n,target. Next m lines contain n sorted integers.",
+      "outputFormat": "Print YES or NO.",
+      "constraints": ["1 <= m, n <= 100", "Must be O(log(m*n))"],
+      "tags": ["array", "binary-search", "matrix"],
+      "testCases": [
+        {"input": "3 4 3\n1 3 5 7\n10 11 16 20\n23 30 34 60", "output": "YES", "explanation": "3 exists"},
+        {"input": "3 4 13\n1 3 5 7\n10 11 16 20\n23 30 34 60", "output": "NO", "explanation": "13 doesn't exist"}
+      ]
+    },
+    {
+      "id": "A075",
+      "title": "Game of Life",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Apply Game of Life rules to m x n grid. Update in-place.",
+      "inputFormat": "First line contains m and n. Next m lines contain n binary integers.",
+      "outputFormat": "Print next state of board.",
+      "constraints": ["1 <= m, n <= 25", "Must update in-place"],
+      "tags": ["array", "matrix", "simulation"],
+      "testCases": [
+        {"input": "4 3\n0 1 0\n0 0 1\n1 1 1\n0 0 0", "output": "0 0 0\n1 0 1\n0 1 1\n0 1 0", "explanation": "Next generation"},
+        {"input": "2 2\n1 1\n1 0", "output": "1 1\n1 1", "explanation": "Stable state"}
+      ]
+    },
+    {
+      "id": "A076",
+      "title": "Candy",
+      "difficulty": "Hard",
+      "timeLimit": "3s",
+      "memoryLimit": "256MB",
+      "description": "Give minimum candies where higher rated child gets more than neighbors.",
+      "inputFormat": "First line contains n (1 <= n <= 20000). Second line contains n integers (ratings).",
+      "outputFormat": "Print minimum candies needed.",
+      "constraints": ["1 <= n <= 20000"],
+      "tags": ["array", "greedy"],
+      "testCases": [
+        {"input": "3\n1 0 2", "output": "5", "explanation": "Candies: [2,1,2]"},
+        {"input": "3\n1 2 2", "output": "4", "explanation": "Candies: [1,2,1]"}
+      ]
+    },
+    {
+      "id": "A077",
+      "title": "Gas Station",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Find starting gas station to complete circuit. Return -1 if impossible.",
+      "inputFormat": "First line contains n. Second line contains n integers (gas). Third line contains n integers (cost).",
+      "outputFormat": "Print starting index or -1.",
+      "constraints": ["1 <= n <= 100000"],
+      "tags": ["array", "greedy"],
+      "testCases": [
+        {"input": "5\n1 2 3 4 5\n3 4 5 1 2", "output": "3", "explanation": "Start at index 3"},
+        {"input": "3\n2 3 4\n3 4 3", "output": "-1", "explanation": "Impossible"}
+      ]
+    },
+    {
+      "id": "A078",
+      "title": "Queue Reconstruction by Height",
+      "difficulty": "Medium",
+      "timeLimit": "3s",
+      "memoryLimit": "256MB",
+      "description": "Reconstruct queue where [h,k] means height h with k people >= h in front.",
+      "inputFormat": "First line contains n. Next n lines contain two integers h and k.",
+      "outputFormat": "Print reconstructed queue, one pair per line.",
+      "constraints": ["1 <= n <= 2000"],
+      "tags": ["array", "greedy", "sorting"],
+      "testCases": [
+        {"input": "6\n7 0\n4 4\n7 1\n5 0\n6 1\n5 2", "output": "5 0\n7 0\n5 2\n6 1\n4 4\n7 1", "explanation": "Reconstructed queue"},
+        {"input": "3\n6 0\n5 0\n4 0", "output": "4 0\n5 0\n6 0", "explanation": "Sorted by height"}
+      ]
+    },
+    {
+      "id": "A079",
+      "title": "Non-decreasing Array",
+      "difficulty": "Medium",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Check if array can become non-decreasing by modifying at most one element.",
+      "inputFormat": "First line contains n (1 <= n <= 10000). Second line contains n integers.",
+      "outputFormat": "Print YES or NO.",
+      "constraints": ["1 <= n <= 10000"],
+      "tags": ["array"],
+      "testCases": [
+        {"input": "4\n4 2 3 4", "output": "YES", "explanation": "Change 4 to 1"},
+        {"input": "4\n4 2 1 3", "output": "NO", "explanation": "Need 2+ changes"}
+      ]
+    },
+    {
+      "id": "A080",
+      "title": "Largest Number",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Arrange numbers to form largest number.",
+      "inputFormat": "First line contains n (1 <= n <= 100). Second line contains n non-negative integers.",
+      "outputFormat": "Print largest number as string.",
+      "constraints": ["1 <= n <= 100", "0 <= nums[i] <= 1000000000"],
+      "tags": ["array", "string", "sorting"],
+      "testCases": [
+        {"input": "2\n10 2", "output": "210", "explanation": "2 then 10"},
+        {"input": "5\n3 30 34 5 9", "output": "9534330", "explanation": "Optimal arrangement"}
+      ]
+    },
+    {
+      "id": "A081",
+      "title": "Task Scheduler",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Find minimum intervals to complete all tasks with n cooldown between same task.",
+      "inputFormat": "First line contains num tasks and n. Second line contains tasks (characters A-Z).",
+      "outputFormat": "Print minimum intervals.",
+      "constraints": ["1 <= tasks.length <= 10000", "0 <= n <= 100"],
+      "tags": ["array", "greedy", "heap"],
+      "testCases": [
+        {"input": "6 2\nA A A B B B", "output": "8", "explanation": "A->B->idle->A->B->idle->A->B"},
+        {"input": "6 0\nA A A B B B", "output": "6", "explanation": "No cooldown"}
+      ]
+    },
+    {
+      "id": "A082",
+      "title": "Subarray Product Less Than K",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Count subarrays where product of all elements is less than k.",
+      "inputFormat": "First line contains n and k (1 <= n <= 50000). Second line contains n positive integers.",
+      "outputFormat": "Print count of valid subarrays.",
+      "constraints": ["1 <= n <= 50000", "0 < k <= 1000000"],
+      "tags": ["array", "sliding-window"],
+      "testCases": [
+        {"input": "4 100\n10 5 2 6", "output": "8", "explanation": "8 valid subarrays"},
+        {"input": "1 1\n1", "output": "0", "explanation": "Product not less than 1"}
+      ]
+    },
+    {
+      "id": "A083",
+      "title": "Max Chunks To Make Sorted",
+      "difficulty": "Medium",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Find max number of chunks to sort array (permutation of [0..n-1]).",
+      "inputFormat": "First line contains n (1 <= n <= 10). Second line contains n integers (permutation).",
+      "outputFormat": "Print maximum chunks.",
+      "constraints": ["1 <= n <= 10", "Array is permutation of [0..n-1]"],
+      "tags": ["array", "greedy", "sorting"],
+      "testCases": [
+        {"input": "5\n4 3 2 1 0", "output": "1", "explanation": "Need one chunk"},
+        {"input": "5\n1 0 2 3 4", "output": "4", "explanation": "4 chunks possible"}
+      ]
+    },
+    {
+      "id": "A084",
+      "title": "Max Chunks To Make Sorted II",
+      "difficulty": "Hard",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Find max chunks for arbitrary array (may have duplicates).",
+      "inputFormat": "First line contains n (1 <= n <= 2000). Second line contains n integers.",
+      "outputFormat": "Print maximum chunks.",
+      "constraints": ["1 <= n <= 2000"],
+      "tags": ["array", "greedy", "sorting"],
+      "testCases": [
+        {"input": "5\n5 4 3 2 1", "output": "1", "explanation": "One chunk"},
+        {"input": "4\n2 1 3 4", "output": "3", "explanation": "3 chunks: [2,1], [3], [4]"}
+      ]
+    },
+    {
+      "id": "A085",
+      "title": "Partition Labels",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Partition string into max pieces where each letter appears in at most one part.",
+      "inputFormat": "Single line with string s (1 <= length <= 500, lowercase letters).",
+      "outputFormat": "Print sizes of partitions space-separated.",
+      "constraints": ["1 <= s.length <= 500"],
+      "tags": ["array", "string", "greedy"],
+      "testCases": [
+        {"input": "ababcbacadefegdehijhklij", "output": "9 7 8", "explanation": "3 partitions"},
+        {"input": "eccbbbbdec", "output": "10", "explanation": "Single partition"}
+      ]
+    },
+    {
+      "id": "A086",
+      "title": "Minimum Domino Rotations",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Find minimum rotations to make all tops or bottoms same value.",
+      "inputFormat": "First line contains n. Second line contains n integers (tops). Third line contains n integers (bottoms).",
+      "outputFormat": "Print minimum rotations or -1.",
+      "constraints": ["2 <= n <= 20000", "1 <= tops[i], bottoms[i] <= 6"],
+      "tags": ["array", "greedy"],
+      "testCases": [
+        {"input": "6\n2 1 2 4 2 2\n5 2 6 2 3 2", "output": "2", "explanation": "Make all tops 2"},
+        {"input": "3\n3 5 1\n1 3 2", "output": "-1", "explanation": "Impossible"}
+      ]
+    },
+    {
+      "id": "A087",
+      "title": "Asteroid Collision",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Find state of asteroids after collisions. Positive = right, negative = left.",
+      "inputFormat": "First line contains n (2 <= n <= 10000). Second line contains n non-zero integers.",
+      "outputFormat": "Print remaining asteroids space-separated or empty line.",
+      "constraints": ["2 <= n <= 10000", "|asteroids[i]| <= 1000"],
+      "tags": ["array", "stack"],
+      "testCases": [
+        {"input": "5\n5 10 -5 -10 15", "output": "15", "explanation": "After collisions"},
+        {"input": "2\n8 -8", "output": "", "explanation": "All destroyed"}
+      ]
+    },
+    {
+      "id": "A088",
+      "title": "Daily Temperatures",
+      "difficulty": "Medium",
+      "timeLimit": "3s",
+      "memoryLimit": "256MB",
+      "description": "Find days until warmer temperature for each day.",
+      "inputFormat": "First line contains n (1 <= n <= 100000). Second line contains n integers (temperatures).",
+      "outputFormat": "Print n integers - days to wait.",
+      "constraints": ["1 <= n <= 100000", "30 <= temperatures[i] <= 100"],
+      "tags": ["array", "stack", "monotonic-stack"],
+      "testCases": [
+        {"input": "8\n73 74 75 71 69 72 76 73", "output": "1 1 4 2 1 1 0 0", "explanation": "Days until warmer"},
+        {"input": "4\n30 40 50 60", "output": "1 1 1 0", "explanation": "Increasing temps"}
+      ]
+    },
+    {
+      "id": "A089",
+      "title": "Next Greater Element I",
+      "difficulty": "Easy",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "For each element in nums1, find next greater element in nums2.",
+      "inputFormat": "First line contains n and m. Second line contains n integers (nums1). Third line contains m integers (nums2).",
+      "outputFormat": "Print n integers - next greater or -1.",
+      "constraints": ["1 <= n <= m <= 1000", "All elements unique"],
+      "tags": ["array", "stack", "hash-table"],
+      "testCases": [
+        {"input": "4 4\n4 1 2 3\n1 3 4 2", "output": "-1 3 -1 -1", "explanation": "Next greater in nums2"},
+        {"input": "2 4\n2 4\n1 2 3 4", "output": "3 -1", "explanation": "Next greater elements"}
+      ]
+    },
+    {
+      "id": "A090",
+      "title": "Next Greater Element II",
+      "difficulty": "Medium",
+      "timeLimit": "3s",
+      "memoryLimit": "256MB",
+      "description": "Find next greater element in circular array.",
+      "inputFormat": "First line contains n (1 <= n <= 10000). Second line contains n integers.",
+      "outputFormat": "Print n integers - next greater or -1.",
+      "constraints": ["1 <= n <= 10000"],
+      "tags": ["array", "stack", "monotonic-stack"],
+      "testCases": [
+        {"input": "5\n1 2 1 3 4", "output": "2 3 3 4 -1", "explanation": "Circular next greater"},
+        {"input": "4\n1 2 3 4", "output": "2 3 4 -1", "explanation": "No wraparound needed"}
+      ]
+    },
+    {
+      "id": "A091",
+      "title": "Online Stock Span",
+      "difficulty": "Medium",
+      "timeLimit": "3s",
+      "memoryLimit": "256MB",
+      "description": "For each price query, return span (max consecutive days with price <= today).",
+      "inputFormat": "First line contains n (queries). Next n lines contain single integer (price).",
+      "outputFormat": "Print n integers - span for each query.",
+      "constraints": ["1 <= n <= 10000", "1 <= price <= 100000"],
+      "tags": ["array", "stack", "monotonic-stack"],
+      "testCases": [
+        {"input": "7\n100\n80\n60\n70\n60\n75\n85", "output": "1 1 1 2 1 4 6", "explanation": "Stock spans"},
+        {"input": "5\n10\n20\n30\n40\n50", "output": "1 2 3 4 5", "explanation": "Increasing prices"}
+      ]
+    },
+    {
+      "id": "A092",
+      "title": "Remove K Digits",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Remove k digits from number string to get smallest possible number.",
+      "inputFormat": "First line contains string num. Second line contains k.",
+      "outputFormat": "Print smallest number as string.",
+      "constraints": ["1 <= num.length <= 100000", "0 <= k <= num.length"],
+      "tags": ["array", "string", "stack", "greedy"],
+      "testCases": [
+        {"input": "1432219\n3", "output": "1219", "explanation": "Remove 4, 3, 2"},
+        {"input": "10200\n1", "output": "200", "explanation": "Remove leading 1"}
+      ]
+    },
+    {
+      "id": "A093",
+      "title": "Car Fleet",
+      "difficulty": "Medium",
+      "timeLimit": "3s",
+      "memoryLimit": "256MB",
+      "description": "Count car fleets arriving at target (cars catch up become fleet).",
+      "inputFormat": "First line contains n and target. Second line contains n positions. Third line contains n speeds.",
+      "outputFormat": "Print number of fleets.",
+      "constraints": ["0 <= n <= 1000", "0 < target <= 1000000"],
+      "tags": ["array", "stack", "sorting"],
+      "testCases": [
+        {"input": "5 12\n10 8 0 5 3\n2 4 1 1 3", "output": "3", "explanation": "3 fleets arrive"},
+        {"input": "1 10\n0\n2", "output": "1", "explanation": "Single car"}
+      ]
+    },
+    {
+      "id": "A094",
+      "title": "Largest Rectangle in Histogram",
+      "difficulty": "Hard",
+      "timeLimit": "3s",
+      "memoryLimit": "256MB",
+      "description": "Find area of largest rectangle in histogram.",
+      "inputFormat": "First line contains n (1 <= n <= 100000). Second line contains n integers (heights).",
+      "outputFormat": "Print largest rectangle area.",
+      "constraints": ["1 <= n <= 100000", "0 <= heights[i] <= 10000"],
+      "tags": ["array", "stack", "monotonic-stack"],
+      "testCases": [
+        {"input": "6\n2 1 5 6 2 3", "output": "10", "explanation": "Rectangle 5x2=10"},
+        {"input": "1\n2", "output": "2", "explanation": "Single bar"}
+      ]
+    },
+    {
+      "id": "A095",
+      "title": "Maximal Rectangle",
+      "difficulty": "Hard",
+      "timeLimit": "4s",
+      "memoryLimit": "256MB",
+      "description": "Find largest rectangle containing only 1s in binary matrix.",
+      "inputFormat": "First line contains m and n. Next m lines contain n binary integers.",
+      "outputFormat": "Print maximum rectangle area.",
+      "constraints": ["1 <= m, n <= 200"],
+      "tags": ["array", "matrix", "stack", "dynamic-programming"],
+      "testCases": [
+        {"input": "4 5\n1 0 1 0 0\n1 0 1 1 1\n1 1 1 1 1\n1 0 0 1 0", "output": "6", "explanation": "Rectangle 2x3=6"},
+        {"input": "1 1\n0", "output": "0", "explanation": "No 1s"}
+      ]
+    },
+    {
+      "id": "S001",
+      "title": "Reverse String",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Write a function that reverses a string. The input string is given as an array of characters.",
+      "inputFormat": "First line contains n (1 <= n <= 10000). Second line contains n characters.",
+      "outputFormat": "Print reversed string.",
+      "constraints": ["1 <= n <= 10000"],
+      "tags": ["string", "two-pointers"],
+      "testCases": [
+        {"input": "5\nhello", "output": "olleh", "explanation": "Reversed string"},
+        {"input": "6\nHannah", "output": "hannaH", "explanation": "Case sensitive"}
+      ]
+    },
+    {
+      "id": "S002",
+      "title": "Valid Palindrome",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Check if string is palindrome considering only alphanumeric characters and ignoring cases.",
+      "inputFormat": "Single line containing string s (1 <= length <= 200000).",
+      "outputFormat": "Print YES or NO.",
+      "constraints": ["1 <= s.length <= 200000"],
+      "tags": ["string", "two-pointers"],
+      "testCases": [
+        {"input": "A man, a plan, a canal: Panama", "output": "YES", "explanation": "Valid palindrome"},
+        {"input": "race a car", "output": "NO", "explanation": "Not palindrome"}
+      ]
+    },
+    {
+      "id": "S003",
+      "title": "Valid Anagram",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Check if two strings are anagrams of each other.",
+      "inputFormat": "Two lines, each containing a string (1 <= length <= 50000).",
+      "outputFormat": "Print YES or NO.",
+      "constraints": ["1 <= s.length, t.length <= 50000"],
+      "tags": ["string", "hash-table", "sorting"],
+      "testCases": [
+        {"input": "anagram\nnagaram", "output": "YES", "explanation": "Are anagrams"},
+        {"input": "rat\ncar", "output": "NO", "explanation": "Not anagrams"}
+      ]
+    },
+    {
+      "id": "S004",
+      "title": "First Unique Character",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Find the first non-repeating character in string and return its index. Return -1 if doesn't exist.",
+      "inputFormat": "Single line containing string s (1 <= length <= 100000).",
+      "outputFormat": "Print index or -1.",
+      "constraints": ["1 <= s.length <= 100000", "Only lowercase letters"],
+      "tags": ["string", "hash-table"],
+      "testCases": [
+        {"input": "leetcode", "output": "0", "explanation": "l is first unique"},
+        {"input": "loveleetcode", "output": "2", "explanation": "v is first unique"}
+      ]
+    },
+    {
+      "id": "S005",
+      "title": "Longest Common Prefix",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Find the longest common prefix string amongst an array of strings.",
+      "inputFormat": "First line contains n (1 <= n <= 200). Next n lines contain strings.",
+      "outputFormat": "Print longest common prefix or empty string.",
+      "constraints": ["1 <= n <= 200", "0 <= strs[i].length <= 200"],
+      "tags": ["string"],
+      "testCases": [
+        {"input": "3\nflower\nflow\nflight", "output": "fl", "explanation": "Common prefix is fl"},
+        {"input": "3\ndog\nracecar\ncar", "output": "", "explanation": "No common prefix"}
+      ]
+    },
+    {
+      "id": "S006",
+      "title": "Implement strStr",
+      "difficulty": "Easy",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Return the index of the first occurrence of needle in haystack, or -1 if not part.",
+      "inputFormat": "Two lines, haystack and needle strings.",
+      "outputFormat": "Print index or -1.",
+      "constraints": ["0 <= haystack.length, needle.length <= 50000"],
+      "tags": ["string", "two-pointers"],
+      "testCases": [
+        {"input": "hello\nll", "output": "2", "explanation": "ll at index 2"},
+        {"input": "aaaaa\nbba", "output": "-1", "explanation": "Not found"}
+      ]
+    },
+    {
+      "id": "S007",
+      "title": "Count and Say",
+      "difficulty": "Medium",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Generate the nth term of count-and-say sequence.",
+      "inputFormat": "Single integer n (1 <= n <= 30).",
+      "outputFormat": "Print nth term.",
+      "constraints": ["1 <= n <= 30"],
+      "tags": ["string"],
+      "testCases": [
+        {"input": "4", "output": "1211", "explanation": "4th term"},
+        {"input": "1", "output": "1", "explanation": "Base case"}
+      ]
+    },
+    {
+      "id": "S008",
+      "title": "Longest Substring Without Repeating Characters",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Find length of longest substring without repeating characters.",
+      "inputFormat": "Single line containing string s (0 <= length <= 50000).",
+      "outputFormat": "Print length.",
+      "constraints": ["0 <= s.length <= 50000"],
+      "tags": ["string", "hash-table", "sliding-window"],
+      "testCases": [
+        {"input": "abcabcbb", "output": "3", "explanation": "abc is longest"},
+        {"input": "bbbbb", "output": "1", "explanation": "b is longest"}
+      ]
+    },
+    {
+      "id": "S009",
+      "title": "Longest Palindromic Substring",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Find the longest palindromic substring in s.",
+      "inputFormat": "Single line containing string s (1 <= length <= 1000).",
+      "outputFormat": "Print longest palindromic substring.",
+      "constraints": ["1 <= s.length <= 1000"],
+      "tags": ["string", "dynamic-programming"],
+      "testCases": [
+        {"input": "babad", "output": "bab", "explanation": "bab or aba"},
+        {"input": "cbbd", "output": "bb", "explanation": "bb is longest"}
+      ]
+    },
+    {
+      "id": "S010",
+      "title": "Zigzag Conversion",
+      "difficulty": "Medium",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Convert string to zigzag pattern on given number of rows.",
+      "inputFormat": "First line contains string s. Second line contains numRows.",
+      "outputFormat": "Print converted string.",
+      "constraints": ["1 <= s.length <= 1000", "1 <= numRows <= 1000"],
+      "tags": ["string"],
+      "testCases": [
+        {"input": "PAYPALISHIRING\n3", "output": "PAHNAPLSIIGYIR", "explanation": "Zigzag pattern"},
+        {"input": "PAYPALISHIRING\n4", "output": "PINALSIGYAHRPI", "explanation": "4 rows"}
+      ]
+    },
+    {
+      "id": "S011",
+      "title": "String to Integer (atoi)",
+      "difficulty": "Medium",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Implement atoi which converts string to integer.",
+      "inputFormat": "Single line containing string s.",
+      "outputFormat": "Print integer value.",
+      "constraints": ["0 <= s.length <= 200"],
+      "tags": ["string"],
+      "testCases": [
+        {"input": "42", "output": "42", "explanation": "Simple conversion"},
+        {"input": "   -42", "output": "-42", "explanation": "With spaces and sign"}
+      ]
+    },
+    {
+      "id": "S012",
+      "title": "Regular Expression Matching",
+      "difficulty": "Hard",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Implement regex matching with '.' and '*'.",
+      "inputFormat": "Two lines: string s and pattern p.",
+      "outputFormat": "Print YES or NO.",
+      "constraints": ["0 <= s.length <= 20", "0 <= p.length <= 30"],
+      "tags": ["string", "dynamic-programming", "recursion"],
+      "testCases": [
+        {"input": "aa\na", "output": "NO", "explanation": "Does not match"},
+        {"input": "aa\na*", "output": "YES", "explanation": "Matches"}
+      ]
+    },
+    {
+      "id": "S013",
+      "title": "Wildcard Matching",
+      "difficulty": "Hard",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Implement wildcard pattern matching with '?' and '*'.",
+      "inputFormat": "Two lines: string s and pattern p.",
+      "outputFormat": "Print YES or NO.",
+      "constraints": ["0 <= s.length, p.length <= 2000"],
+      "tags": ["string", "dynamic-programming", "greedy"],
+      "testCases": [
+        {"input": "aa\na", "output": "NO", "explanation": "Does not match"},
+        {"input": "aa\n*", "output": "YES", "explanation": "* matches any"}
+      ]
+    },
+    {
+      "id": "S014",
+      "title": "Group Anagrams",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Group strings that are anagrams of each other.",
+      "inputFormat": "First line contains n (1 <= n <= 10000). Next n lines contain strings.",
+      "outputFormat": "Print groups, one group per line, strings space-separated.",
+      "constraints": ["1 <= n <= 10000", "0 <= strs[i].length <= 100"],
+      "tags": ["string", "hash-table"],
+      "testCases": [
+        {"input": "6\neat\ntea\ntan\nate\nnat\nbat", "output": "eat tea ate\ntan nat\nbat", "explanation": "Grouped anagrams"},
+        {"input": "1\n", "output": "", "explanation": "Empty string"}
+      ]
+    },
+    {
+      "id": "S015",
+      "title": "Multiply Strings",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Multiply two non-negative integers represented as strings.",
+      "inputFormat": "Two lines, each containing a number string.",
+      "outputFormat": "Print product as string.",
+      "constraints": ["1 <= num1.length, num2.length <= 200"],
+      "tags": ["string", "math"],
+      "testCases": [
+        {"input": "2\n3", "output": "6", "explanation": "2 * 3 = 6"},
+        {"input": "123\n456", "output": "56088", "explanation": "123 * 456"}
+      ]
+    },
+    {
+      "id": "S016",
+      "title": "Generate Parentheses",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Generate all combinations of well-formed parentheses.",
+      "inputFormat": "Single integer n (1 <= n <= 8).",
+      "outputFormat": "Print each combination on new line.",
+      "constraints": ["1 <= n <= 8"],
+      "tags": ["string", "backtracking"],
+      "testCases": [
+        {"input": "3", "output": "((()))\n(()())\n(())()\n()(())\n()()()", "explanation": "All valid combinations"},
+        {"input": "1", "output": "()", "explanation": "Single pair"}
+      ]
+    },
+    {
+      "id": "S017",
+      "title": "Letter Combinations of Phone Number",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Return all possible letter combinations that number could represent (like old phone keyboards).",
+      "inputFormat": "Single line with digits string (0 <= length <= 4).",
+      "outputFormat": "Print combinations space-separated.",
+      "constraints": ["0 <= digits.length <= 4", "digits[i] is digit 2-9"],
+      "tags": ["string", "backtracking"],
+      "testCases": [
+        {"input": "23", "output": "ad ae af bd be bf cd ce cf", "explanation": "All combinations"},
+        {"input": "", "output": "", "explanation": "Empty input"}
+      ]
+    },
+    {
+      "id": "S018",
+      "title": "Valid Parentheses",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Check if string with brackets is valid (properly opened and closed).",
+      "inputFormat": "Single line containing string s (1 <= length <= 10000).",
+      "outputFormat": "Print YES or NO.",
+      "constraints": ["1 <= s.length <= 10000"],
+      "tags": ["string", "stack"],
+      "testCases": [
+        {"input": "()", "output": "YES", "explanation": "Valid"},
+        {"input": "()[]{}", "output": "YES", "explanation": "All valid"}
+      ]
+    },
+    {
+      "id": "S019",
+      "title": "Longest Valid Parentheses",
+      "difficulty": "Hard",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Find length of longest valid parentheses substring.",
+      "inputFormat": "Single line containing string s (0 <= length <= 30000).",
+      "outputFormat": "Print maximum length.",
+      "constraints": ["0 <= s.length <= 30000"],
+      "tags": ["string", "dynamic-programming", "stack"],
+      "testCases": [
+        {"input": "(()", "output": "2", "explanation": "() is longest"},
+        {"input": ")()())", "output": "4", "explanation": "()() is longest"}
+      ]
+    },
+    {
+      "id": "S020",
+      "title": "Simplify Path",
+      "difficulty": "Medium",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Simplify Unix-style absolute path.",
+      "inputFormat": "Single line containing path string.",
+      "outputFormat": "Print simplified canonical path.",
+      "constraints": ["1 <= path.length <= 3000"],
+      "tags": ["string", "stack"],
+      "testCases": [
+        {"input": "/home/", "output": "/home", "explanation": "Remove trailing slash"},
+        {"input": "/../", "output": "/", "explanation": "Cannot go above root"}
+      ]
+    },
+    {
+      "id": "S021",
+      "title": "Minimum Window Substring",
+      "difficulty": "Hard",
+      "timeLimit": "3s",
+      "memoryLimit": "256MB",
+      "description": "Find minimum window in s containing all characters of t.",
+      "inputFormat": "Two lines: string s and string t.",
+      "outputFormat": "Print minimum window or empty string.",
+      "constraints": ["1 <= s.length, t.length <= 100000"],
+      "tags": ["string", "hash-table", "sliding-window"],
+      "testCases": [
+        {"input": "ADOBECODEBANC\nABC", "output": "BANC", "explanation": "Minimum window"},
+        {"input": "a\na", "output": "a", "explanation": "Single character"}
+      ]
+    },
+    {
+      "id": "S022",
+      "title": "Word Break",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Determine if string can be segmented into space-separated sequence of dictionary words.",
+      "inputFormat": "First line: string s. Second line: n (dictionary size). Next n lines: dictionary words.",
+      "outputFormat": "Print YES or NO.",
+      "constraints": ["1 <= s.length <= 300", "1 <= wordDict.length <= 1000"],
+      "tags": ["string", "dynamic-programming"],
+      "testCases": [
+        {"input": "leetcode\n2\nleet\ncode", "output": "YES", "explanation": "Can be segmented"},
+        {"input": "catsandog\n5\ncats\ndog\nsand\nand\ncat", "output": "NO", "explanation": "Cannot segment"}
+      ]
+    },
+    {
+      "id": "S023",
+      "title": "Word Break II",
+      "difficulty": "Hard",
+      "timeLimit": "3s",
+      "memoryLimit": "256MB",
+      "description": "Return all possible sentences from word segmentation.",
+      "inputFormat": "First line: string s. Second line: n. Next n lines: dictionary words.",
+      "outputFormat": "Print each sentence on new line.",
+      "constraints": ["1 <= s.length <= 20"],
+      "tags": ["string", "dynamic-programming", "backtracking"],
+      "testCases": [
+        {"input": "catsanddog\n5\ncat\ncats\nand\nsand\ndog", "output": "cats and dog\ncat sand dog", "explanation": "All sentences"},
+        {"input": "pineapplepenapple\n5\napple\npen\napplepen\npine\npineapple", "output": "pine apple pen apple\npineapple pen apple\npine applepen apple", "explanation": "Multiple segmentations"}
+      ]
+    },
+    {
+      "id": "S024",
+      "title": "Decode Ways",
+      "difficulty": "Medium",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Count number of ways to decode string where A=1, B=2, ..., Z=26.",
+      "inputFormat": "Single line containing digit string s (1 <= length <= 100).",
+      "outputFormat": "Print number of ways.",
+      "constraints": ["1 <= s.length <= 100"],
+      "tags": ["string", "dynamic-programming"],
+      "testCases": [
+        {"input": "12", "output": "2", "explanation": "AB or L"},
+        {"input": "226", "output": "3", "explanation": "BZ, VF, or BBF"}
+      ]
+    },
+    {
+      "id": "S025",
+      "title": "Decode Ways II",
+      "difficulty": "Hard",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Count decode ways with '*' wildcard (can be any digit 1-9).",
+      "inputFormat": "Single line containing string s (1 <= length <= 100000).",
+      "outputFormat": "Print number of ways modulo 10^9+7.",
+      "constraints": ["1 <= s.length <= 100000"],
+      "tags": ["string", "dynamic-programming"],
+      "testCases": [
+        {"input": "*", "output": "9", "explanation": "Can be 1-9"},
+        {"input": "1*", "output": "18", "explanation": "Multiple interpretations"}
+      ]
+    },
+    {
+      "id": "S026",
+      "title": "Distinct Subsequences",
+      "difficulty": "Hard",
+      "timeLimit": "3s",
+      "memoryLimit": "256MB",
+      "description": "Count distinct subsequences of s which equals t.",
+      "inputFormat": "Two lines: string s and string t.",
+      "outputFormat": "Print count of subsequences.",
+      "constraints": ["1 <= s.length, t.length <= 1000"],
+      "tags": ["string", "dynamic-programming"],
+      "testCases": [
+        {"input": "rabbbit\nrabbit", "output": "3", "explanation": "3 ways to form rabbit"},
+        {"input": "babgbag\nbag", "output": "5", "explanation": "5 subsequences"}
+      ]
+    },
+    {
+      "id": "S027",
+      "title": "Edit Distance",
+      "difficulty": "Hard",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Find minimum number of operations to convert word1 to word2 (insert, delete, replace).",
+      "inputFormat": "Two lines: string word1 and word2.",
+      "outputFormat": "Print minimum operations.",
+      "constraints": ["0 <= word1.length, word2.length <= 500"],
+      "tags": ["string", "dynamic-programming"],
+      "testCases": [
+        {"input": "horse\nros", "output": "3", "explanation": "3 operations"},
+        {"input": "intention\nexecution", "output": "5", "explanation": "5 operations"}
+      ]
+    },
+    {
+      "id": "S028",
+      "title": "Palindrome Partitioning",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Partition string so every substring is palindrome. Return all possible partitions.",
+      "inputFormat": "Single line containing string s (1 <= length <= 16).",
+      "outputFormat": "Print each partition on new line, substrings space-separated.",
+      "constraints": ["1 <= s.length <= 16"],
+      "tags": ["string", "backtracking", "dynamic-programming"],
+      "testCases": [
+        {"input": "aab", "output": "a a b\naa b", "explanation": "Two partitions"},
+        {"input": "a", "output": "a", "explanation": "Single character"}
+      ]
+    },
+    {
+      "id": "S029",
+      "title": "Palindrome Partitioning II",
+      "difficulty": "Hard",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Return minimum cuts needed for palindrome partitioning.",
+      "inputFormat": "Single line containing string s (1 <= length <= 2000).",
+      "outputFormat": "Print minimum cuts.",
+      "constraints": ["1 <= s.length <= 2000"],
+      "tags": ["string", "dynamic-programming"],
+      "testCases": [
+        {"input": "aab", "output": "1", "explanation": "One cut: aa|b"},
+        {"input": "a", "output": "0", "explanation": "No cuts needed"}
+      ]
+    },
+    {
+      "id": "S030",
+      "title": "Interleaving String",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Check if s3 is formed by interleaving s1 and s2.",
+      "inputFormat": "Three lines: strings s1, s2, s3.",
+      "outputFormat": "Print YES or NO.",
+      "constraints": ["0 <= s1.length, s2.length <= 100"],
+      "tags": ["string", "dynamic-programming"],
+      "testCases": [
+        {"input": "aabcc\ndbbca\naadbbcbcac", "output": "YES", "explanation": "Valid interleaving"},
+        {"input": "aabcc\ndbbca\naadbbbaccc", "output": "NO", "explanation": "Not interleaved"}
+      ]
+    },
+    {
+      "id": "S031",
+      "title": "Scramble String",
+      "difficulty": "Hard",
+      "timeLimit": "3s",
+      "memoryLimit": "256MB",
+      "description": "Check if s2 is scrambled string of s1.",
+      "inputFormat": "Two lines: string s1 and s2.",
+      "outputFormat": "Print YES or NO.",
+      "constraints": ["1 <= s1.length, s2.length <= 30"],
+      "tags": ["string", "dynamic-programming"],
+      "testCases": [
+        {"input": "great\nrgeat", "output": "YES", "explanation": "Is scrambled"},
+        {"input": "abcde\ncaebd", "output": "NO", "explanation": "Not scrambled"}
+      ]
+    },
+    {
+      "id": "S032",
+      "title": "Longest Repeating Character Replacement",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Find length of longest substring with same characters after replacing at most k characters.",
+      "inputFormat": "First line: string s. Second line: integer k.",
+      "outputFormat": "Print maximum length.",
+      "constraints": ["1 <= s.length <= 100000", "0 <= k <= s.length"],
+      "tags": ["string", "sliding-window"],
+      "testCases": [
+        {"input": "ABAB\n2", "output": "4", "explanation": "Replace both A or B"},
+        {"input": "AABABBA\n1", "output": "4", "explanation": "Replace one B"}
+      ]
+    },
+    {
+      "id": "S033",
+      "title": "Permutation in String",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Check if s2 contains permutation of s1.",
+      "inputFormat": "Two lines: string s1 and s2.",
+      "outputFormat": "Print YES or NO.",
+      "constraints": ["1 <= s1.length, s2.length <= 10000"],
+      "tags": ["string", "sliding-window"],
+      "testCases": [
+        {"input": "ab\neidbaooo", "output": "YES", "explanation": "Contains ba"},
+        {"input": "ab\neidboaoo", "output": "NO", "explanation": "No permutation"}
+      ]
+    },
+    {
+      "id": "S034",
+      "title": "Find All Anagrams in String",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Find all start indices of anagrams of p in s.",
+      "inputFormat": "Two lines: string s and p.",
+      "outputFormat": "Print indices space-separated.",
+      "constraints": ["1 <= s.length, p.length <= 30000"],
+      "tags": ["string", "hash-table", "sliding-window"],
+      "testCases": [
+        {"input": "cbaebabacd\nabc", "output": "0 6", "explanation": "Anagrams at 0 and 6"},
+        {"input": "abab\nab", "output": "0 1 2", "explanation": "Three anagrams"}
+      ]
+    },
+    {
+      "id": "S035",
+      "title": "String Compression",
+      "difficulty": "Medium",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Compress string using counts of repeated characters. Modify in-place.",
+      "inputFormat": "Single line with characters space-separated.",
+      "outputFormat": "Print compressed string and new length.",
+      "constraints": ["1 <= chars.length <= 2000"],
+      "tags": ["string", "two-pointers"],
+      "testCases": [
+        {"input": "a a b b c c c", "output": "a2b2c3 6", "explanation": "Compressed"},
+        {"input": "a", "output": "a 1", "explanation": "Single character"}
+      ]
+    },
+    {
+      "id": "S036",
+      "title": "Add Binary",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Add two binary strings and return sum as binary string.",
+      "inputFormat": "Two lines, each containing binary string.",
+      "outputFormat": "Print sum as binary string.",
+      "constraints": ["1 <= a.length, b.length <= 10000"],
+      "tags": ["string", "math"],
+      "testCases": [
+        {"input": "11\n1", "output": "100", "explanation": "3 + 1 = 4"},
+        {"input": "1010\n1011", "output": "10101", "explanation": "Binary addition"}
+      ]
+    },
+    {
+      "id": "S037",
+      "title": "Add Strings",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Add two non-negative integers represented as strings without converting to int.",
+      "inputFormat": "Two lines containing number strings.",
+      "outputFormat": "Print sum as string.",
+      "constraints": ["1 <= num1.length, num2.length <= 10000"],
+      "tags": ["string", "math"],
+      "testCases": [
+        {"input": "11\n123", "output": "134", "explanation": "11 + 123 = 134"},
+        {"input": "456\n77", "output": "533", "explanation": "Addition"}
+      ]
+    },
+    {
+      "id": "S038",
+      "title": "Compare Version Numbers",
+      "difficulty": "Medium",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Compare two version numbers. Return -1, 0, or 1.",
+      "inputFormat": "Two lines containing version strings.",
+      "outputFormat": "Print -1, 0, or 1.",
+      "constraints": ["1 <= version1.length, version2.length <= 500"],
+      "tags": ["string"],
+      "testCases": [
+        {"input": "1.01\n1.001", "output": "0", "explanation": "Equal versions"},
+        {"input": "1.0\n1.0.0", "output": "0", "explanation": "Trailing zeros ignored"}
+      ]
+    },
+    {
+      "id": "S039",
+      "title": "Integer to Roman",
+      "difficulty": "Medium",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Convert integer to Roman numeral.",
+      "inputFormat": "Single integer num (1 <= num <= 3999).",
+      "outputFormat": "Print Roman numeral.",
+      "constraints": ["1 <= num <= 3999"],
+      "tags": ["string", "math"],
+      "testCases": [
+        {"input": "3", "output": "III", "explanation": "3 = III"},
+        {"input": "58", "output": "LVIII", "explanation": "L=50, V=5, III=3"}
+      ]
+    },
+    {
+      "id": "S040",
+      "title": "Roman to Integer",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Convert Roman numeral to integer.",
+      "inputFormat": "Single line containing Roman numeral string.",
+      "outputFormat": "Print integer value.",
+      "constraints": ["1 <= s.length <= 15", "Valid Roman numeral"],
+      "tags": ["string", "math"],
+      "testCases": [
+        {"input": "III", "output": "3", "explanation": "III = 3"},
+        {"input": "LVIII", "output": "58", "explanation": "L=50, V=5, III=3"}
+      ]
+    },
+    {
+      "id": "S041",
+      "title": "Integer to English Words",
+      "difficulty": "Hard",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Convert non-negative integer to English words representation.",
+      "inputFormat": "Single integer num (0 <= num < 2^31).",
+      "outputFormat": "Print English words.",
+      "constraints": ["0 <= num < 2^31"],
+      "tags": ["string", "math", "recursion"],
+      "testCases": [
+        {"input": "123", "output": "One Hundred Twenty Three", "explanation": "Number to words"},
+        {"input": "12345", "output": "Twelve Thousand Three Hundred Forty Five", "explanation": "With thousands"}
+      ]
+    },
+    {
+      "id": "S042",
+      "title": "Excel Sheet Column Title",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Convert column number to Excel column title (A=1, B=2, ..., Z=26, AA=27).",
+      "inputFormat": "Single integer columnNumber (1 <= n <= 2^31-1).",
+      "outputFormat": "Print column title.",
+      "constraints": ["1 <= columnNumber <= 2^31 - 1"],
+      "tags": ["string", "math"],
+      "testCases": [
+        {"input": "1", "output": "A", "explanation": "Column A"},
+        {"input": "28", "output": "AB", "explanation": "Column AB"}
+      ]
+    },
+    {
+      "id": "S043",
+      "title": "Excel Sheet Column Number",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Convert Excel column title to number.",
+      "inputFormat": "Single line containing column title string.",
+      "outputFormat": "Print column number.",
+      "constraints": ["1 <= columnTitle.length <= 7"],
+      "tags": ["string", "math"],
+      "testCases": [
+        {"input": "A", "output": "1", "explanation": "Column 1"},
+        {"input": "AB", "output": "28", "explanation": "Column 28"}
+      ]
+    },
+    {
+      "id": "S044",
+      "title": "Reverse Words in String",
+      "difficulty": "Medium",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Reverse order of words in string. Words separated by spaces.",
+      "inputFormat": "Single line containing string s.",
+      "outputFormat": "Print reversed string.",
+      "constraints": ["1 <= s.length <= 10000"],
+      "tags": ["string", "two-pointers"],
+      "testCases": [
+        {"input": "the sky is blue", "output": "blue is sky the", "explanation": "Words reversed"},
+        {"input": "  hello world  ", "output": "world hello", "explanation": "Trim spaces"}
+      ]
+    },
+    {
+      "id": "S045",
+      "title": "Reverse Words in String III",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Reverse characters in each word while preserving word order and spaces.",
+      "inputFormat": "Single line containing string s.",
+      "outputFormat": "Print modified string.",
+      "constraints": ["1 <= s.length <= 50000"],
+      "tags": ["string", "two-pointers"],
+      "testCases": [
+        {"input": "Let's take LeetCode contest", "output": "s'teL ekat edoCteeL tsetnoc", "explanation": "Each word reversed"},
+        {"input": "God Ding", "output": "doG gniD", "explanation": "Words reversed individually"}
+      ]
+    },
+    {
+      "id": "S046",
+      "title": "Length of Last Word",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Return length of last word in string. Word is maximal substring of non-space characters.",
+      "inputFormat": "Single line containing string s.",
+      "outputFormat": "Print length.",
+      "constraints": ["1 <= s.length <= 10000"],
+      "tags": ["string"],
+      "testCases": [
+        {"input": "Hello World", "output": "5", "explanation": "World has 5 chars"},
+        {"input": "   fly me   to   the moon  ", "output": "4", "explanation": "moon has 4 chars"}
+      ]
+    },
+    {
+      "id": "S047",
+      "title": "Detect Capital",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Check if usage of capitals in word is correct (all caps, all lower, or first cap).",
+      "inputFormat": "Single line containing word string.",
+      "outputFormat": "Print YES or NO.",
+      "constraints": ["1 <= word.length <= 100"],
+      "tags": ["string"],
+      "testCases": [
+        {"input": "USA", "output": "YES", "explanation": "All capitals"},
+        {"input": "FlaG", "output": "NO", "explanation": "Invalid capitals"}
+      ]
+    },
+    {
+      "id": "S048",
+      "title": "Ransom Note",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Check if ransomNote can be constructed from magazine letters.",
+      "inputFormat": "Two lines: ransomNote and magazine strings.",
+      "outputFormat": "Print YES or NO.",
+      "constraints": ["1 <= ransomNote.length, magazine.length <= 100000"],
+      "tags": ["string", "hash-table"],
+      "testCases": [
+        {"input": "a\nb", "output": "NO", "explanation": "b doesn't have a"},
+        {"input": "aa\naab", "output": "YES", "explanation": "Can construct aa"}
+      ]
+    },
+    {
+      "id": "S049",
+      "title": "Isomorphic Strings",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Check if two strings are isomorphic (can replace chars to get other).",
+      "inputFormat": "Two lines containing strings s and t.",
+      "outputFormat": "Print YES or NO.",
+      "constraints": ["1 <= s.length <= 50000", "s.length == t.length"],
+      "tags": ["string", "hash-table"],
+      "testCases": [
+        {"input": "egg\nadd", "output": "YES", "explanation": "e->a, g->d"},
+        {"input": "foo\nbar", "output": "NO", "explanation": "o can't map to two"}
+      ]
+    },
+    {
+      "id": "S050",
+      "title": "Word Pattern",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Check if string follows pattern (bijection between pattern char and word).",
+      "inputFormat": "Two lines: pattern string and s string.",
+      "outputFormat": "Print YES or NO.",
+      "constraints": ["1 <= pattern.length <= 300"],
+      "tags": ["string", "hash-table"],
+      "testCases": [
+        {"input": "abba\ndog cat cat dog", "output": "YES", "explanation": "Follows pattern"},
+        {"input": "abba\ndog cat cat fish", "output": "NO", "explanation": "Doesn't match"}
+      ]
+    },
+    {
+      "id": "S051",
+      "title": "Repeated Substring Pattern",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Check if string can be constructed by repeating substring multiple times.",
+      "inputFormat": "Single line containing string s.",
+      "outputFormat": "Print YES or NO.",
+      "constraints": ["1 <= s.length <= 10000"],
+      "tags": ["string"],
+      "testCases": [
+        {"input": "abab", "output": "YES", "explanation": "ab repeated twice"},
+        {"input": "aba", "output": "NO", "explanation": "Cannot be formed"}
+      ]
+    },
+    {
+      "id": "S052",
+      "title": "Rotate String",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Check if s can become goal after rotations (moving leftmost to right).",
+      "inputFormat": "Two lines: string s and goal.",
+      "outputFormat": "Print YES or NO.",
+      "constraints": ["1 <= s.length, goal.length <= 100"],
+      "tags": ["string"],
+      "testCases": [
+        {"input": "abcde\ncdeab", "output": "YES", "explanation": "Can rotate"},
+        {"input": "abcde\nabced", "output": "NO", "explanation": "Cannot match"}
+      ]
+    },
+    {
+      "id": "S053",
+      "title": "Buddy Strings",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Check if you can swap two letters in s to get goal.",
+      "inputFormat": "Two lines: string s and goal.",
+      "outputFormat": "Print YES or NO.",
+      "constraints": ["1 <= s.length, goal.length <= 20000"],
+      "tags": ["string", "hash-table"],
+      "testCases": [
+        {"input": "ab\nba", "output": "YES", "explanation": "Swap a and b"},
+        {"input": "ab\nab", "output": "NO", "explanation": "No duplicates to swap"}
+      ]
+    },
+    {
+      "id": "S054",
+      "title": "Backspace String Compare",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Check if two strings are equal when typed into text editor with # as backspace.",
+      "inputFormat": "Two lines: string s and t.",
+      "outputFormat": "Print YES or NO.",
+      "constraints": ["1 <= s.length, t.length <= 200"],
+      "tags": ["string", "two-pointers", "stack"],
+      "testCases": [
+        {"input": "ab#c\nad#c", "output": "YES", "explanation": "Both become ac"},
+        {"input": "ab##\nc#d#", "output": "YES", "explanation": "Both become empty"}
+      ]
+    },
+    {
+      "id": "S055",
+      "title": "Goat Latin",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Convert sentence to Goat Latin (move consonant to end + ma, vowel + ma, add a's).",
+      "inputFormat": "Single line containing sentence string.",
+      "outputFormat": "Print Goat Latin sentence.",
+      "constraints": ["1 <= sentence.length <= 150"],
+      "tags": ["string"],
+      "testCases": [
+        {"input": "I speak Goat Latin", "output": "Imaa peaksma oatGmaa atinLmaaa", "explanation": "Goat Latin conversion"},
+        {"input": "The quick brown fox", "output": "heTmaa uickqmaaa rownbmaaaa oxfmaaaaa", "explanation": "With consonants"}
+      ]
+    },
+    {
+      "id": "S056",
+      "title": "License Key Formatting",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Reformat license key: remove dashes, divide into groups of K chars (first group can be shorter), uppercase.",
+      "inputFormat": "First line: string s. Second line: integer K.",
+      "outputFormat": "Print reformatted string.",
+      "constraints": ["1 <= s.length <= 100000", "1 <= K <= 10000"],
+      "tags": ["string"],
+      "testCases": [
+        {"input": "5F3Z-2e-9-w\n4", "output": "5F3Z-2E9W", "explanation": "Reformatted"},
+        {"input": "2-5g-3-J\n2", "output": "2-5G-3J", "explanation": "Groups of 2"}
+      ]
+    },
+    {
+      "id": "S057",
+      "title": "Most Common Word",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Find most frequent word not in banned list.",
+      "inputFormat": "First line: paragraph string. Second line: n (banned count). Next n lines: banned words.",
+      "outputFormat": "Print most common word.",
+      "constraints": ["1 <= paragraph.length <= 1000"],
+      "tags": ["string", "hash-table"],
+      "testCases": [
+        {"input": "Bob hit a ball, the hit BALL flew far after it was hit.\n1\nhit", "output": "ball", "explanation": "ball appears most"},
+        {"input": "a.\n0", "output": "a", "explanation": "Single word"}
+      ]
+    },
+    {
+      "id": "S058",
+      "title": "Reorder Data in Log Files",
+      "difficulty": "Easy",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Reorder logs: letter-logs before digit-logs, letter-logs sorted by content then identifier.",
+      "inputFormat": "First line: n. Next n lines: log strings.",
+      "outputFormat": "Print reordered logs, one per line.",
+      "constraints": ["1 <= logs.length <= 100"],
+      "tags": ["string", "sorting"],
+      "testCases": [
+        {"input": "4\ndig1 8 1 5 1\nlet1 art can\ndig2 3 6\nlet2 own kit dig", "output": "let1 art can\nlet2 own kit dig\ndig1 8 1 5 1\ndig2 3 6", "explanation": "Letter logs first"},
+        {"input": "3\na1 9 2 3 1\ng1 act car\nzo4 4 7", "output": "g1 act car\na1 9 2 3 1\nzo4 4 7", "explanation": "Sorted"}
+      ]
+    },
+    {
+      "id": "S059",
+      "title": "Unique Email Addresses",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Count unique emails (ignore . in local, ignore after + in local).",
+      "inputFormat": "First line: n. Next n lines: email strings.",
+      "outputFormat": "Print count of unique addresses.",
+      "constraints": ["1 <= emails.length <= 100"],
+      "tags": ["string", "hash-table"],
+      "testCases": [
+        {"input": "3\ntest.email+alex@leetcode.com\ntest.e.mail+bob.cathy@leetcode.com\ntestemail+david@lee.tcode.com", "output": "2", "explanation": "First two are same"},
+        {"input": "2\na@leetcode.com\nb@leetcode.com", "output": "2", "explanation": "Both unique"}
+      ]
+    },
+    {
+      "id": "S060",
+      "title": "Longest Uncommon Subsequence I",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Find longest uncommon subsequence between two strings.",
+      "inputFormat": "Two lines: string a and b.",
+      "outputFormat": "Print length or -1.",
+      "constraints": ["1 <= a.length, b.length <= 100"],
+      "tags": ["string"],
+      "testCases": [
+        {"input": "aba\ncdc", "output": "3", "explanation": "Either string"},
+        {"input": "aaa\naaa", "output": "-1", "explanation": "Same strings"}
+      ]
+    },
+    {
+      "id": "S061",
+      "title": "Longest Uncommon Subsequence II",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Find longest uncommon subsequence among array of strings.",
+      "inputFormat": "First line: n. Next n lines: strings.",
+      "outputFormat": "Print length or -1.",
+      "constraints": ["2 <= strs.length <= 50"],
+      "tags": ["string", "sorting"],
+      "testCases": [
+        {"input": "3\naba\ncdc\neae", "output": "3", "explanation": "All are uncommon"},
+        {"input": "2\naaa\naaa", "output": "-1", "explanation": "No uncommon"}
+      ]
+    },
+    {
+      "id": "S062",
+      "title": "Student Attendance Record I",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Check if student could be rewarded (< 2 absences and no 3 consecutive lates).",
+      "inputFormat": "Single line containing record string (A=absent, L=late, P=present).",
+      "outputFormat": "Print YES or NO.",
+      "constraints": ["1 <= s.length <= 1000"],
+      "tags": ["string"],
+      "testCases": [
+        {"input": "PPALLP", "output": "YES", "explanation": "Qualifies"},
+        {"input": "PPALLL", "output": "NO", "explanation": "3 consecutive lates"}
+      ]
+    },
+    {
+      "id": "S063",
+      "title": "Student Attendance Record II",
+      "difficulty": "Hard",
+      "timeLimit": "3s",
+      "memoryLimit": "256MB",
+      "description": "Count rewardable n-day attendance records (< 2 A's, no 3+ consecutive L's).",
+      "inputFormat": "Single integer n (1 <= n <= 100000).",
+      "outputFormat": "Print count modulo 10^9+7.",
+      "constraints": ["1 <= n <= 100000"],
+      "tags": ["string", "dynamic-programming"],
+      "testCases": [
+        {"input": "2", "output": "8", "explanation": "8 valid records"},
+        {"input": "1", "output": "3", "explanation": "A, L, P"}
+      ]
+    },
+    {
+      "id": "S064",
+      "title": "Shortest Palindrome",
+      "difficulty": "Hard",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Find shortest palindrome by adding characters in front.",
+      "inputFormat": "Single line containing string s.",
+      "outputFormat": "Print shortest palindrome.",
+      "constraints": ["0 <= s.length <= 50000"],
+      "tags": ["string", "kmp"],
+      "testCases": [
+        {"input": "aacecaaa", "output": "aaacecaaa", "explanation": "Add one a"},
+        {"input": "abcd", "output": "dcbabcd", "explanation": "Add dcb"}
+      ]
+    },
+    {
+      "id": "S065",
+      "title": "Count Binary Substrings",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Count binary substrings with same number of 0's and 1's and all 0's and 1's grouped.",
+      "inputFormat": "Single line containing binary string s.",
+      "outputFormat": "Print count.",
+      "constraints": ["1 <= s.length <= 50000"],
+      "tags": ["string"],
+      "testCases": [
+        {"input": "00110011", "output": "6", "explanation": "6 valid substrings"},
+        {"input": "10101", "output": "4", "explanation": "4 substrings"}
+      ]
+    },
+    {
+      "id": "S066",
+      "title": "Repeated String Match",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Find minimum times to repeat a to make b substring. Return -1 if impossible.",
+      "inputFormat": "Two lines: string a and b.",
+      "outputFormat": "Print minimum times or -1.",
+      "constraints": ["1 <= a.length, b.length <= 10000"],
+      "tags": ["string"],
+      "testCases": [
+        {"input": "abcd\ncdabcdab", "output": "3", "explanation": "Repeat 3 times"},
+        {"input": "a\naa", "output": "2", "explanation": "Repeat twice"}
+      ]
+    },
+    {
+      "id": "S067",
+      "title": "Expressive Words",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Count stretchy words (can extend groups of same chars to 3+).",
+      "inputFormat": "First line: string s. Second line: n. Next n lines: words.",
+      "outputFormat": "Print count of stretchy words.",
+      "constraints": ["1 <= s.length, words[i].length <= 50"],
+      "tags": ["string"],
+      "testCases": [
+        {"input": "heeellooo\n3\nhello\nhi\nhelo", "output": "1", "explanation": "hello is stretchy"},
+        {"input": "zzzzzyyyyy\n3\nzzyy\nzy\nzyy", "output": "3", "explanation": "All stretchy"}
+      ]
+    },
+    {
+      "id": "S068",
+      "title": "Find and Replace Pattern",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Return words that match pattern (bijection).",
+      "inputFormat": "First line: n. Next n lines: words. Last line: pattern.",
+      "outputFormat": "Print matching words space-separated.",
+      "constraints": ["1 <= words.length <= 50"],
+      "tags": ["string", "hash-table"],
+      "testCases": [
+        {"input": "3\nabc\ndeq\nmee\nabb", "output": "mee", "explanation": "Matches pattern"},
+        {"input": "3\na\nb\nc\na", "output": "a b c", "explanation": "All match"}
+      ]
+    },
+    {
+      "id": "S069",
+      "title": "Camelcase Matching",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Check if queries match pattern (can insert lowercase letters).",
+      "inputFormat": "First line: n. Next n lines: query strings. Last line: pattern.",
+      "outputFormat": "Print YES or NO for each query, space-separated.",
+      "constraints": ["1 <= queries.length <= 100"],
+      "tags": ["string", "two-pointers"],
+      "testCases": [
+        {"input": "5\nFooBar\nFooBarTest\nFootBall\nFrameBuffer\nForceFeedBack\nFB", "output": "YES YES YES YES NO", "explanation": "Pattern matching"},
+        {"input": "2\nFooBar\nFoobar\nFooBar", "output": "YES NO", "explanation": "Case sensitive"}
+      ]
+    },
+    {
+      "id": "S070",
+      "title": "Check If Word Is Valid After Substitutions",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Check if string is valid (starts with abc and can repeatedly insert abc).",
+      "inputFormat": "Single line containing string s.",
+      "outputFormat": "Print YES or NO.",
+      "constraints": ["1 <= s.length <= 20000"],
+      "tags": ["string", "stack"],
+      "testCases": [
+        {"input": "aabcbc", "output": "YES", "explanation": "Valid: a -> aabc -> aabcbc"},
+        {"input": "abcabcababcc", "output": "YES", "explanation": "Can be formed"}
+      ]
+    },
+    {
+      "id": "S071",
+      "title": "Number of Matching Subsequences",
+      "difficulty": "Medium",
+      "timeLimit": "3s",
+      "memoryLimit": "256MB",
+      "description": "Count words that are subsequence of s.",
+      "inputFormat": "First line: string s. Second line: n. Next n lines: words.",
+      "outputFormat": "Print count.",
+      "constraints": ["1 <= s.length <= 50000", "1 <= words.length <= 5000"],
+      "tags": ["string", "hash-table"],
+      "testCases": [
+        {"input": "abcde\n5\na\nbb\nacd\nace\nace", "output": "4", "explanation": "4 are subsequences"},
+        {"input": "dsahjpjauf\n3\nahjpjau\nja\nahbwzgqnuk", "output": "2", "explanation": "2 subsequences"}
+      ]
+    },
+    {
+      "id": "S072",
+      "title": "Custom Sort String",
+      "difficulty": "Medium",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Sort s according to order defined in order string.",
+      "inputFormat": "Two lines: order string and s string.",
+      "outputFormat": "Print sorted s.",
+      "constraints": ["1 <= order.length <= 26", "1 <= s.length <= 200"],
+      "tags": ["string", "hash-table", "sorting"],
+      "testCases": [
+        {"input": "cba\nabcd", "output": "cbad", "explanation": "Sorted by cba order"},
+        {"input": "cbafg\nabcd", "output": "cbad", "explanation": "Extra chars at end"}
+      ]
+    },
+    {
+      "id": "S073",
+      "title": "Shifting Letters",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Shift first i+1 letters by shifts[i]. Return final string.",
+      "inputFormat": "First line: string s. Second line: n. Next line: n integers (shifts).",
+      "outputFormat": "Print shifted string.",
+      "constraints": ["1 <= s.length <= 100000"],
+      "tags": ["string"],
+      "testCases": [
+        {"input": "abc\n3\n3 5 9", "output": "rpl", "explanation": "Apply shifts"},
+        {"input": "aaa\n3\n1 2 3", "output": "gfd", "explanation": "Cumulative shifts"}
+      ]
+    },
+    {
+      "id": "S074",
+      "title": "Positions of Large Groups",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Find start and end positions of each large group (3+ same consecutive chars).",
+      "inputFormat": "Single line containing string s.",
+      "outputFormat": "Print each interval on new line.",
+      "constraints": ["1 <= s.length <= 1000"],
+      "tags": ["string"],
+      "testCases": [
+        {"input": "abbxxxxzzy", "output": "3 6", "explanation": "xxxx is large group"},
+        {"input": "abc", "output": "", "explanation": "No large groups"}
+      ]
+    },
+    {
+      "id": "S075",
+      "title": "Flip String to Monotone Increasing",
+      "difficulty": "Medium",
+      "timeLimit": "2s",
+      "memoryLimit": "256MB",
+      "description": "Find minimum flips to make binary string monotone increasing.",
+      "inputFormat": "Single line containing binary string s.",
+      "outputFormat": "Print minimum flips.",
+      "constraints": ["1 <= s.length <= 100000"],
+      "tags": ["string", "dynamic-programming"],
+      "testCases": [
+        {"input": "00110", "output": "1", "explanation": "Flip last 0"},
+        {"input": "010110", "output": "2", "explanation": "Two flips needed"}
+      ]
+    },
+    {
+      "id": "S076",
+      "title": "Substrings With Only One Distinct Letter",
+      "difficulty": "Easy",
+      "timeLimit": "1s",
+      "memoryLimit": "256MB",
+      "description": "Count substrings with only one distinct letter.",
+      "inputFormat": "Single line containing string s.",
+      "outputFormat": "Print count.",
+      "constraints": ["1 <= s.length <= 1000"],
+      "tags": ["string"],
+      "testCases": [
+        {"input": "aaaba", "output": "8", "explanation": "8 valid substrings"},
+        {"input": "aaaaaaaaaa", "output": "55", "explanation": "All same"}
+      ]
+    }
+  ]}

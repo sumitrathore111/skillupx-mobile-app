@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+  xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+    http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+
+  <!-- Homepage -->
+  <url>
+    <loc>https://skillupx.online/</loc>
+    <lastmod>2026-02-22</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://res.cloudinary.com/doytvgisa/image/upload/v1758623200/logo_evymhe.svg</image:loc>
+      <image:title>SkillUpX Logo – Free Developer Platform</image:title>
+      <image:caption>SkillUpX – Free developer platform for CodeArena 1v1 coding battles, DSA practice, project collaboration, learning roadmaps, Developer Connect and tech reviews</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://res.cloudinary.com/dvwmbidka/image/upload/e_sharpen:150/skillupx-og-banner_re2t6u</image:loc>
+      <image:title>SkillUpX Platform Banner – CodeArena, Projects, Roadmaps</image:title>
+      <image:caption>SkillUpX – Best free coding platform in India 2026. CodeArena 1v1 battles, 3000+ DSA questions, project collaboration, learning roadmaps and developer networking</image:caption>
+    </image:image>
+  </url>
+
+  <!-- About Page -->
+  <url>
+    <loc>https://skillupx.online/about</loc>
+    <lastmod>2026-02-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://res.cloudinary.com/dvwmbidka/image/upload/e_sharpen:150/skillupx-og-banner_re2t6u</image:loc>
+      <image:title>About SkillUpX</image:title>
+      <image:caption>Learn about SkillUpX team, mission, and story behind the developer platform</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Contact Page -->
+  <url>
+    <loc>https://skillupx.online/contact</loc>
+    <lastmod>2026-02-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Tech Updates / Blog -->
+  <url>
+    <loc>https://skillupx.online/TechUpdate</loc>
+    <lastmod>2026-02-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Documentation -->
+  <url>
+    <loc>https://skillupx.online/documentation</loc>
+    <lastmod>2026-02-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Privacy Policy -->
+  <url>
+    <loc>https://skillupx.online/privacy-policy</loc>
+    <lastmod>2026-02-22</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <!-- Terms and Conditions -->
+  <url>
+    <loc>https://skillupx.online/terms-and-conditions</loc>
+    <lastmod>2026-02-22</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <!-- Developer Blog -->
+  <url>
+    <loc>https://skillupx.online/blog</loc>
+    <lastmod>2026-02-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://res.cloudinary.com/dvwmbidka/image/upload/e_sharpen:150/skillupx-og-banner_re2t6u</image:loc>
+      <image:title>SkillUpX Developer Blog</image:title>
+      <image:caption>Expert articles on DSA patterns, coding interviews, React, Node.js, open source, and developer career growth from SkillUpX</image:caption>
+    </image:image>
+  </url>
+
+  <!-- CodeArena - 1v1 Coding Battles -->
+  <url>
+    <loc>https://skillupx.online/codearena</loc>
+    <lastmod>2026-02-22</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://res.cloudinary.com/dvwmbidka/image/upload/e_sharpen:150/skillupx-og-banner_re2t6u</image:loc>
+      <image:title>CodeArena – 1v1 Coding Battles</image:title>
+      <image:caption>Real-time 1v1 coding battles, 3000+ DSA questions, global leaderboard rankings on SkillUpX CodeArena</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Learning Roadmaps -->
+  <url>
+    <loc>https://skillupx.online/roadmaps</loc>
+    <lastmod>2026-02-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://res.cloudinary.com/dvwmbidka/image/upload/e_sharpen:150/skillupx-og-banner_re2t6u</image:loc>
+      <image:title>Learning Roadmaps</image:title>
+      <image:caption>Curated learning roadmaps for React, Node.js, Full Stack, DSA, System Design and career growth</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Creator Corner - Project Collaboration -->
+  <url>
+    <loc>https://skillupx.online/creator-corner</loc>
+    <lastmod>2026-02-22</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://res.cloudinary.com/dvwmbidka/image/upload/e_sharpen:150/skillupx-og-banner_re2t6u</image:loc>
+      <image:title>Creator Corner – Project Collaboration</image:title>
+      <image:caption>Collaborate on real-world projects, join teams, earn verified certificates on SkillUpX Creator Corner</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Developer Connect -->
+  <url>
+    <loc>https://skillupx.online/developer-connect</loc>
+    <lastmod>2026-02-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Login -->
+  <url>
+    <loc>https://skillupx.online/login</loc>
+    <lastmod>2026-02-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Sign Up -->
+  <url>
+    <loc>https://skillupx.online/signup</loc>
+    <lastmod>2026-02-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+</urlset>
